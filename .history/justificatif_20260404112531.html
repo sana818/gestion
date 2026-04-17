@@ -1,0 +1,1772 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Justificatif de retard - EmployeeSpace Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4a6fa5;
+            --primary-light: #5a7bb5;
+            --secondary: #4dabf7;
+            --accent: #90caf9;
+            --success: #2E8B57;
+            --success-soft: #4CAF50;
+            --warning-soft: #F9B572;
+            --danger-soft: #E57373;
+            --info-soft: #4a6fa5;
+            --dark: #1A1A2E;
+            --light: #F8F9FA;
+            --gradient-1: linear-gradient(135deg, #4a6fa5 0%, #4dabf7 100%);
+            --gradient-soft-1: linear-gradient(135deg, #90caf9 0%, #bbdefb 100%);
+            --gradient-soft-2: linear-gradient(135deg, #fbc2c2 0%, #f8b0b0 100%);
+            --gradient-soft-3: linear-gradient(135deg, #a7c0e0 0%, #b8d0e8 100%);
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.2);
+            --sidebar-width: 300px;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            margin-left: var(--sidebar-width);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            bottom: 20px;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            box-shadow: var(--shadow-xl), 0 0 0 1px rgba(255, 255, 255, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--secondary);
+            border-radius: 10px;
+        }
+
+        .sidebar-header {
+            padding: 30px 25px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .sidebar-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 15%;
+            width: 70%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--secondary), transparent);
+        }
+
+        .user-avatar-wrapper {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 15px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: var(--shadow-lg), 0 0 0 3px rgba(255, 255, 255, 0.5);
+            transition: all 0.5s ease;
+            animation: morphing 8s ease-in-out infinite;
+        }
+
+        @keyframes morphing {
+            0% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+            25% { border-radius: 58% 42% 75% 25% / 76% 46% 54% 24%; }
+            50% { border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%; }
+            75% { border-radius: 33% 67% 58% 42% / 63% 68% 32% 37%; }
+            100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05) rotate(5deg);
+        }
+
+        .online-indicator {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 15px;
+            height: 15px;
+            background: var(--success);
+            border-radius: 50%;
+            border: 2px solid white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+        }
+
+        .user-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .user-title {
+            display: inline-block;
+            padding: 5px 15px;
+            background: linear-gradient(135deg, rgba(74, 111, 165, 0.1), rgba(77, 171, 247, 0.1));
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-top: 5px;
+        }
+
+        .time-display {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 1rem;
+            margin: 20px auto 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Navigation */
+        .sidebar-nav {
+            padding: 20px 15px;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            padding: 14px 20px;
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(77, 171, 247, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.4s ease;
+            border-radius: 12px;
+            z-index: 0;
+        }
+
+        .nav-link:hover::before {
+            transform: translateX(0);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(90deg, rgba(77, 171, 247, 0.15), transparent);
+            color: white;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .nav-link.active i {
+            color: var(--secondary);
+        }
+
+        .nav-link i {
+            width: 24px;
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.6);
+            transition: all 0.3s ease;
+        }
+
+        .badge-notification {
+            margin-left: auto;
+            background: var(--danger-soft);
+            color: white;
+            border-radius: 50px;
+            padding: 4px 8px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 20px 30px;
+            min-height: 100vh;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 25px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .left-column, .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* Containers */
+        .justificatif-container, .statistics-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: var(--shadow-xl), 0 0 0 1px rgba(255, 255, 255, 0.5);
+            border: var(--glass-border);
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px dashed rgba(74, 111, 165, 0.2);
+        }
+
+        .section-title i {
+            width: 35px;
+            height: 35px;
+            border-radius: 10px;
+            background: var(--gradient-1);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .section-title h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Info Badge */
+        .info-badge {
+            background: linear-gradient(135deg, rgba(249, 181, 114, 0.1), rgba(233, 157, 94, 0.1));
+            border-left: 4px solid var(--warning-soft);
+            padding: 12px 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .info-badge i {
+            font-size: 1.5rem;
+            color: var(--warning-soft);
+        }
+
+        .info-badge-content h5 {
+            color: var(--warning-soft);
+            font-weight: 700;
+            margin-bottom: 3px;
+            font-size: 0.95rem;
+        }
+
+        .info-badge-content p {
+            color: #666;
+            margin: 0;
+            font-size: 0.8rem;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+
+        .required-star {
+            color: #DC143C;
+            margin-left: 4px;
+        }
+
+        .form-control, .form-select {
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 2px solid rgba(74, 111, 165, 0.1);
+            background: white;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.1);
+            outline: none;
+        }
+
+        /* Retard Options */
+        .retard-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .retard-option {
+            background: rgba(74, 111, 165, 0.05);
+            border: 2px solid rgba(74, 111, 165, 0.1);
+            border-radius: 10px;
+            padding: 10px 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .retard-option:hover {
+            background: rgba(74, 111, 165, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .retard-option.selected {
+            background: linear-gradient(135deg, rgba(74, 111, 165, 0.15), rgba(77, 171, 247, 0.15));
+            border-color: var(--secondary);
+        }
+
+        .retard-option i {
+            font-size: 1.3rem;
+            color: var(--secondary);
+            margin-bottom: 5px;
+        }
+
+        .retard-option span {
+            display: block;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.75rem;
+        }
+
+        .autre-raison-container {
+            margin-top: 10px;
+            display: none;
+        }
+
+        .autre-raison-container.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* File Upload */
+        .file-upload-area {
+            border: 2px dashed var(--secondary);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            background: rgba(77, 171, 247, 0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-area:hover {
+            background: rgba(77, 171, 247, 0.1);
+            border-color: var(--primary);
+        }
+
+        .file-upload-area i {
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 5px;
+        }
+
+        .file-upload-area h6 {
+            font-size: 0.9rem;
+            margin-bottom: 3px;
+        }
+
+        .file-upload-area p, .file-upload-area small {
+            font-size: 0.75rem;
+        }
+
+        /* Regulation Cards */
+        .regulation-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: var(--shadow-xl), 0 0 0 1px rgba(255, 255, 255, 0.5);
+            border: var(--glass-border);
+        }
+
+        .stats-mini-card {
+            background: rgba(74, 111, 165, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .stats-label {
+            color: #666;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stats-value {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .progress-bar-custom {
+            height: 6px;
+            background: rgba(74, 111, 165, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--warning-soft), var(--danger-soft));
+            border-radius: 3px;
+            width: 0%;
+        }
+
+        .regulation-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .regulation-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(74, 111, 165, 0.1);
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .regulation-list li:last-child {
+            border-bottom: none;
+        }
+
+        .regulation-list li i.fa-check-circle {
+            color: var(--success-soft);
+        }
+
+        .regulation-list li i.fa-times-circle {
+            color: var(--danger-soft);
+        }
+
+        .regulation-note {
+            padding: 12px;
+            background: rgba(249, 181, 114, 0.1);
+            border-radius: 10px;
+            color: var(--warning-soft);
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Buttons */
+        .btn-custom {
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            border: none;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 12px rgba(74, 111, 165, 0.3);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(74, 111, 165, 0.4);
+        }
+
+        .btn-custom:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #868e96);
+            margin-top: 10px;
+        }
+
+        /* Historique */
+        .historique-mini {
+            margin-top: 20px;
+        }
+
+        .historique-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: rgba(74, 111, 165, 0.03);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .historique-date {
+            font-size: 0.75rem;
+            color: #888;
+            min-width: 45px;
+        }
+
+        .historique-cause {
+            flex: 1;
+            font-size: 0.85rem;
+            color: var(--primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .historique-statut {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 50px;
+            font-weight: 600;
+        }
+
+        .statut-ok {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--success-soft);
+        }
+
+        .statut-attente {
+            background: rgba(249, 181, 114, 0.1);
+            color: var(--warning-soft);
+        }
+
+        .statut-refuse {
+            background: rgba(229, 115, 115, 0.1);
+            color: var(--danger-soft);
+        }
+
+        /* Statistics Styles */
+        .stats-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .stats-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stats-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: var(--gradient-1);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stats-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+            line-height: 1.2;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .chart-bar-label {
+            min-width: 100px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .chart-bar-progress {
+            flex: 1;
+            height: 30px;
+            background: rgba(74, 111, 165, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .chart-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+        }
+
+        .chart-bar-value {
+            min-width: 50px;
+            text-align: right;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .duree-retard-badge {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+
+        /* Message */
+        .message-container {
+            margin-top: 15px;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: var(--gradient-1);
+            color: white;
+            border: none;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-lg);
+            z-index: 1001;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideOut {
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(100%); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .two-columns {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 992px) {
+            body {
+                margin-left: 0;
+                padding-top: 20px;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                left: 10px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .two-columns {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
+            }
+
+            .retard-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .retard-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="user-avatar-wrapper" onclick="openAvatarModal()">
+                <img src="https://ui-avatars.com/api/?name=Jean+Dupont&size=100&background=4a6fa5&color=fff&bold=true" 
+                     class="user-avatar" 
+                     alt="Photo de profil"
+                     id="sidebarAvatar">
+                <span class="online-indicator"></span>
+            </div>
+            <h3 class="user-name" id="sidebarName">Chargement...</h3>
+            <span class="user-title" id="sidebarPoste">-</span>
+            <div class="time-display">
+                <i class="fas fa-clock"></i>
+                <span id="currentTime">--:--</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-item">
+                <a href="#" class="nav-link" onclick="window.location.href='profile1.html'; return false;">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Tableau de bord</span>
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="#" class="nav-link active" onclick="showJustificatifSection(); return false;">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Justificatif de retard</span>
+                </a>
+            </div>
+                        
+            <div class="nav-item">
+                <a href="#" class="nav-link" onclick="window.location.href='conge.html'; return false;">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Demande congé</span>
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="#" class="nav-link" onclick="window.location.href='statistiques.html'; return false;">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Statistiques</span>
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="#" class="nav-link" onclick="showNotifications(); return false;">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                    <span class="badge-notification" id="notificationBadge">3</span>
+                </a>
+            </div>
+            
+            <div class="nav-item mt-4">
+                <hr style="border-color: rgba(255, 255, 255, 0.1);">
+            </div>
+            
+            <div class="nav-item">
+                <a href="#" class="nav-link" onclick="logout(); return false;">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Déconnexion</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="two-columns">
+            <!-- LEFT COLUMN -->
+            <div class="left-column">
+                <!-- Justificatif Section -->
+                <div class="justificatif-container" id="justificatifSection">
+                    <div class="section-title">
+                        <i class="fas fa-clock"></i>
+                        <h4>Justifier un retard</h4>
+                    </div>
+
+                    <div class="info-badge">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <div class="info-badge-content">
+                            <h5>Retard non justifié = sanction</h5>
+                            <p>Au-delà de 30 min sans justificatif, votre retard sera sanctionné</p>
+                        </div>
+                    </div>
+
+                    <form id="justificatifForm" enctype="multipart/form-data" class="justificatif-form">
+                        <input type="hidden" id="userId" name="userId">
+                        <input type="hidden" id="userNom" name="userNom">
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-calendar-alt"></i>
+                                Date du retard
+                                <span class="required-star">*</span>
+                            </label>
+                            <input type="date" name="date" class="form-control" required id="dateRetard" max="">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-clock"></i>
+                                Heure d'arrivée normale
+                                <span class="required-star">*</span>
+                            </label>
+                            <input type="time" name="heure_arrivee_reelle" class="form-control" required id="heureReelle" value="09:00" readonly style="background-color: #f0f0f0;">
+                            <small class="text-muted">Heure d'arrivée normale (9h00)</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-clock"></i>
+                                Heure d'arrivée prévue
+                                <span class="required-star">*</span>
+                            </label>
+                            <input type="time" name="heure_arrivee_prevue" class="form-control" required id="heurePrevue" onchange="calculerDureeRetard()">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-hourglass-half"></i>
+                                Durée du retard
+                            </label>
+                            <div class="duree-retard-badge" id="dureeRetardDisplay">
+                                <i class="fas fa-stopwatch"></i>
+                                <span id="dureeRetardTexte">0 minute</span>
+                            </div>
+                            <input type="hidden" name="duree_retard" id="dureeRetard" value="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-tag"></i>
+                                Cause du retard
+                                <span class="required-star">*</span>
+                            </label>
+                            <div class="retard-options" id="retardOptions">
+                                <div class="retard-option selected" onclick="selectRetardType('medical')" data-type="medical">
+                                    <i class="fas fa-hospital"></i>
+                                    <span>Médical</span>
+                                </div>
+                                <div class="retard-option" onclick="selectRetardType('circulation')" data-type="circulation">
+                                    <i class="fas fa-car"></i>
+                                    <span>Circulation</span>
+                                </div>
+                                <div class="retard-option" onclick="selectRetardType('transport')" data-type="transport">
+                                    <i class="fas fa-bus"></i>
+                                    <span>Transport</span>
+                                </div>
+                                <div class="retard-option" onclick="selectRetardType('famille')" data-type="famille">
+                                    <i class="fas fa-users"></i>
+                                    <span>Famille</span>
+                                </div>
+                                <div class="retard-option" onclick="selectRetardType('autre')" data-type="autre">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span>Autre</span>
+                                </div>
+                            </div>
+                            <input type="hidden" name="raison" id="raison" value="medical">
+                            
+                            <div class="autre-raison-container" id="autreRaisonContainer">
+                                <input type="text" class="form-control" placeholder="Précisez la raison" id="autreRaison">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-comment"></i>
+                                Commentaire
+                            </label>
+                            <textarea name="commentaire" class="form-control" id="commentaire" rows="3" placeholder="Ajoutez un commentaire (optionnel)"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-paperclip"></i>
+                                Document justificatif
+                            </label>
+                            <div class="file-upload-area" onclick="document.getElementById('justificatifFile').click()">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <h6>Cliquez pour télécharger</h6>
+                                <p>PDF, JPG, PNG (max 5 Mo)</p>
+                                <small id="selectedFileName">Aucun fichier sélectionné</small>
+                                <input type="file" 
+                                       id="justificatifFile" 
+                                       name="document" 
+                                       accept=".pdf,.jpg,.jpeg,.png" 
+                                       style="display: none;"
+                                       onchange="updateFileName(this)">
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn-custom" id="submitBtn" onclick="submitJustificatif()">
+                            <i class="fas fa-paper-plane"></i>
+                            Envoyer le justificatif
+                        </button>
+
+                        <div id="message" class="message-container"></div>
+                    </form>
+                </div>
+
+                <!-- Statistics Section (hidden by default) -->
+                <div class="statistics-container" id="statisticsSection" style="display: none;">
+                    <div class="section-title">
+                        <i class="fas fa-chart-line"></i>
+                        <h4>Statistiques détaillées</h4>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stats-card">
+                            <div class="stats-header">
+                                <div class="stats-icon">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <div>
+                                    <h5 class="stats-title">Ce mois-ci</h5>
+                                    <div class="stats-number" id="statsMonthTotal">0</div>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <div class="chart-bar">
+                                    <span class="chart-bar-label">Justifiés</span>
+                                    <div class="chart-bar-progress">
+                                        <div class="chart-bar-fill" id="justifiedBar" style="width: 0%">0%</div>
+                                    </div>
+                                    <span class="chart-bar-value" id="justifiedCount">0</span>
+                                </div>
+                                <div class="chart-bar">
+                                    <span class="chart-bar-label">Non justifiés</span>
+                                    <div class="chart-bar-progress">
+                                        <div class="chart-bar-fill" id="unjustifiedBar" style="width: 0%; background: linear-gradient(90deg, #E57373, #EF9A9A);">0%</div>
+                                    </div>
+                                    <span class="chart-bar-value" id="unjustifiedCount">0</span>
+                                </div>
+                                <div class="chart-bar">
+                                    <span class="chart-bar-label">En attente</span>
+                                    <div class="chart-bar-progress">
+                                        <div class="chart-bar-fill" id="pendingBar" style="width: 0%; background: linear-gradient(90deg, #F9B572, #FFB74D);">0%</div>
+                                    </div>
+                                    <span class="chart-bar-value" id="pendingCount">0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stats-card">
+                            <div class="stats-header">
+                                <div class="stats-icon">
+                                    <i class="fas fa-chart-pie"></i>
+                                </div>
+                                <div>
+                                    <h5 class="stats-title">Par cause</h5>
+                                </div>
+                            </div>
+                            <div id="causeStats">
+                                <div class="chart-bar">
+                                    <span class="chart-bar-label">Médical</span>
+                                    <div class="chart-bar-progress">
+                                        <div class="chart-bar-fill" id="medicalBar" style="width: 0%">0</div>
+                                    </div>
+                                    <span class="chart-bar-value" id="medicalCount">0</span>
+                                </div>
+                                <div class="chart-bar">
+                                    <span class="chart-bar-label">Circulation</span>
+                                    <div class="chart-bar-progress">
+                                        <div class="chart-bar-fill" id="circulationBar" style="width: 0%">0</div>
+                                    </div>
+                                    <span class="chart-bar-value" id="circulationCount">0</span>
+                                </div>
+                                <div class="chart-bar">
+                                    <span class="chart-bar-label">Transport</span>
+                                    <div class="chart-bar-progress">
+                                        <div class="chart-bar-fill" id="transportBar" style="width: 0%">0</div>
+                                    </div>
+                                    <span class="chart-bar-value" id="transportCount">0</span>
+                                </div>
+                                <div class="chart-bar">
+                                    <span class="chart-bar-label">Famille</span>
+                                    <div class="chart-bar-progress">
+                                        <div class="chart-bar-fill" id="familleBar" style="width: 0%">0</div>
+                                    </div>
+                                    <span class="chart-bar-value" id="familleCount">0</span>
+                                </div>
+                                <div class="chart-bar">
+                                    <span class="chart-bar-label">Autre</span>
+                                    <div class="chart-bar-progress">
+                                        <div class="chart-bar-fill" id="autreBar" style="width: 0%">0</div>
+                                    </div>
+                                    <span class="chart-bar-value" id="autreCount">0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stats-card">
+                            <div class="stats-header">
+                                <div class="stats-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div>
+                                    <h5 class="stats-title">Durée moyenne</h5>
+                                    <div class="stats-number" id="averageDuration">0 min</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stats-card">
+                            <div class="stats-header">
+                                <div class="stats-icon">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <div>
+                                    <h5 class="stats-title">Évolution</h5>
+                                </div>
+                            </div>
+                            <div class="stats-row">
+                                <span class="stats-label">Ce mois vs mois dernier</span>
+                                <span class="stats-value" id="monthlyEvolution">0%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn-custom btn-secondary" onclick="showJustificatifSection()">
+                        <i class="fas fa-arrow-left"></i>
+                        Retour au formulaire
+                    </button>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="right-column">
+                <div class="regulation-card">
+                    <div class="section-title">
+                        <i class="fas fa-gavel"></i>
+                        <h4>Règlementation des retards</h4>
+                    </div>
+                    
+                    <div class="stats-mini-card">
+                        <div class="stats-row">
+                            <span class="stats-label">
+                                <i class="fas fa-calendar"></i>
+                                Ce mois
+                            </span>
+                            <span class="stats-value" id="statsThisMonth">-</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="stats-label">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Non justifiés
+                            </span>
+                            <span class="stats-value" id="statsUnjustified">-</span>
+                        </div>
+                        <div class="progress-bar-custom">
+                            <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+                        </div>
+                        <small class="text-muted">3 retards non justifiés = avertissement</small>
+                    </div>
+
+                    <ul class="regulation-list">
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <strong>0-10 min :</strong> Tolérance
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <strong>10-30 min :</strong> Justificatif recommandé
+                        </li>
+                        <li>
+                            <i class="fas fa-times-circle"></i>
+                            <strong>30-60 min :</strong> Justificatif OBLIGATOIRE
+                        </li>
+                        <li>
+                            <i class="fas fa-times-circle"></i>
+                            <strong>> 60 min :</strong> Justificatif + avertissement
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            Délai de soumission : 48h max
+                        </li>
+                    </ul>
+
+                    <div class="regulation-note">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        3 retards non justifiés = 1 avertissement formel
+                    </div>
+                </div>
+
+                <div class="regulation-card">
+                    <div class="section-title">
+                        <i class="fas fa-history"></i>
+                        <h4>Mes justificatifs récents</h4>
+                    </div>
+                    
+                    <div class="historique-mini" id="historiqueJustificatifs">
+                        <div class="text-center py-3 text-muted">
+                            <i class="fas fa-spinner fa-spin"></i> Chargement...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let employeeData = {};
+        let token = localStorage.getItem('jwt');
+        let selectedRetardType = 'medical';
+        let allJustificatifs = [];
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page chargée');
+            
+            if (!token) {
+                window.location.href = 'connexion.html';
+                return;
+            }
+
+            // Set max date to today
+            const today = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('dateRetard');
+            if (dateInput) {
+                dateInput.setAttribute('max', today);
+            }
+
+            loadEmployeeData();
+            loadJustificatifs();
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 60000);
+        });
+
+        // Navigation
+        function showJustificatifSection() {
+            document.getElementById('justificatifSection').style.display = 'block';
+            document.getElementById('statisticsSection').style.display = 'none';
+            
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.querySelector('span') && link.querySelector('span').textContent === 'Justificatif de retard') {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        function showStatisticsSection() {
+            document.getElementById('justificatifSection').style.display = 'none';
+            document.getElementById('statisticsSection').style.display = 'block';
+            
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.querySelector('span') && link.querySelector('span').textContent === 'Statistiques') {
+                    link.classList.add('active');
+                }
+            });
+            
+            loadStatisticsData();
+        }
+
+        // Calculer la durée du retard
+        function calculerDureeRetard() {
+            const heurePrevue = document.getElementById('heurePrevue').value;
+            const heureReelle = document.getElementById('heureReelle').value;
+            
+            if (heurePrevue && heureReelle) {
+                const prevueParts = heurePrevue.split(':');
+                const reelleParts = heureReelle.split(':');
+                
+                const prevueMinutes = parseInt(prevueParts[0]) * 60 + parseInt(prevueParts[1]);
+                const reelleMinutes = parseInt(reelleParts[0]) * 60 + parseInt(reelleParts[1]);
+                
+                let dureeRetard = prevueMinutes - reelleMinutes;
+                if (dureeRetard < 0) dureeRetard = 0;
+                
+                document.getElementById('dureeRetard').value = dureeRetard;
+                
+                const heures = Math.floor(dureeRetard / 60);
+                const minutes = dureeRetard % 60;
+                
+                let texte = '';
+                if (heures > 0) {
+                    texte = `${heures} heure${heures > 1 ? 's' : ''}`;
+                    if (minutes > 0) texte += ` et ${minutes} minute${minutes > 1 ? 's' : ''}`;
+                } else {
+                    texte = `${minutes} minute${minutes > 1 ? 's' : ''}`;
+                }
+                
+                document.getElementById('dureeRetardTexte').textContent = texte;
+                
+                const display = document.getElementById('dureeRetardDisplay');
+                if (dureeRetard <= 10) {
+                    display.style.background = 'linear-gradient(135deg, #4CAF50, #66BB6A)';
+                } else if (dureeRetard <= 30) {
+                    display.style.background = 'linear-gradient(135deg, #F9B572, #FFB74D)';
+                } else {
+                    display.style.background = 'linear-gradient(135deg, #E57373, #EF9A9A)';
+                }
+            }
+        }
+
+        // Charger les données employé
+        async function loadEmployeeData() {
+            try {
+                const response = await fetch("profile1.php", {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        localStorage.removeItem('jwt');
+                        window.location.href = 'connexion.html';
+                        return;
+                    }
+                    throw new Error('Erreur');
+                }
+
+                const text = await response.text();
+console.log("RESPONSE PHP =", text);
+
+let data;
+try {
+    data = JSON.parse(text);
+} catch (e) {
+    console.error("❌ JSON invalide :", text);
+    showNotification("Erreur serveur (voir console)", "danger");
+    return;
+}
+                
+                if (data.success && data.user) {
+                    employeeData = data.user;
+                    updateUI();
+                    document.getElementById('userId').value = employeeData.id || '';
+                    document.getElementById('userNom').value = `${employeeData.prenom || ''} ${employeeData.nom || ''}`.trim();
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showNotification('Erreur de chargement', 'danger');
+            }
+        }
+
+        function updateUI() {
+            if (employeeData.photo_profil) {
+                document.getElementById('sidebarAvatar').src = employeeData.photo_profil;
+            }
+            
+            document.getElementById('sidebarName').textContent = 
+                `${employeeData.prenom || ''} ${employeeData.nom || ''}`.trim() || 'Jean Dupont';
+            document.getElementById('sidebarPoste').textContent = employeeData.poste || 'Développeur';
+        }
+
+        // Charger les justificatifs
+        async function loadJustificatifs() {
+            try {
+                const response = await fetch("justificatif.php", {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    allJustificatifs = data.justificatifs || [];
+                    displayJustificatifs(allJustificatifs);
+                    updateStats(allJustificatifs);
+                } else {
+                    document.getElementById('historiqueJustificatifs').innerHTML = `
+                        <div class="text-center py-3 text-muted">
+                            <i class="fas fa-exclamation-circle"></i> Erreur de chargement
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                document.getElementById('historiqueJustificatifs').innerHTML = `
+                    <div class="text-center py-3 text-muted">
+                        <i class="fas fa-exclamation-circle"></i> Erreur de chargement
+                    </div>
+                `;
+            }
+        }
+
+        function displayJustificatifs(justificatifs) {
+            const container = document.getElementById('historiqueJustificatifs');
+            
+            if (!justificatifs || justificatifs.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-3 text-muted">
+                        <i class="fas fa-file-alt"></i> Aucun justificatif
+                    </div>
+                `;
+                return;
+            }
+
+            const recents = justificatifs.slice(0, 5);
+            
+            container.innerHTML = recents.map(j => {
+                let statutClass = 'statut-attente';
+                let statutText = 'En attente';
+                
+                if (j.statut === 'approuvé' || j.statut === 'accepte') {
+                    statutClass = 'statut-ok';
+                    statutText = 'Approuvé';
+                } else if (j.statut === 'refusé') {
+                    statutClass = 'statut-refuse';
+                    statutText = 'Refusé';
+                }
+                
+                const date = new Date(j.date_absence);
+                const formattedDate = date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+                
+                return `
+                    <div class="historique-item">
+                        <span class="historique-date">${formattedDate}</span>
+                        <span class="historique-cause" title="${j.raison}">${j.raison.substring(0, 20)}${j.raison.length > 20 ? '...' : ''}</span>
+                        <span class="historique-statut ${statutClass}">${statutText}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateStats(justificatifs) {
+            if (!justificatifs || justificatifs.length === 0) {
+                document.getElementById('statsThisMonth').textContent = '0 retard';
+                document.getElementById('statsUnjustified').textContent = '0';
+                document.getElementById('progressBar').style.width = '0%';
+                return;
+            }
+            
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            
+            const thisMonth = justificatifs.filter(j => {
+                const date = new Date(j.date_absence);
+                return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+            });
+            
+            const unjustified = thisMonth.filter(j => j.statut === 'refusé' || j.statut === 'en attente').length;
+            
+            document.getElementById('statsThisMonth').textContent = thisMonth.length + ' retard(s)';
+            document.getElementById('statsUnjustified').textContent = unjustified;
+            
+            const progressWidth = Math.min((unjustified / 3) * 100, 100);
+            document.getElementById('progressBar').style.width = progressWidth + '%';
+        }
+
+        function loadStatisticsData() {
+            if (!allJustificatifs || allJustificatifs.length === 0) {
+                updateStatisticsDisplay([]);
+                return;
+            }
+            
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            
+            const thisMonth = allJustificatifs.filter(j => {
+                const date = new Date(j.date_absence);
+                return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+            });
+            
+            updateStatisticsDisplay(thisMonth);
+        }
+
+        function updateStatisticsDisplay(justificatifs) {
+            const total = justificatifs.length;
+            const justified = justificatifs.filter(j => j.statut === 'approuvé' || j.statut === 'accepte').length;
+            const unjustified = justificatifs.filter(j => j.statut === 'refusé').length;
+            const pending = justificatifs.filter(j => j.statut === 'en attente').length;
+            
+            document.getElementById('statsMonthTotal').textContent = total;
+            document.getElementById('justifiedCount').textContent = justified;
+            document.getElementById('unjustifiedCount').textContent = unjustified;
+            document.getElementById('pendingCount').textContent = pending;
+            
+            document.getElementById('justifiedBar').style.width = total > 0 ? (justified / total * 100) + '%' : '0%';
+            document.getElementById('justifiedBar').textContent = total > 0 ? Math.round(justified / total * 100) + '%' : '0%';
+            
+            document.getElementById('unjustifiedBar').style.width = total > 0 ? (unjustified / total * 100) + '%' : '0%';
+            document.getElementById('unjustifiedBar').textContent = total > 0 ? Math.round(unjustified / total * 100) + '%' : '0%';
+            
+            document.getElementById('pendingBar').style.width = total > 0 ? (pending / total * 100) + '%' : '0%';
+            document.getElementById('pendingBar').textContent = total > 0 ? Math.round(pending / total * 100) + '%' : '0%';
+            
+            const medical = justificatifs.filter(j => j.raison && j.raison.toLowerCase().includes('medical')).length;
+            const circulation = justificatifs.filter(j => j.raison && j.raison.toLowerCase().includes('circulation')).length;
+            const transport = justificatifs.filter(j => j.raison && j.raison.toLowerCase().includes('transport')).length;
+            const famille = justificatifs.filter(j => j.raison && j.raison.toLowerCase().includes('famille')).length;
+            const autre = justificatifs.filter(j => j.raison && 
+                !j.raison.toLowerCase().includes('medical') && 
+                !j.raison.toLowerCase().includes('circulation') && 
+                !j.raison.toLowerCase().includes('transport') && 
+                !j.raison.toLowerCase().includes('famille')).length;
+            
+            document.getElementById('medicalCount').textContent = medical;
+            document.getElementById('circulationCount').textContent = circulation;
+            document.getElementById('transportCount').textContent = transport;
+            document.getElementById('familleCount').textContent = famille;
+            document.getElementById('autreCount').textContent = autre;
+            
+            document.getElementById('medicalBar').style.width = total > 0 ? (medical / total * 100) + '%' : '0%';
+            document.getElementById('medicalBar').textContent = total > 0 ? medical : '0';
+            
+            document.getElementById('circulationBar').style.width = total > 0 ? (circulation / total * 100) + '%' : '0%';
+            document.getElementById('circulationBar').textContent = total > 0 ? circulation : '0';
+            
+            document.getElementById('transportBar').style.width = total > 0 ? (transport / total * 100) + '%' : '0%';
+            document.getElementById('transportBar').textContent = total > 0 ? transport : '0';
+            
+            document.getElementById('familleBar').style.width = total > 0 ? (famille / total * 100) + '%' : '0%';
+            document.getElementById('familleBar').textContent = total > 0 ? famille : '0';
+            
+            document.getElementById('autreBar').style.width = total > 0 ? (autre / total * 100) + '%' : '0%';
+            document.getElementById('autreBar').textContent = total > 0 ? autre : '0';
+            
+            let totalDuration = 0;
+            justificatifs.forEach(j => {
+                if (j.duree_retard) totalDuration += parseInt(j.duree_retard) || 0;
+            });
+            const avgDuration = total > 0 ? Math.round(totalDuration / total) : 0;
+            document.getElementById('averageDuration').textContent = avgDuration + ' min';
+            
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            
+            let lastMonth = currentMonth - 1;
+            let lastYear = currentYear;
+            if (lastMonth < 0) {
+                lastMonth = 11;
+                lastYear = currentYear - 1;
+            }
+            
+            const lastMonthCount = allJustificatifs.filter(j => {
+                const date = new Date(j.date_absence);
+                return date.getMonth() === lastMonth && date.getFullYear() === lastYear;
+            }).length;
+            
+            let evolution = 0;
+            if (lastMonthCount > 0) {
+                evolution = Math.round(((total - lastMonthCount) / lastMonthCount) * 100);
+            }
+            
+            document.getElementById('monthlyEvolution').textContent = (evolution > 0 ? '+' : '') + evolution + '%';
+            document.getElementById('monthlyEvolution').style.color = evolution > 0 ? '#E57373' : '#4CAF50';
+        }
+
+        function updateCurrentTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = 
+                now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function selectRetardType(type) {
+            selectedRetardType = type;
+            
+            document.querySelectorAll('.retard-option').forEach(option => {
+                option.classList.remove('selected');
+                if (option.dataset.type === type) {
+                    option.classList.add('selected');
+                }
+            });
+            
+            document.getElementById('raison').value = type;
+            
+            const autreContainer = document.getElementById('autreRaisonContainer');
+            if (type === 'autre') {
+                autreContainer.classList.add('show');
+            } else {
+                autreContainer.classList.remove('show');
+            }
+        }
+
+        function updateFileName(input) {
+            const fileName = input.files[0] ? input.files[0].name : 'Aucun fichier sélectionné';
+            document.getElementById('selectedFileName').textContent = fileName;
+            
+            if (input.files[0] && input.files[0].size > 5 * 1024 * 1024) {
+                showNotification('Le fichier ne doit pas dépasser 5 Mo', 'warning');
+                input.value = '';
+                document.getElementById('selectedFileName').textContent = 'Aucun fichier sélectionné';
+            }
+        }
+
+        async function submitJustificatif() {
+            console.log('Soumission du justificatif');
+            
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (!employeeData || !employeeData.id) {
+                showNotification('Veuillez vous reconnecter', 'warning');
+                window.location.href = 'connexion.html';
+                return;
+            }
+            
+            const date = document.getElementById('dateRetard').value;
+            const heurePrevue = document.getElementById('heurePrevue').value;
+            let raison = selectedRetardType;
+            
+            if (selectedRetardType === 'autre') {
+                const autreRaison = document.getElementById('autreRaison').value;
+                if (!autreRaison) {
+                    showNotification('Veuillez préciser la raison', 'warning');
+                    return;
+                }
+                raison = autreRaison;
+            }
+    
+            if (!date || !heurePrevue) {
+                showNotification('Veuillez remplir tous les champs obligatoires', 'warning');
+                return;
+            }
+    
+            document.getElementById('raison').value = raison;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi...';
+    
+            try {
+                const form = document.getElementById('justificatifForm');
+                const formData = new FormData(form);
+                
+                if (!formData.has('userId') && employeeData.id) {
+                    formData.append('userId', employeeData.id);
+                }
+    
+                const response = await fetch("justificatif.php", {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "X-Token": token
+                    }
+                });
+    
+                const data = await response.json();
+                
+                if (data.success) {
+                    showNotification('Justificatif envoyé avec succès', 'success');
+                    form.reset();
+                    document.getElementById('selectedFileName').textContent = 'Aucun fichier sélectionné';
+                    document.getElementById('autreRaisonContainer').classList.remove('show');
+                    document.getElementById('dureeRetardTexte').textContent = '0 minute';
+                    selectRetardType('medical');
+                    await loadJustificatifs();
+                } else {
+                    showNotification(data.message || 'Erreur', 'danger');
+                }
+            } catch (error) {
+                console.error("Erreur:", error);
+                showNotification('Erreur de connexion', 'danger');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Envoyer le justificatif';
+            }
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        function openAvatarModal() {
+            showNotification('Fonctionnalité à venir', 'info');
+        }
+
+        function showNotifications() {
+            showNotification('3 nouvelles notifications', 'info');
+        }
+
+        function showNotification(message, type = 'info') {
+            const colors = {
+                success: '#4CAF50',
+                danger: '#E57373',
+                warning: '#F9B572',
+                info: '#4a6fa5'
+            };
+            
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: white;
+                backdrop-filter: blur(10px);
+                color: ${colors[type]};
+                padding: 12px 20px;
+                border-radius: 10px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+                border-left: 4px solid ${colors[type]};
+                font-weight: 500;
+                z-index: 9999;
+                animation: slideIn 0.3s ease-out;
+                font-size: 0.9rem;
+            `;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 
+                                 type === 'danger' ? 'exclamation-circle' : 
+                                 type === 'warning' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+                ${message}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        function logout() {
+            if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+                localStorage.removeItem('jwt');
+                window.location.href = 'connexion.html';
+            }
+        }
+    </script>
+</body>
+</html>

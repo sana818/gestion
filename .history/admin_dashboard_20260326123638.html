@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tableau de bord directeur</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+<style>
+  :root {
+    --primary-color: #4a6fa5;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --sidebar-width: 320px;
+    --transition-speed: 0.4s;
+    --accent-color: #4dabf7;
+    --gray-color: #6c757d;
+  }
+  body {
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    min-height: 100vh;
+    padding-bottom: 20px;
+    margin-left: var(--sidebar-width);
+    transition: margin-left var(--transition-speed) ease;
+  }
+  #sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    position: fixed;
+    left: 0; top: 0;
+    z-index: 1050;
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    color: white;
+    box-shadow: 8px 0 30px rgba(0,0,0,0.2);
+    transition: all var(--transition-speed) cubic-bezier(0.4,0,0.2,1);
+    overflow-y: auto; overflow-x: hidden;
+    border-right: 1px solid rgba(255,255,255,0.1);
+  }
+  .sidebar-header {
+    padding: 30px 25px;
+    background: rgba(15,23,42,0.8);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .sidebar-brand {
+    display: flex; align-items: center; gap: 15px;
+    font-size: 1.4rem; font-weight: 700; color: white;
+    text-decoration: none; transition: transform 0.3s ease;
+  }
+  .sidebar-brand:hover { transform: translateX(5px); }
+  .sidebar-brand i { color: var(--accent-color); font-size: 2rem; }
+  .sidebar-user {
+    padding: 30px 25px; text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    background: rgba(30,41,59,0.6);
+  }
+  .user-avatar-wrapper { position: relative; width: fit-content; margin: 0 auto 20px; cursor: pointer; }
+  .user-avatar {
+    width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+    border: 3px solid rgba(255,255,255,0.2);
+    box-shadow: 0 8px 25px rgba(59,130,246,0.3);
+    transition: all 0.3s ease;
+  }
+  .user-avatar:hover { transform: scale(1.05); }
+  .online-indicator {
+    position: absolute; bottom: 5px; right: 5px;
+    width: 12px; height: 12px;
+    background: var(--success-color); border-radius: 50%;
+    border: 2px solid white; animation: pulse 2s infinite;
+  }
+  #welcomeText {
+    font-size: 1.2rem; font-weight: 600; margin-bottom: 5px;
+    background: linear-gradient(90deg,#fff,#cbd5e1);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .user-email { font-size: 0.9rem; opacity: 0.7; color: #cbd5e1; }
+  .sidebar-nav { padding: 25px 0; }
+  .sidebar-nav .nav-link {
+    color: rgba(255,255,255,0.8); padding: 16px 30px;
+    display: flex; align-items: center; gap: 18px;
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    border-left: 4px solid transparent;
+    margin: 5px 15px; border-radius: 12px; position: relative; overflow: hidden;
+  }
+  .sidebar-nav .nav-link:hover {
+    color: white; background: rgba(255,255,255,0.05);
+    border-left-color: var(--accent-color); transform: translateX(10px);
+  }
+  .sidebar-nav .nav-link.active {
+    color: white;
+    background: linear-gradient(90deg,rgba(77,171,247,0.15),transparent);
+    border-left-color: var(--accent-color);
+  }
+  .sidebar-nav .nav-link i { width: 26px; text-align: center; font-size: 1.3rem; transition: transform 0.3s ease; }
+  .sidebar-nav .nav-link:hover i { transform: scale(1.2); color: var(--accent-color); }
+  .stats-section { padding: 25px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .stats-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; color: rgba(255,255,255,0.9); }
+  .stats-header i { color: var(--accent-color); }
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .stat-item {
+    background: rgba(255,255,255,0.05); border-radius: 10px; padding: 15px;
+    text-align: center; transition: all 0.3s ease; border: 1px solid rgba(255,255,255,0.05);
+  }
+  .stat-item:hover { background: rgba(255,255,255,0.08); transform: translateY(-3px); }
+  .stat-value { font-size: 1.5rem; font-weight: 700; color: white; margin-bottom: 5px; }
+  .stat-label { font-size: 0.8rem; color: rgba(255,255,255,0.6); }
+  .sidebar-footer {
+    padding: 25px; border-top: 1px solid rgba(255,255,255,0.08);
+    background: rgba(15,23,42,0.8);
+  }
+  .notification-container { margin-bottom: 15px; }
+  .notification-btn {
+    width: 100%;
+    background: linear-gradient(135deg,rgba(77,171,247,0.15),rgba(59,130,246,0.1));
+    border: 1px solid rgba(77,171,247,0.2); color: white;
+    padding: 14px 20px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: all 0.3s ease;
+  }
+  .notification-btn:hover {
+    background: linear-gradient(135deg,rgba(77,171,247,0.25),rgba(59,130246,0.2));
+    transform: translateY(-2px);
+  }
+  .notification-content { display: flex; align-items: center; gap: 15px; }
+  .notification-content i { color: var(--accent-color); }
+  .notification-badge {
+    background: linear-gradient(135deg,#ef4444,#dc2626); color: white;
+    font-weight: 600; font-size: 0.8rem; min-width: 24px; height: 24px;
+    border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    animation: pulse 2s infinite;
+  }
+  .logout-btn {
+    width: 100%;
+    background: linear-gradient(135deg,rgba(239,68,68,0.15),rgba(220,38,38,0.1));
+    border: 1px solid rgba(239,68,68,0.2); color: #fecaca;
+    padding: 14px 20px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    transition: all 0.3s ease; font-weight: 500;
+  }
+  .logout-btn:hover { background: linear-gradient(135deg,rgba(239,68,68,0.25),rgba(220,38,38,0.2)); color: white; transform: translateY(-2px); }
+  .dropdown-menu.notifications-dropdown {
+    border-radius: 20px; border: none;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    padding: 0; max-height: 500px; overflow-y: auto;
+    min-width: 380px;
+    background: linear-gradient(135deg,#1e293b,#0f172a);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .dropdown-header { background: rgba(30,41,59,0.8); color: white; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 20px; font-weight: 600; }
+  .notification-item { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease; cursor: pointer; }
+  .notification-item:hover { background: rgba(255,255,255,0.05); }
+  .notification-item.unread { background: rgba(77,171,247,0.07); border-left: 3px solid var(--accent-color); }
+  .notification-item .notif-icon { width: 36px; height: 36px; border-radius: 10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:1rem; }
+  .notification-item .notif-icon.conge  { background: rgba(40,167,69,0.15); color: #28a745; }
+  .notification-item .notif-icon.retard { background: rgba(253,126,20,0.15); color: #fd7e14; }
+  .notification-item .notif-icon.info   { background: rgba(77,171,247,0.15); color: var(--accent-color); }
+  .notification-message { color: rgba(255,255,255,0.9); font-size: 0.9rem; margin-bottom: 3px; line-height: 1.4; }
+  .notification-time { color: rgba(255,255,255,0.45); font-size: 0.78rem; }
+  .notif-unread-dot { width:8px; height:8px; background:#4dabf7; border-radius:50%; flex-shrink:0; margin-top:4px; }
+  .dropdown-footer { padding: 15px 20px; text-align: center; }
+  .mark-all-read { color: var(--accent-color); text-decoration: none; font-weight: 500; font-size:0.9rem; }
+  .mark-all-read:hover { color: white; text-decoration: underline; }
+
+  .container {
+    margin-top: 30px; margin-bottom: 30px;
+    margin-left: 40px; margin-right: 40px;
+    animation: slideIn 0.8s cubic-bezier(0.4,0,0.2,1);
+    max-width: calc(100% - 80px);
+  }
+  .btn { border-radius: 10px; font-weight: 500; padding: 10px 20px; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: none; }
+  .btn-primary { background: linear-gradient(135deg,var(--primary-color),#3a5795); color: white; }
+  .btn-success { background: linear-gradient(135deg,var(--success-color),#1e7e34); color: white; }
+  .btn-warning { background: linear-gradient(135deg,var(--warning-color),#e0a800); color: #000; }
+  .btn-info { background: linear-gradient(135deg,#17a2b8,#138496); color: white; }
+  .table-responsive { border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+  .table { background: white; }
+  .table thead { background: linear-gradient(90deg,var(--primary-color),#5a7bb5); color: white; }
+  .table thead th { border: none; padding: 18px 15px; font-weight: 600; }
+  .table tbody tr:hover { background-color: rgba(74,111,165,0.05); }
+  .section-container { display: none; opacity: 0; transform: translateY(20px); transition: all 0.5s ease; }
+  .section-container.active { display: block; opacity: 1; transform: translateY(0); }
+  .card { border: none; border-radius: 15px; box-shadow: 0 6px 20px rgba(0,0,0,0.08); transition: all var(--transition-speed) ease; overflow: hidden; }
+  .modal-content { border-radius: 20px; border: none; }
+  .modal-header { background: linear-gradient(90deg,var(--primary-color),#5a7bb5); color: white; border: none; padding: 20px 30px; }
+  .day-checkbox-group { display: flex; gap: 15px; flex-wrap: wrap; margin: 15px 0; }
+  .day-checkbox { display: flex; align-items: center; gap: 8px; background: #f8f9fa; padding: 8px 15px; border-radius: 25px; cursor: pointer; transition: all 0.2s ease; }
+  .day-checkbox:hover { background: #e9ecef; transform: translateY(-2px); }
+  .day-checkbox input { width: 18px; height: 18px; cursor: pointer; }
+  .day-checkbox label { margin: 0; cursor: pointer; font-weight: 500; }
+  .day-checkbox.checked { background: linear-gradient(135deg,var(--primary-color),#5a7bb5); color: white; }
+  .day-checkbox.checked label { color: white; }
+  .badge-jour { background: #e9ecef; color: #495057; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 5px; margin: 2px; }
+  .badge-jour.actif { background: linear-gradient(135deg,var(--success-color),#1e7e34); color: white; }
+  .heure-badge { background: #e9ecef; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem; color: #495057; display: inline-flex; align-items: center; gap: 5px; }
+  .salle-badge { background: linear-gradient(135deg,#4dabf7,#3b82f6); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 5px; }
+  @media (max-width: 992px) { body { margin-left: 0; } #sidebar { width: 100%; height: auto; position: relative; } .container { margin-left: 20px; margin-right: 20px; max-width: 100%; } }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); } 70% { box-shadow: 0 0 0 10px rgba(239,68,68,0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); } }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR (simplifié pour la lisibilité) -->
+<div id="sidebar">
+  <div class="sidebar-header">
+    <a class="sidebar-brand" href="#"><i class="fas fa-user-tie"></i><span>Espace RH</span></a>
+  </div>
+  <div class="sidebar-user">
+    <img src="https://ui-avatars.com/api/?name=RH&size=80&background=4a6fa5&color=fff&bold=true" class="user-avatar" alt="Photo">
+    <div id="welcomeText" class="mt-2 fw-bold">Bienvenue</div>
+    <div class="small text-secondary" id="userEmail"></div>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="#" class="nav-link" onclick="showSection('dashboard')"><i class="fas fa-tachometer-alt"></i><span>Tableau de bord</span></a>
+    <a href="#" class="nav-link active" onclick="showSection('gestionTemps')"><i class="fas fa-calendar-alt"></i><span>Gestion des temps</span></a>
+    <a href="#" class="nav-link" onclick="showSection('planningHebdo')"><i class="fas fa-calendar-week"></i><span>Planning hebdomadaire</span></a>
+    <a href="#" class="nav-link" onclick="showSection('statistics')"><i class="fas fa-chart-line"></i><span>Statistiques</span></a>
+    <a href="#" class="nav-link" onclick="showSection('conges')"><i class="fas fa-calendar-alt"></i><span>Gestion des congés</span></a>
+  </nav>
+  <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i><span>Déconnexion</span></button>
+</div>
+
+<div class="container">
+  <div id="errorContent" class="alert alert-danger d-none"></div>
+  <div id="successContent" class="alert alert-success d-none"></div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="section-container">
+    <h2>Tableau de bord</h2>
+    <div class="row">
+      <div class="col-md-3 mb-4"><div class="card text-center"><div class="card-body"><i class="fas fa-users fa-3x text-primary mb-3"></i><h3 id="totalEmployes">0</h3><p>Employés</p></div></div></div>
+      <div class="col-md-3 mb-4"><div class="card text-center"><div class="card-body"><i class="fas fa-clock fa-3x text-success mb-3"></i><h3 id="totalTravailSemaine">0</h3><p>Jours travaillés/semaine</p></div></div></div>
+    </div>
+    <div class="table-responsive"><table class="table"><thead><tr><th>ID</th><th>Nom</th><th>Email</th><th>Poste</th><th>Actions</th></tr></thead><tbody id="usersTableBody"></tbody></table></div>
+  </div>
+
+  <!-- GESTION DES TEMPS AVEC JOURS DE TRAVAIL -->
+  <div id="gestionTemps" class="section-container active">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2><i class="fas fa-calendar-alt me-2 text-primary"></i>Gestion des horaires et jours de travail</h2>
+      <button class="btn btn-primary" onclick="ouvrirModalTempsGlobal()"><i class="fas fa-edit me-2"></i>Modification en masse</button>
+    </div>
+    <div class="alert alert-info">
+      <i class="fas fa-info-circle me-2"></i>
+      Définissez pour chaque employé ses jours de travail, ses horaires et sa salle assignée.
+    </div>
+    <div class="filter-container mb-4 d-flex gap-3">
+      <input type="text" id="searchEmployeTemps" class="form-control" placeholder="Rechercher un employé..." onkeyup="filterEmployesTemps()" style="width: 250px;">
+      <select id="filterSalleTemps" class="form-select" onchange="filterEmployesTemps()" style="width: 200px;"><option value="">Toutes les salles</option></select>
+      <select id="filterJourTemps" class="form-select" onchange="filterEmployesTemps()" style="width: 180px;"><option value="">Tous les jours</option><option value="Lundi">Travaille le Lundi</option><option value="Mardi">Travaille le Mardi</option><option value="Mercredi">Travaille le Mercredi</option><option value="Jeudi">Travaille le Jeudi</option><option value="Vendredi">Travaille le Vendredi</option><option value="Samedi">Travaille le Samedi</option><option value="Dimanche">Travaille le Dimanche</option></select>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead><tr><th>Employé</th><th>Poste</th><th>Jours de travail</th><th>Salle</th><th>Horaires</th><th>Actions</th></tr></thead>
+        <tbody id="employesTempsTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PLANNING HEBDOMADAIRE -->
+  <div id="planningHebdo" class="section-container">
+    <h2><i class="fas fa-calendar-week me-2 text-primary"></i>Planning hebdomadaire</h2>
+    <div class="row mb-4">
+      <div class="col-md-4"><label class="form-label">Sélectionner un employé</label><select id="selectEmployePlanning" class="form-select" onchange="afficherPlanningHebdo()"><option value="">Choisir...</option></select></div>
+      <div class="col-md-4"><label class="form-label">Semaine du</label><input type="date" id="semaineDate" class="form-control" onchange="afficherPlanningHebdo()"></div>
+    </div>
+    <div id="planningHebdoContent" class="card"><div class="card-body text-center text-muted"><i class="fas fa-calendar fa-3x mb-3"></i><p>Sélectionnez un employé pour voir son planning</p></div></div>
+  </div>
+
+  <!-- STATISTIQUES (simplifiées) -->
+  <div id="statistics" class="section-container">
+    <h2>Statistiques</h2>
+    <div class="row"><div class="col-md-6"><div class="card"><div class="card-body"><h5>Répartition par poste</h5><canvas id="posteChart"></canvas></div></div></div></div>
+  </div>
+
+  <!-- CONGÉS -->
+  <div id="conges" class="section-container">
+    <h2>Gestion des demandes de congé</h2>
+    <div class="table-responsive"><table class="table"><thead><tr><th>ID</th><th>Employé</th><th>Type</th><th>Date Début</th><th>Date Fin</th><th>Jours</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="congesTableBody"></tbody></table></div>
+  </div>
+</div>
+
+<!-- MODAL MODIFICATION INDIVIDUELLE AVEC JOURS -->
+<div class="modal fade" id="modalModifierHoraire" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title"><i class="fas fa-user-clock me-2"></i>Modifier le planning</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <input type="hidden" id="editEmployeId">
+        <div class="mb-3"><label class="fw-bold">Employé</label><p class="form-control-static" id="editEmployeNom"></p></div>
+        <div class="mb-3"><label class="fw-bold">Jours de travail</label><div class="day-checkbox-group" id="joursTravailGroup"></div><small class="text-muted">Cochez les jours où l'employé travaille</small></div>
+        <div class="mb-3"><label class="fw-bold">Salle de travail</label><select id="editSalle" class="form-select"></select></div>
+        <div class="row"><div class="col-md-6 mb-3"><label class="fw-bold">Heure d'arrivée</label><input type="time" id="editHeureArrivee" class="form-control"></div><div class="col-md-6 mb-3"><label class="fw-bold">Heure de sortie</label><input type="time" id="editHeureSortie" class="form-control"></div></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button><button class="btn btn-primary" onclick="enregistrerHoraireEmploye()">Enregistrer</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MODIFICATION EN MASSE -->
+<div class="modal fade" id="modalModifierHoraireGlobal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title"><i class="fas fa-users me-2"></i>Modification en masse</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="alert alert-warning"><i class="fas fa-exclamation-triangle me-2"></i>Sélectionnez les employés à modifier</div>
+        <div class="mb-3"><label class="fw-bold">Employés concernés</label><select id="globalEmployesSelect" class="form-select" multiple size="8"></select><small class="text-muted">Maintenez Ctrl pour sélection multiple</small></div>
+        <div class="mb-3"><label class="fw-bold">Jours de travail (optionnel)</label><div class="day-checkbox-group" id="globalJoursGroup"></div></div>
+        <div class="row"><div class="col-md-6 mb-3"><label>Nouvelle heure d'arrivée</label><input type="time" id="globalHeureArrivee" class="form-control"></div><div class="col-md-6 mb-3"><label>Nouvelle heure de sortie</label><input type="time" id="globalHeureSortie" class="form-control"></div></div>
+        <div class="mb-3"><label>Nouvelle salle</label><select id="globalSalle" class="form-select"><option value="">Ne pas changer</option></select></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button><button class="btn btn-primary" onclick="enregistrerHorairesGlobal()">Appliquer</button></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// ==================== DONNÉES ====================
+let usersList = [], congesList = [];
+let horairesEmployes = {}; // { employeId: { jours: [], salle: "", heureArrivee: "", heureSortie: "" } }
+const joursSemaine = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
+const sallesDisponibles = ["Salle de réunion A", "Salle de réunion B", "Bureau open space", "Bureau RH", "Salle serveur", "Cafétéria", "Salle de formation", "Espace créatif"];
+
+// ==================== CHARGEMENT/SAUVEGARDE ====================
+function chargerHorairesEmployes() {
+  const stock = localStorage.getItem('horairesEmployesComplets');
+  if (stock) {
+    horairesEmployes = JSON.parse(stock);
+  } else {
+    horairesEmployes = {};
+    if (usersList.length) {
+      usersList.forEach(user => {
+        horairesEmployes[user.id] = {
+          jours: ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"],
+          salle: sallesDisponibles[0],
+          heureArrivee: "08:00",
+          heureSortie: "17:00"
+        };
+      });
+      sauvegarderHoraires();
+    }
+  }
+}
+
+function sauvegarderHoraires() {
+  localStorage.setItem('horairesEmployesComplets', JSON.stringify(horairesEmployes));
+}
+
+function getHoraireEmploye(employeId) {
+  if (!horairesEmployes[employeId]) {
+    horairesEmployes[employeId] = {
+      jours: ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"],
+      salle: sallesDisponibles[0],
+      heureArrivee: "08:00",
+      heureSortie: "17:00"
+    };
+    sauvegarderHoraires();
+  }
+  return horairesEmployes[employeId];
+}
+
+function setHoraireEmploye(employeId, jours, salle, heureArrivee, heureSortie) {
+  horairesEmployes[employeId] = { jours, salle, heureArrivee, heureSortie };
+  sauvegarderHoraires();
+}
+
+// ==================== AFFICHAGE ====================
+function afficherEmployesAvecHoraires() {
+  const tbody = document.getElementById('employesTempsTableBody');
+  if (!tbody) return;
+  const search = document.getElementById('searchEmployeTemps')?.value.toLowerCase() || '';
+  const salleFilter = document.getElementById('filterSalleTemps')?.value || '';
+  const jourFilter = document.getElementById('filterJourTemps')?.value || '';
+  
+  let employesFiltres = usersList.filter(user => {
+    const nom = `${user.prenom || ''} ${user.nom || ''}`.toLowerCase();
+    const horaire = getHoraireEmploye(user.id);
+    if (search && !nom.includes(search)) return false;
+    if (salleFilter && horaire.salle !== salleFilter) return false;
+    if (jourFilter && !horaire.jours.includes(jourFilter.replace('Travaille le ', ''))) return false;
+    return true;
+  });
+  
+  if (!employesFiltres.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center">Aucun employé</td></tr>'; return; }
+  
+  tbody.innerHTML = employesFiltres.map(user => {
+    const h = getHoraireEmploye(user.id);
+    const joursHtml = h.jours.map(j => `<span class="badge-jour actif"><i class="fas fa-check-circle"></i> ${j.substring(0,3)}</span>`).join('');
+    const nonTravail = joursSemaine.filter(j => !h.jours.includes(j)).map(j => `<span class="badge-jour"><i class="fas fa-times-circle"></i> ${j.substring(0,3)}</span>`).join('');
+    return `<tr>
+      <td><strong>${user.prenom || ''} ${user.nom || ''}</strong><br><small class="text-muted">${user.poste || '—'}</small></td>
+      <td>${user.poste || '—'}</td>
+      <td>${joursHtml} ${nonTravail}</td>
+      <td><span class="salle-badge"><i class="fas fa-building"></i> ${h.salle}</span></td>
+      <td><span class="heure-badge"><i class="fas fa-sign-in-alt"></i> ${h.heureArrivee}</span> → <span class="heure-badge"><i class="fas fa-sign-out-alt"></i> ${h.heureSortie}</span></td>
+      <td><button class="btn btn-sm btn-primary" onclick="ouvrirModalModifierHoraire(${user.id}, '${user.prenom || ''} ${user.nom || ''}')"><i class="fas fa-edit"></i> Modifier</button></td>
+    </tr>`;
+  }).join('');
+  
+  // Mettre à jour les stats
+  const totalJours = employesFiltres.reduce((sum, u) => sum + getHoraireEmploye(u.id).jours.length, 0);
+  const avgJours = employesFiltres.length ? (totalJours / employesFiltres.length).toFixed(1) : 0;
+  document.getElementById('totalTravailSemaine')?.setAttribute('data-value', avgJours);
+}
+
+function filterEmployesTemps() { afficherEmployesAvecHoraires(); }
+
+// ==================== MODAL INDIVIDUEL ====================
+function ouvrirModalModifierHoraire(employeId, employeNom) {
+  const h = getHoraireEmploye(employeId);
+  document.getElementById('editEmployeId').value = employeId;
+  document.getElementById('editEmployeNom').innerHTML = `<i class="fas fa-user"></i> ${employeNom}`;
+  document.getElementById('editHeureArrivee').value = h.heureArrivee;
+  document.getElementById('editHeureSortie').value = h.heureSortie;
+  
+  // Générer les cases à cocher pour les jours
+  const joursDiv = document.getElementById('joursTravailGroup');
+  joursDiv.innerHTML = joursSemaine.map(jour => `
+    <div class="day-checkbox ${h.jours.includes(jour) ? 'checked' : ''}" onclick="toggleJourCheckbox(this, '${jour}')">
+      <input type="checkbox" value="${jour}" ${h.jours.includes(jour) ? 'checked' : ''} onclick="event.stopPropagation()">
+      <label>${jour}</label>
+    </div>
+  `).join('');
+  
+  // Remplir les salles
+  const salleSelect = document.getElementById('editSalle');
+  salleSelect.innerHTML = sallesDisponibles.map(s => `<option value="${s}" ${h.salle === s ? 'selected' : ''}>${s}</option>`).join('');
+  
+  new bootstrap.Modal(document.getElementById('modalModifierHoraire')).show();
+}
+
+function toggleJourCheckbox(div, jour) {
+  const checkbox = div.querySelector('input');
+  checkbox.checked = !checkbox.checked;
+  if (checkbox.checked) div.classList.add('checked');
+  else div.classList.remove('checked');
+}
+
+function enregistrerHoraireEmploye() {
+  const employeId = document.getElementById('editEmployeId').value;
+  const checkboxes = document.querySelectorAll('#joursTravailGroup input');
+  const jours = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+  const salle = document.getElementById('editSalle').value;
+  const heureArrivee = document.getElementById('editHeureArrivee').value;
+  const heureSortie = document.getElementById('editHeureSortie').value;
+  
+  if (!jours.length) { showError("Sélectionnez au moins un jour de travail"); return; }
+  if (!salle) { showError("Sélectionnez une salle"); return; }
+  
+  setHoraireEmploye(employeId, jours, salle, heureArrivee, heureSortie);
+  afficherEmployesAvecHoraires();
+  bootstrap.Modal.getInstance(document.getElementById('modalModifierHoraire')).hide();
+  showSuccess("Planning modifié avec succès");
+}
+
+// ==================== MODIFICATION EN MASSE ====================
+function ouvrirModalTempsGlobal() {
+  const select = document.getElementById('globalEmployesSelect');
+  select.innerHTML = usersList.map(u => `<option value="${u.id}">${u.prenom || ''} ${u.nom || ''} - ${u.poste || '—'}</option>`).join('');
+  
+  const joursDiv = document.getElementById('globalJoursGroup');
+  joursDiv.innerHTML = joursSemaine.map(jour => `
+    <div class="day-checkbox" onclick="toggleGlobalJour(this, '${jour}')">
+      <input type="checkbox" value="${jour}" onclick="event.stopPropagation()">
+      <label>${jour}</label>
+    </div>
+  `).join('');
+  
+  const salleSelect = document.getElementById('globalSalle');
+  salleSelect.innerHTML = '<option value="">Ne pas changer</option>' + sallesDisponibles.map(s => `<option value="${s}">${s}</option>`).join('');
+  
+  new bootstrap.Modal(document.getElementById('modalModifierHoraireGlobal')).show();
+}
+
+let globalJoursSelectionnes = [];
+function toggleGlobalJour(div, jour) {
+  const cb = div.querySelector('input');
+  cb.checked = !cb.checked;
+  if (cb.checked) div.classList.add('checked');
+  else div.classList.remove('checked');
+}
+
+function enregistrerHorairesGlobal() {
+  const selectedOptions = document.getElementById('globalEmployesSelect').selectedOptions;
+  const employesIds = Array.from(selectedOptions).map(opt => opt.value);
+  const globalJours = Array.from(document.querySelectorAll('#globalJoursGroup input')).filter(cb => cb.checked).map(cb => cb.value);
+  const heureArrivee = document.getElementById('globalHeureArrivee').value;
+  const heureSortie = document.getElementById('globalHeureSortie').value;
+  const salle = document.getElementById('globalSalle').value;
+  
+  if (!employesIds.length) { showError("Sélectionnez au moins un employé"); return; }
+  
+  let compteur = 0;
+  employesIds.forEach(id => {
+    const h = getHoraireEmploye(id);
+    const nouveauxJours = globalJours.length ? globalJours : h.jours;
+    const nouvelleArrivee = heureArrivee || h.heureArrivee;
+    const nouvelleSortie = heureSortie || h.heureSortie;
+    const nouvelleSalle = salle || h.salle;
+    if (nouveauxJours.length) {
+      setHoraireEmploye(id, nouveauxJours, nouvelleSalle, nouvelleArrivee, nouvelleSortie);
+      compteur++;
+    }
+  });
+  
+  afficherEmployesAvecHoraires();
+  bootstrap.Modal.getInstance(document.getElementById('modalModifierHoraireGlobal')).hide();
+  showSuccess(`${compteur} employé(s) modifié(s)`);
+}
+
+// ==================== PLANNING HEBDOMADAIRE ====================
+function afficherPlanningHebdo() {
+  const employeId = document.getElementById('selectEmployePlanning').value;
+  const dateInput = document.getElementById('semaineDate').value;
+  if (!employeId) return;
+  
+  const employe = usersList.find(u => u.id == employeId);
+  const horaire = getHoraireEmploye(employeId);
+  const semaineRef = dateInput ? new Date(dateInput) : new Date();
+  const debutSemaine = new Date(semaineRef);
+  debutSemaine.setDate(semaineRef.getDate() - semaineRef.getDay() + (semaineRef.getDay() === 0 ? -6 : 1));
+  
+  const planningHtml = `
+    <div class="card-body">
+      <h5 class="mb-3">${employe?.prenom || ''} ${employe?.nom || ''} - Semaine du ${debutSemaine.toLocaleDateString('fr-FR')}</h5>
+      <div class="table-responsive">
+        <table class="table table-bordered">
+          <thead><tr><th>Jour</th><th>Statut</th><th>Salle</th><th>Horaires</th></tr></thead>
+          <tbody>
+            ${joursSemaine.map((jour, idx) => {
+              const estTravail = horaire.jours.includes(jour);
+              const dateJour = new Date(debutSemaine);
+              dateJour.setDate(debutSemaine.getDate() + idx);
+              return `<tr class="${estTravail ? 'table-success' : 'table-secondary'}">
+                <td><strong>${jour}</strong><br><small>${dateJour.toLocaleDateString('fr-FR')}</small></td>
+                <td>${estTravail ? '<span class="badge bg-success">Travaille</span>' : '<span class="badge bg-secondary">Repos</span>'}</td>
+                <td>${estTravail ? `<span class="salle-badge">${horaire.salle}</span>` : '—'}</td>
+                <td>${estTravail ? `<span class="heure-badge">${horaire.heureArrivee} → ${horaire.heureSortie}</span>` : '—'}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="alert alert-info mt-3">
+        <i class="fas fa-info-circle"></i> Jours travaillés: ${horaire.jours.join(', ')} | Horaires: ${horaire.heureArrivee} - ${horaire.heureSortie}
+      </div>
+    </div>
+  `;
+  document.getElementById('planningHebdoContent').innerHTML = planningHtml;
+}
+
+// ==================== FONCTIONS EXISTANTES CONSERVÉES ====================
+function fetchUsers() {
+  const token = localStorage.getItem('jwt');
+  if (!token) { logout(); return; }
+  fetch('admin_api.php', {
+    headers: { 'Authorization': `Bearer ${token}` }
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (!data.error) {
+      usersList = Array.isArray(data) ? data : [];
+      chargerHorairesEmployes();
+      afficherEmployesAvecHoraires();
+      miseAJourSelects();
+      document.getElementById('totalEmployes').innerText = usersList.length;
+      renderUsers(usersList);
+    }
+  })
+  .catch(console.error);
+}
+
+function renderUsers(users) {
+  const tbody = document.getElementById('usersTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = users.length ? users.map(u => `<tr><td>${u.id}</td><td>${u.prenom || ''} ${u.nom || ''}</td><td>${u.email}</td><td>${u.poste || '—'}</td><td><button class="btn btn-sm btn-warning" onclick="modifierUser(${u.id})"><i class="fas fa-edit"></i></button></td></tr>`).join('') : '<tr><td colspan="5" class="text-center">Aucun utilisateur</td></tr>';
+}
+
+function miseAJourSelects() {
+  const select = document.getElementById('selectEmployePlanning');
+  if (select) {
+    select.innerHTML = '<option value="">Choisir un employé...</option>' + 
+      usersList.map(u => `<option value="${u.id}">${u.prenom || ''} ${u.nom || ''}</option>`).join('');
+  }
+  const filterSalle = document.getElementById('filterSalleTemps');
+  if (filterSalle) {
+    filterSalle.innerHTML = '<option value="">Toutes les salles</option>' + sallesDisponibles.map(s => `<option value="${s}">${s}</option>`).join('');
+  }
+}
+
+function fetchConges() {
+  const token = localStorage.getItem('jwt');
+  if (!token) return;
+  fetch('admin_conges.php?action=get_conges', {
+    headers: { 'Authorization': `Bearer ${token}` }
+  })
+  .then(res => res.json())
+  .then(data => {
+    congesList = data.data || data || [];
+    renderConges(congesList);
+  })
+  .catch(console.error);
+}
+
+function renderConges(conges) {
+  const tbody = document.getElementById('congesTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = conges.length ? conges.map(c => `<tr><td>${c.id}</td><td>${c.employe || 'N/A'}</td><td>${c.type || 'N/A'}</td><td>${formatDate(c.date_debut)}</td><td>${formatDate(c.date_fin)}</td><td>${c.nb_jours || '—'}</td><td><span class="badge bg-warning">En attente</span></td><td><button class="btn btn-sm btn-primary">Traiter</button></td></tr>`).join('') : '<tr><td colspan="8" class="text-center">Aucune demande</td></tr>';
+}
+
+function formatDate(d) {
+  if (!d) return 'N/A';
+  try { return new Date(d).toLocaleDateString('fr-FR'); }
+  catch(e) { return 'N/A'; }
+}
+
+function showSection(sectionId) {
+  document.querySelectorAll('.section-container').forEach(s => s.classList.remove('active'));
+  const section = document.getElementById(sectionId);
+  if (section) section.classList.add('active');
+  if (sectionId === 'planningHebdo') miseAJourSelects();
+  if (sectionId === 'statistics') createCharts();
+}
+
+function createCharts() {
+  const posteData = {};
+  usersList.forEach(u => { const p = u.poste || 'Non défini'; posteData[p] = (posteData[p] || 0) + 1; });
+  const canvas = document.getElementById('posteChart');
+  if (canvas && Object.keys(posteData).length) {
+    const parent = canvas.parentElement;
+    parent.innerHTML = '<canvas id="posteChart"></canvas>';
+    new Chart(document.getElementById('posteChart'), {
+      type: 'doughnut',
+      data: { labels: Object.keys(posteData), datasets: [{ data: Object.values(posteData), backgroundColor: ['#FF6B6B','#4ECDC4','#45B7D1','#96CEB4','#FFE194'] }] },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorContent');
+  if (el) { el.textContent = msg; el.classList.remove('d-none'); setTimeout(() => el.classList.add('d-none'), 5000); }
+}
+
+function showSuccess(msg) {
+  const el = document.getElementById('successContent');
+  if (el) { el.textContent = msg; el.classList.remove('d-none'); setTimeout(() => el.classList.add('d-none'), 3000); }
+}
+
+function logout() {
+  if (confirm('Déconnexion ?')) {
+    localStorage.clear();
+    window.location.href = 'connexion.html';
+  }
+}
+
+function modifierUser(id) { alert("Fonctionnalité à implémenter"); }
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', () => {
+  const token = localStorage.getItem('jwt');
+  const role = localStorage.getItem('role');
+  if (!token || role !== 'responsable_rh') {
+    alert("Accès refusé");
+    window.location.href = "connexion.html";
+    return;
+  }
+  const nom = localStorage.getItem('nom') || 'RH';
+  const email = localStorage.getItem('email') || '';
+  document.getElementById('welcomeText').innerHTML = `Bienvenue, ${nom} !`;
+  document.getElementById('userEmail').innerText = email;
+  
+  fetchUsers();
+  fetchConges();
+  setInterval(() => { fetchUsers(); }, 30000);
+});
+</script>
+</body>
+</html>

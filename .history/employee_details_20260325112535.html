@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Détails de l'employé</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+<style>
+  :root {
+    --primary-color: #4a6fa5;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --accent-color: #4dabf7;
+    --gray-color: #6c757d;
+    --modify-salary-color: #4a6fa5;
+  }
+  
+  body {
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    min-height: 100vh;
+    padding: 20px;
+  }
+  
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    animation: slideIn 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Styles pour la page détails employé */
+  .employee-name-link {
+    color: var(--primary-color) !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+    padding: 5px 10px !important;
+    border-radius: 6px !important;
+  }
+  
+  .employee-name-link:hover {
+    background-color: rgba(74, 111, 165, 0.1) !important;
+    text-decoration: underline !important;
+    transform: translateY(-1px) !important;
+  }
+  
+  .info-item {
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  
+  .info-label {
+    font-size: 0.85rem;
+    color: var(--secondary-color);
+    font-weight: 500;
+  }
+  
+  .info-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--dark-color);
+  }
+  
+  .stat-card {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 140px;
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  }
+  
+  .stat-header {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    margin-bottom: 10px;
+  }
+  
+  .stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-top: auto;
+  }
+  
+  .stat-value-small {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-top: auto;
+  }
+  
+  .salary-info p {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  
+  .card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+  }
+  
+  /* Style personnalisé pour l'en-tête des statistiques de travail */
+  .stats-header {
+    background: linear-gradient(90deg, #4a6fa5 0%, #3a5795 100%) !important;
+    color: white !important;
+    border: none !important;
+  }
+  
+  .stats-header h5 {
+    color: white !important;
+  }
+  
+  /* Style pour l'avatar avec la même couleur que le bouton modifier */
+  .employee-avatar {
+    width: 120px; 
+    height: 120px; 
+    border-radius: 50%; 
+    margin: 0 auto; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 3rem; 
+    color: white;
+    overflow: hidden;
+  }
+  
+  .employee-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .employee-avatar i {
+    background: linear-gradient(135deg, #4a6fa5 0%, #3a5795 100%);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Style pour le bouton rafraîchir avec la même couleur */
+  .btn-refresh {
+    background: linear-gradient(135deg, #4a6fa5 0%, #3a5795 100%) !important;
+    color: white !important;
+    border: none !important;
+  }
+  
+  .btn-refresh:hover {
+    background: linear-gradient(135deg, #3a5795 0%, #2a4075 100%) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+  }
+  
+  .table {
+    margin-bottom: 0;
+    background: white;
+  }
+  
+  .table thead {
+    background: linear-gradient(90deg, var(--primary-color) 0%, #5a7bb5 100%);
+    color: white;
+  }
+  
+  .table thead th {
+    border: none;
+    padding: 18px 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+  }
+  
+  .table tbody tr {
+    transition: all 0.2s ease;
+  }
+  
+  .table tbody tr:hover {
+    background-color: rgba(74, 111, 165, 0.05);
+    transform: scale(1.002);
+  }
+  
+  .table td {
+    padding: 15px;
+    vertical-align: middle;
+    border-color: #f1f5f9;
+  }
+  
+  .badge {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 50px;
+    font-weight: 500;
+  }
+  
+  .salary-history-item {
+    background: #f8f9fa;
+    border-left: 4px solid var(--primary-color);
+    transition: all 0.3s ease;
+  }
+  
+  .salary-history-item:hover {
+    background: #e9ecef;
+  }
+  
+  .btn {
+    border-radius: 10px;
+    font-weight: 500;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+  }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #3a5795 100%);
+  }
+  
+  .btn-secondary {
+    background: linear-gradient(135deg, var(--secondary-color) 0%, #545b62 100%);
+  }
+  
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+  }
+  
+  .alert {
+    border-radius: 12px;
+    border: none;
+    padding: 15px 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+  }
+  
+  .modal-content {
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+  }
+  
+  .modal-header {
+    background: linear-gradient(90deg, var(--primary-color) 0%, #5a7bb5 100%);
+    color: white;
+    border: none;
+    padding: 20px 30px;
+  }
+  
+  /* Pour que toutes les cartes aient la même hauteur */
+  .row.flex-grow-1 {
+    margin-left: -10px;
+    margin-right: -10px;
+  }
+  
+  .col-md-6.d-flex {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  
+  @keyframes slideIn {
+    from { 
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to { 
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+</head>
+<body>
+<div class="container mt-4">
+  <div id="employeeDetails">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3>Détails de l'employé</h3>
+      <div>
+        <button class="btn btn-refresh me-2" onclick="refreshData()">
+          <i class="fas fa-sync-alt me-1"></i>Rafraîchir
+        </button>
+        <button class="btn btn-secondary" onclick="goBack()">
+          <i class="fas fa-arrow-left me-2"></i>Retour
+        </button>
+      </div>
+    </div>
+    
+    <!-- Alerts pour les messages -->
+    <div id="errorContent" class="alert alert-danger d-none"></div>
+    <div id="successContent" class="alert alert-success d-none"></div>
+    
+    <div class="row">
+      <!-- Carte d'informations principales -->
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          <div class="card-body text-center d-flex flex-column">
+            <div class="employee-avatar mb-3" id="employeeAvatarContainer">
+              <i class="fas fa-user-tie"></i>
+            </div>
+            <h4 id="employeeDetailName" class="mb-2">belkhir Aziz</h4>
+            <p class="text-muted" id="employeeDetailPoste"></p>
+            <div class="employee-info-grid mt-4 flex-grow-1">
+              <div class="info-item mb-3">
+                <div class="info-label">Email</div>
+                <div class="info-value" id="employeeDetailEmail">aziz@gmail.com</div>
+              </div>
+              <div class="info-item mb-3">
+                <div class="info-label">Téléphone</div>
+                <div class="info-value" id="employeeDetailPhone">22222222</div>
+              </div>
+              <div class="info-item mb-3">
+                <div class="info-label">Date de naissance</div>
+                <div class="info-value" id="employeeDetailBirthDate">10/07/2005</div>
+              </div>
+              <div class="info-item mb-3">
+                <div class="info-label">ID Employé</div>
+                <div class="info-value" id="employeeDetailId">4</div>
+              </div>
+              <div class="info-item mb-3">
+                <div class="info-label">Rôle</div>
+                <div class="info-value" id="employeeDetailRole">Employé</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Carte des statistiques de travail -->
+      <div class="col-md-8 mb-4">
+        <div class="card h-100">
+          <div class="card-header stats-header">
+            <h5 class="mb-0">Statistiques de travail - <span id="currentMonthYear">FÉVRIER 2026</span></h5>
+          </div>
+          <div class="card-body d-flex flex-column">
+            <div class="row flex-grow-1 g-3">
+              <!-- Colonne gauche -->
+              <div class="col-md-6 d-flex flex-column">
+                <div class="stat-card mb-3">
+                  <div class="stat-header d-flex justify-content-between">
+                    <span>Salaire mensuel</span>
+                    <i class="fas fa-money-bill-wave"></i>
+                  </div>
+                  <div class="stat-value" id="employeeSalary">-- DT</div>
+                </div>
+                
+                <div class="stat-card mb-3">
+                  <div class="stat-header d-flex justify-content-between">
+                    <span>Heures travaillées (ce mois)</span>
+                    <i class="fas fa-clock"></i>
+                  </div>
+                  <div class="stat-value" id="employeeHours">0 h</div>
+                </div>
+                
+                <div class="stat-card mb-3">
+                  <div class="stat-header d-flex justify-content-between">
+                    <span>Heures supplémentaires</span>
+                    <i class="fas fa-bolt"></i>
+                  </div>
+                  <div class="stat-value" id="employeeOvertime">0 h</div>
+                </div>
+
+                <div class="stat-card">
+                  <div class="stat-header d-flex justify-content-between">
+                    <span>Grade actuel</span>
+                    <i class="fas fa-star"></i>
+                  </div>
+                  <div class="stat-value-small" id="employeeGrade">Débutant</div>
+                </div>
+              </div>
+              
+              <!-- Colonne droite -->
+              <div class="col-md-6 d-flex flex-column">
+                <div class="stat-card mb-3">
+                  <div class="stat-header d-flex justify-content-between">
+                    <span>Jours de travail (ce mois)</span>
+                    <i class="fas fa-calendar-day"></i>
+                  </div>
+                  <div class="stat-value" id="employeeWorkDays">0 jours</div>
+                </div>
+                
+                <div class="stat-card mb-3">
+                  <div class="stat-header d-flex justify-content-between">
+                    <span>Taux horaire</span>
+                    <i class="fas fa-money-bill-wave"></i>
+                  </div>
+                  <div class="stat-value" id="employeeHourlyRate">-- DT/h</div>
+                </div>
+                
+                <div class="stat-card mb-3">
+                  <div class="stat-header d-flex justify-content-between">
+                    <span>Salaire estimé</span>
+                    <i class="fas fa-calculator"></i>
+                  </div>
+                  <div class="stat-value" id="employeeEstimatedSalary">-- DT</div>
+                </div>
+
+                <div class="stat-card">
+                  <div class="stat-header d-flex justify-content-between">
+                    <span>Dernière promotion</span>
+                    <i class="fas fa-arrow-up"></i>
+                  </div>
+                  <div class="stat-value-small" id="employeeLastPromotion">01/01/2025</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> 
+    </div>
+    
+    <!-- Section gestion du salaire -->
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Gestion du salaire</h5>
+            <button class="btn btn-primary" onclick="openSalaryModal()">
+              <i class="fas fa-edit me-2"></i>Modifier le salaire
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <h6>Configuration actuelle</h6>
+                <div class="salary-info">
+                  <p><strong>Salaire de base :</strong> <span id="baseSalaryInfo">-- DT</span></p>
+                  <p><strong>Taux horaire :</strong> <span id="hourlyRateInfo">-- DT/h</span></p>
+                  <p><strong>Heures par semaine :</strong> <span id="weeklyHours">-- h</span></p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <h6>Historique des modifications</h6>
+                <div id="salaryHistory" class="salary-history-container" style="max-height: 200px; overflow-y: auto;">
+                  <!-- L'historique sera chargé ici -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Section historique de présence détaillé -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Historique de présence détaillé</h5>
+        <div>
+          <select id="presenceMonthFilter" class="form-select form-select-sm" style="width: 150px; display: inline-block;">
+            <option value="">Tous les mois</option>
+            <!-- Options seront ajoutées dynamiquement -->
+          </select>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Heure d'arrivée</th>
+                <th>Heure de départ</th>
+                <th>Salle</th>
+                <th>Durée</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody id="employeePresenceDetails">
+              <!-- Les données seront chargées ici -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal pour modifier le salaire -->
+<div class="modal fade" id="salaryModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modifier le salaire</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="salaryForm">
+          <input type="hidden" id="salaryEmployeeId">
+          <div class="mb-3">
+            <label class="form-label">Salaire mensuel (DT)</label>
+            <input type="number" class="form-control" id="monthlySalary" step="100" required>
+            <div class="form-text">Salaire brut mensuel en dinars tunisiens</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Taux horaire (DT/h)</label>
+            <input type="number" class="form-control" id="hourlyRate" step="0.5" required>
+            <div class="form-text">Taux horaire en dinars tunisiens</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Heures par semaine</label>
+            <input type="number" class="form-control" id="weeklyHoursInput" step="0.5" required>
+            <div class="form-text">Nombre d'heures de travail par semaine</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Date d'effet</label>
+            <input type="date" class="form-control" id="effectiveDate" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Commentaire (optionnel)</label>
+            <textarea class="form-control" id="salaryComment" rows="2"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-primary" onclick="updateSalary()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  let currentEmployee = null;
+  let presenceData = [];
+  let salaryData = null;
+  let roomHistoryData = [];
+  let employeeIdGlobal = null; // ID centralisé depuis l'URL ou le token
+  
+  // ================= UTILITAIRES =================
+  function parseJwt(token) {
+    if (!token) return null;
+    try {
+      const base64Payload = token.split('.')[1];
+      const payload = atob(base64Payload);
+      return JSON.parse(payload);
+    } catch (e) {
+      return null;
+    }
+  }
+  
+  function showError(message) {
+    const errorDiv = document.getElementById('errorContent');
+    if (!errorDiv) return;
+    errorDiv.textContent = message;
+    errorDiv.classList.remove('d-none');
+    setTimeout(() => errorDiv.classList.add('d-none'), 5000);
+  }
+  
+  function showSuccess(message) {
+    const successDiv = document.getElementById('successContent');
+    if (!successDiv) return;
+    successDiv.textContent = message;
+    successDiv.classList.remove('d-none');
+    setTimeout(() => successDiv.classList.add('d-none'), 3000);
+  }
+  
+  function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'N/A';
+      return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    } catch (error) {
+      return 'N/A';
+    }
+  }
+  
+  function formatTime(timeString) {
+    if (!timeString) return '--:--';
+    return timeString.substring(0, 5);
+  }
+  
+  function calculateWorkHours(startTime, endTime) {
+    if (!startTime || !endTime) return 0;
+    const start = new Date(`2000-01-01T${startTime}`);
+    const end = new Date(`2000-01-01T${endTime}`);
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) return 0;
+    const diffMs = end - start;
+    if (diffMs < 0) return 0;
+    return diffMs / (1000*60*60);
+  }
+  
+  function calculateDuration(startTime, endTime) {
+    const hours = calculateWorkHours(startTime, endTime);
+    if (hours <= 0) return '--:--';
+    const h = Math.floor(hours);
+    const m = Math.round((hours-h)*60);
+    return h > 0 ? `${h}h ${m}min` : `${m} min`;
+  }
+  
+  // ================= INITIALISATION DE L'ID =================
+  function initEmployeeId() {
+    const urlParams = new URLSearchParams(window.location.search);
+    let id = urlParams.get('id');
+    if (!id) {
+      const token = localStorage.getItem('jwt');
+      const payload = parseJwt(token);
+      id = payload?.id;
+    }
+    employeeIdGlobal = id;
+  }
+  
+  // ================= CHARGEMENT DONNÉES =================
+  async function loadEmployeeDetails() {
+    if (!employeeIdGlobal) {
+      showError("Aucun employé sélectionné");
+      return;
+    }
+    const token = localStorage.getItem('jwt');
+    if (!token) { window.location.href = 'connexion.html'; return; }
+  
+    try {
+      const res = await fetch(`admin_api.php?action=get_employee&id=${employeeIdGlobal}`, {
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+      });
+      if (!res.ok) {
+        if (res.status===401) { window.location.href='login.html'; return; }
+        throw new Error('Erreur serveur: '+res.status);
+      }
+      const data = await res.json();
+      if (data.success && data.employee) {
+        currentEmployee = data.employee;
+        if (currentEmployee.role === 'Directeur') currentEmployee.role = 'responsable_rh';
+        displayEmployeeInfo();
+        await Promise.all([
+          loadEmployeeSalary(),
+          loadEmployeePresenceDetails(),
+          loadPresenceMonths(),
+          loadEmployeeRoomHistory()
+        ]);
+        calculateAndDisplayEmployeeStats();
+      } else {
+        showError(data.message || "Employé non trouvé");
+      }
+    } catch (error) {
+      console.error(error);
+      showError("Erreur lors du chargement des données de l'employé");
+    }
+  }
+  
+  function displayEmployeeInfo() {
+    if (!currentEmployee) return;
+    const fullName = `${currentEmployee.prenom||''} ${currentEmployee.nom||''}`.trim();
+    document.getElementById('employeeDetailName').textContent = fullName || 'Nom non disponible';
+    document.getElementById('employeeDetailPoste').textContent = currentEmployee.poste || '';
+    document.getElementById('employeeDetailId').textContent = currentEmployee.id || 'N/A';
+    document.getElementById('employeeDetailEmail').textContent = currentEmployee.email || 'Non renseigné';
+    document.getElementById('employeeDetailPhone').textContent = currentEmployee.numero_telephone || 'Non renseigné';
+    document.getElementById('employeeDetailBirthDate').textContent = currentEmployee.date_naissance ? formatDate(currentEmployee.date_naissance) : 'Non renseigné';
+    displayEmployeePhoto();
+  
+    // Rôle
+    const infoGrid = document.querySelector('.employee-info-grid');
+    if (currentEmployee.role) {
+      let roleExists = false;
+      infoGrid.querySelectorAll('.info-item').forEach(item => {
+        if (item.querySelector('.info-label').textContent === 'Rôle') {
+          roleExists=true;
+          item.querySelector('.info-value').textContent=currentEmployee.role;
+        }
+      });
+      if (!roleExists) {
+        const div=document.createElement('div');
+        div.className='info-item mb-3';
+        div.innerHTML=`<div class="info-label">Rôle</div><div class="info-value">${currentEmployee.role}</div>`;
+        infoGrid.appendChild(div);
+      }
+    }
+  
+    const now = new Date();
+    document.getElementById('currentMonthYear').textContent = now.toLocaleDateString('fr-FR',{month:'long',year:'numeric'}).toUpperCase();
+    document.getElementById('employeeGrade').textContent = currentEmployee.grade||'Débutant';
+    document.getElementById('employeeLastPromotion').textContent = currentEmployee.last_promotion||'01/01/2025';
+  }
+  
+  function displayEmployeePhoto() {
+    const avatarContainer = document.getElementById('employeeAvatarContainer');
+    if (!avatarContainer) return;
+    if (currentEmployee.photo) {
+      const img = document.createElement('img');
+      img.src = currentEmployee.photo;
+      img.alt = "Photo de l'employé";
+      img.onerror = ()=>{avatarContainer.innerHTML='<i class="fas fa-user-tie"></i>';}
+      avatarContainer.innerHTML=''; avatarContainer.appendChild(img);
+    } else avatarContainer.innerHTML='<i class="fas fa-user-tie"></i>';
+  }
+  
+  // ================= SALAIRE =================
+  async function loadEmployeeSalary() {
+    if (!employeeIdGlobal) return;
+    const token = localStorage.getItem('jwt');
+    try {
+      const res = await fetch(`admin_api.php?action=get_salary&employee_id=${employeeIdGlobal}`,{
+        headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'}
+      });
+      if(res.ok){
+        const data = await res.json();
+        salaryData = data.success ? data : null;
+        displaySalaryInfo();
+      } else setDefaultSalaryValues();
+    } catch(e){ console.error(e); setDefaultSalaryValues(); }
+  }
+  
+  function setDefaultSalaryValues(){
+    const fields=['employeeSalary','employeeHourlyRate','baseSalaryInfo','hourlyRateInfo'];
+    fields.forEach(id=>{const el=document.getElementById(id);if(el) el.textContent='-- DT';});
+    const weekly = document.getElementById('weeklyHours'); if(weekly) weekly.textContent='-- h';
+  }
+  
+  // ================= PRESENCE =================
+  async function loadEmployeePresenceDetails(month=null, year=null){
+    if(!employeeIdGlobal) return;
+    const token = localStorage.getItem('jwt');
+    const date = new Date();
+    const m = month || date.getMonth()+1;
+    const y = year || date.getFullYear();
+    try{
+      const res = await fetch(`presence.php?action=get_employee_presence&employee_id=${employeeIdGlobal}&month=${m}&year=${y}`,{
+        headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'}
+      });
+      const data = await res.json();
+      presenceData = data.success ? (data.presences||[]) : [];
+      displayPresenceDetails();
+    }catch(e){ console.error(e); presenceData=[]; displayPresenceDetails();}
+  }
+  
+  // ================= HISTORIQUE SALLES =================
+  async function loadEmployeeRoomHistory(){
+    if(!employeeIdGlobal) return;
+    const token = localStorage.getItem('jwt');
+    try{
+      const res = await fetch(`api_historique_salles.php?action=get_employee_history&employee_id=${employeeIdGlobal}`,{
+        headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'}
+      });
+      const data = await res.json();
+      roomHistoryData = data.success ? data.historique||[] : [];
+    }catch(e){ console.error(e);}
+  }
+  
+  // ================= FILTRAGE MOIS =================
+  async function loadPresenceMonths(){
+    if(!employeeIdGlobal) return;
+    const token = localStorage.getItem('jwt');
+    try{
+      const res = await fetch(`presence.php?action=get_presence_months&employee_id=${employeeIdGlobal}`,{
+        headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'}
+      });
+      const data = await res.json();
+      if(data.success && data.months) populateMonthFilter(data.months);
+    }catch(e){console.error(e);}
+  }
+  
+  function populateMonthFilter(months){
+    const filter = document.getElementById('presenceMonthFilter'); if(!filter) return;
+    filter.innerHTML='<option value="">Tous les mois</option>';
+    months.forEach(m=>{
+      const [y,mon]=m.split('-'); const date = new Date(y,mon-1,1);
+      const monthName=date.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
+      const option=document.createElement('option');
+      option.value=m; option.textContent=monthName.charAt(0).toUpperCase()+monthName.slice(1);
+      filter.appendChild(option);
+    });
+    filter.addEventListener('change',function(){
+      if(this.value){ const [y,mon]=this.value.split('-'); loadEmployeePresenceDetails(parseInt(mon),parseInt(y)); }
+      else loadEmployeePresenceDetails();
+    });
+  }
+  
+  // ================= INITIALISATION =================
+  document.addEventListener('DOMContentLoaded',()=>{
+    const token = localStorage.getItem('jwt');
+    if(!token){ window.location.href='connexion.html'; return; }
+    initEmployeeId();
+    loadEmployeeDetails();
+    const tooltipList=[].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipList.map(el=>new bootstrap.Tooltip(el));
+  });
+  </script>
+</body>
+</html>

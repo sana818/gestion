@@ -1,0 +1,426 @@
+<?php
+header('Content-Type: application/json; charset=utf-8');
+
+// 🔥 Activer les erreurs temporairement
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/error.log');
+error_reporting(E_ALL);
+
+// 🔹 Capturer tous les erreurs PHP et les retourner en JSON
+set_error_handler(function($errno, $errstr, $errfile, $errline) {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Erreur serveur',
+        'error' => $errstr,
+        'file' => $errfile,
+        'line' => $errline
+    ]);
+    exit;
+});
+
+require_once 'Database.php';
+require_once __DIR__ . '/vendor/autoload.php';
+
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+
+try {
+    // 🔹 1️⃣ Récupération du token JWT
+    $headers = getallheaders();
+    
+    $jwt = '';
+    
+    if (isset($headers['X-Token'])) {
+        $jwt = $headers['X-Token'];
+    } elseif (isset($headers['Authorization'])) {
+        $authHeader = $headers['Authorization'];
+        if (strpos($authHeader, 'Bearer ') === 0) {
+            $jwt = substr($authHeader, 7);
+        }
+    }
+    
+    if (!$jwt) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'Token JWT manquant']);
+        exit;
+    }
+    
+    $secret_key = "Votre_Cle_Secrete_Complexe_Ici_123!@#";
+    
+    try {
+        $decoded = JWT::decode($jwt, new Key($secret_key, 'HS256'));
+    } catch (Exception $e) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'Token invalide']);
+        exit;
+    }
+    
+    $userId = $decoded->id ?? null;
+    
+    if (!$userId) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'ID utilisateur introuvable']);
+        exit;
+    }
+    
+    // 🔹 2️⃣ Récupération des données POST
+    $date = $_POST['date'] ?? null;
+    $heure_arrivee_reelle = $_POST['heure_arrivee_reelle'] ?? null;
+    $heure_arrivee_prevue = $_POST['heure_arrivee_prevue'] ?? null;
+    $duree_retard = $_POST['duree_retard'] ?? null;
+    $raison = $_POST['raison'] ?? null;
+    $commentaire = $_POST['commentaire'] ?? '';
+    $duree = 1;
+    
+    // 🔥 DEBUG
+    error_log('POST data: ' . json_encode($_POST));
+    error_log('FILES data: ' . json_encode($_FILES));
+    
+    if (!$date || !$heure_arrivee_reelle || !$heure_arrivee_prevue || !$duree_retard || !$raison) {
+        http_response_code(400);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Champs obligatoires manquants',
+            'received' => [
+                'date' => $date,
+                'heure_arrivee_reelle' => $heure_arrivee_reelle,
+                'heure_arrivee_prevue' => $heure_arrivee_prevue,
+                'duree_retard' => $duree_retard,
+                'raison' => $raison
+            ]
+        ]);
+        exit;
+    }
+    
+    // 🔹 3️⃣ Upload fichier (optionnel)
+    $documentPath = null;
+    
+    if (isset($_FILES['document']) && $_FILES['document']['error'] == 0) {
+        $uploadDir = 'uploads/justificatifs/';
+        
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+        
+        $ext = pathinfo($_FILES['document']['name'], PATHINFO_EXTENSION);
+        $fileName = time() . '_' . uniqid() . '.' . $ext;
+        $targetFile = $uploadDir . $fileName;
+        
+        $allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+        
+        if (!in_array($_FILES['document']['type'], $allowedTypes)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Type fichier invalide']);
+            exit;
+        }
+        
+        if ($_FILES['document']['size'] > 5 * 1024 * 1024) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Fichier trop grand (max 5 Mo)']);
+            exit;
+        }
+        
+        if (move_uploaded_file($_FILES['document']['tmp_name'], $targetFile)) {
+            $documentPath = $targetFile;
+        } else {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Erreur lors du téléchargement']);
+            exit;
+        }
+    }
+    
+    // 🔹 4️⃣ Insertion en base de données
+    try {
+        $pdo = Database::connect();
+        
+        // Récupérer les infos utilisateur
+        $stmt = $pdo->prepare("SELECT nom, prenom FROM employes WHERE id = ?");
+        $stmt->execute([$userId]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$user) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'message' => 'Utilisateur introuvable']);
+            exit;
+        }
+        
+        $nomComplet = $user['prenom'] . ' ' . $user['nom'];
+        
+        $statut = 'non lu';
+        $statut_demande = 'en attente';
+        $date_envoi = date('Y-m-d H:i:s');
+        
+        // INSERT dans la table
+        $stmt = $pdo->prepare("
+            INSERT INTO justificatif_employe 
+            (employe_id, date_absence, heure_arrivee_reelle, heure_arrivee_prevue, duree_retard, duree, raison, commentaire, document, statut, date_envoi, statut_lecture)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        
+        $stmt->execute([
+            $userId,
+            $date,
+            $heure_arrivee_reelle,
+            $heure_arrivee_prevue,
+            $duree_retard,
+            $duree,
+            $raison,
+            $commentaire,
+            $documentPath,
+            $statut_demande,
+            $date_envoi,
+            $statut
+        ]);
+        
+        $justificatifId = $pdo->lastInsertId();
+        
+        // 🔹 5️⃣ Notifications admin
+        $stmt = $pdo->prepare("SELECT id FROM employes WHERE role = 'directeur'");
+        $stmt->execute();
+        $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Formater la durée
+        $dureeMin = intval($duree_retard);
+        $dureeTexte = ($dureeMin < 60)
+            ? $dureeMin . ' min'
+            : floor($dureeMin / 60) . 'h ' . ($dureeMin % 60) . 'min';
+        
+        $message = $nomComplet . " a signalé un retard le " . date('d/m/Y', strtotime($date)) . " (" . $dureeTexte . ")";
+        $lien = '/admin_justificatifs.php?id=' . $justificatifId;
+        
+        if (!empty($admins)) {
+            $stmtNotif = $pdo->prepare("
+                INSERT INTO notifications (destinataire_id, type, message, lien, date, lu)
+                VALUES (?, 'retard', ?, ?, NOW(), 0)
+            ");
+            
+            foreach ($admins as $admin) {
+                $stmtNotif->execute([$admin['id'], $message, $lien]);
+            }
+        }
+        
+        // ✅ Succès
+        http_response_code(200);
+        echo json_encode([
+            'success' => true,
+            'message' => 'Justificatif envoyé avec succès',
+            'justificatif_id' => $justificatifId
+        ]);
+        
+    } catch (PDOException $e) {
+        error_log('Database error: ' . $e->getMessage());
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Erreur base de données',
+            'error' => $e->getMessage()
+        ]);
+        exit;
+    }
+    
+} catch (Exception $e) {
+    error_log('General error: ' . $e->getMessage());
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Erreur serveur: ' . $e->getMessage()
+    ]);
+    exit;
+}
+?>
+header('Content-Type: application/json; charset=utf-8');
+
+// Catch all errors and return JSON
+set_error_handler(function($errno, $errstr, $errfile, $errline) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Erreur serveur',
+        'debug' => "[$errfile:$errline] $errstr"
+    ]);
+    exit;
+});
+
+// ... rest of your code
+header('Content-Type: application/json; charset=utf-8');
+
+// 🔥 عرض الأخطاء (استعمله فقط أثناء التطوير)
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/error.log');
+error_reporting(E_ALL);
+
+require_once 'Database.php';
+require_once __DIR__ . '/vendor/autoload.php';
+
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+
+// 🔹 1️⃣ Récupération du token JWT
+$headers = getallheaders();
+
+$jwt = '';
+
+if (isset($headers['X-Token'])) {
+    $jwt = $headers['X-Token'];
+} elseif (isset($headers['Authorization'])) {
+    $authHeader = $headers['Authorization'];
+    if (strpos($authHeader, 'Bearer ') === 0) {
+        $jwt = substr($authHeader, 7);
+    }
+}
+
+if (!$jwt) {
+    echo json_encode(['success' => false, 'message' => 'Token JWT manquant']);
+    exit;
+}
+
+$secret_key = "Votre_Cle_Secrete_Complexe_Ici_123!@#";
+
+try {
+    $decoded = JWT::decode($jwt, new Key($secret_key, 'HS256'));
+} catch (Exception $e) {
+    echo json_encode(['success' => false, 'message' => 'Token invalide']);
+    exit;
+}
+
+$userId = $decoded->id ?? null;
+
+if (!$userId) {
+    echo json_encode(['success' => false, 'message' => 'ID utilisateur introuvable']);
+    exit;
+}
+
+// 🔹 2️⃣ Données POST
+$date = $_POST['date'] ?? null;
+$heure_arrivee_reelle = $_POST['heure_arrivee_reelle'] ?? null;
+$heure_arrivee_prevue = $_POST['heure_arrivee_prevue'] ?? null;
+$duree_retard = $_POST['duree_retard'] ?? null;
+$raison = $_POST['raison'] ?? null;
+$commentaire = $_POST['commentaire'] ?? null;
+$duree = 1;
+
+if (!$date || !$heure_arrivee_reelle || !$heure_arrivee_prevue || !$duree_retard || !$raison) {
+    echo json_encode(['success' => false, 'message' => 'Champs obligatoires manquants']);
+    exit;
+}
+
+// 🔹 3️⃣ Upload fichier
+$documentPath = null;
+
+if (isset($_FILES['document']) && $_FILES['document']['error'] == 0) {
+
+    $uploadDir = 'uploads/justificatifs/';
+
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0777, true);
+    }
+
+    $ext = pathinfo($_FILES['document']['name'], PATHINFO_EXTENSION);
+    $fileName = time() . '_' . uniqid() . '.' . $ext;
+    $targetFile = $uploadDir . $fileName;
+
+    $allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+
+    if (!in_array($_FILES['document']['type'], $allowedTypes)) {
+        echo json_encode(['success' => false, 'message' => 'Type fichier invalide']);
+        exit;
+    }
+
+    if ($_FILES['document']['size'] > 5 * 1024 * 1024) {
+        echo json_encode(['success' => false, 'message' => 'Fichier trop grand']);
+        exit;
+    }
+
+    if (move_uploaded_file($_FILES['document']['tmp_name'], $targetFile)) {
+        $documentPath = $targetFile;
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Erreur upload']);
+        exit;
+    }
+}
+
+// 🔹 4️⃣ Insertion DB
+try {
+    $pdo = Database::connect();
+
+    // 🔥 récupérer utilisateur
+    $stmt = $pdo->prepare("SELECT nom, prenom FROM employes WHERE id = ?");
+    $stmt->execute([$userId]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$user) {
+        echo json_encode(['success' => false, 'message' => 'Utilisateur introuvable']);
+        exit;
+    }
+
+    // ✅ CORRECTION IMPORTANTE
+    $nomComplet = $user['prenom'] . ' ' . $user['nom'];
+
+    $statut = 'non lu';
+    $statut_demande = 'en attente';
+    $date_envoi = date('Y-m-d H:i:s');
+
+    // ✅ INSERT CORRECT (toutes les colonnes)
+    $stmt = $pdo->prepare("
+        INSERT INTO justificatif_employe 
+        (employe_id, date_absence, heure_arrivee_reelle, heure_arrivee_prevue, duree_retard, duree, raison, commentaire, document, statut, date_envoi, statut_lecture)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ");
+
+    $stmt->execute([
+        $userId,
+        $date,
+        $heure_arrivee_reelle,
+        $heure_arrivee_prevue,
+        $duree_retard,
+        $duree,
+        $raison,
+        $commentaire,
+        $documentPath,
+        $statut_demande,
+        $date_envoi,
+        $statut
+    ]);
+
+    $justificatifId = $pdo->lastInsertId();
+
+    // 🔹 5️⃣ Notifications admin
+    $stmt = $pdo->prepare("SELECT id FROM employes WHERE role = 'directeur'");
+    $stmt->execute();
+    $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // format durée
+    $dureeMin = intval($duree_retard);
+    $dureeTexte = ($dureeMin < 60)
+        ? $dureeMin . ' min'
+        : floor($dureeMin / 60) . 'h ' . ($dureeMin % 60) . 'min';
+
+    $message = $nomComplet . " a signalé un retard le " . date('d/m/Y', strtotime($date)) . " (" . $dureeTexte . ")";
+    $lien = '/admin_justificatifs.php?id=' . $justificatifId;
+
+    if (!empty($admins)) {
+        $stmtNotif = $pdo->prepare("
+            INSERT INTO notifications (destinataire_id, type, message, lien, date, lu)
+            VALUES (?, 'retard', ?, ?, NOW(), 0)
+        ");
+
+        foreach ($admins as $admin) {
+            $stmtNotif->execute([$admin['id'], $message, $lien]);
+        }
+    }
+
+    // ✅ SUCCESS JSON
+    echo json_encode([
+        'success' => true,
+        'message' => 'Justificatif envoyé avec succès'
+    ]);
+
+} catch (Exception $e) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Erreur serveur : ' . $e->getMessage()
+    ]);
+}
+?>

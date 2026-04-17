@@ -1,0 +1,15 @@
+2026-02-23 11:33:00 - Début du script
+2026-02-23 11:33:00 - Auth Header: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjExIiwiZW1haWwiOiJheml6YmVuYW1hcmFAZ21haWwuY29tIiwibm9tIjoiYXppeiIsInByZW5vbSI6ImJlbiBhbWFyYSIsInJvbGUiOiJFbXBsb3llIiwicG9zdGUiOiJXZWIgZGV2ZWxvcGVyIiwiZXhwIjoxNzcxODQ1MDM3fQ.6Cvy2raMpquMwfD9_i0itL93LZxq-HxmAhq6HAnv_v4
+2026-02-23 11:33:00 - Token décodé: stdClass Object
+(
+    [id] => 11
+    [email] => azizbenamara@gmail.com
+    [nom] => aziz
+    [prenom] => ben amara
+    [role] => Employe
+    [poste] => Web developer
+    [exp] => 1771845037
+)
+
+2026-02-23 11:33:00 - User ID: 11
+2026-02-23 11:33:00 - Données reçues: 

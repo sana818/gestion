@@ -1,0 +1,58 @@
+@startuml
+left to right direction
+
+actor "Employé" as Employe
+actor "Responsable RH" as RH
+
+participant "Système" as System
+participant "DemandeConge" as Demande
+participant "Notification" as Notif
+participant "SoldeConge" as Solde
+
+== Scénario : Demande de congé ==
+
+Employe -> System: seConnecter()
+System --> Employe: Confirmation connexion
+
+Employe -> System: consulterSolde()
+System -> Solde: calculerSolde()
+Solde --> System: joursRestants
+System --> Employe: Affichage solde
+
+Employe -> System: faireDemandeConge(dates, type)
+System -> Demande: creerDemande()
+Demande --> System: Demande créée
+System -> Notif: envoyer("Nouvelle demande")
+Notif --> RH: Notification
+System --> Employe: Confirmation création
+
+== Scénario : Traitement demande ==
+
+RH -> System: seConnecter()
+System --> RH: Confirmation connexion
+
+RH -> System: consulterDemandes()
+System --> RH: Liste demandes en attente
+
+RH -> System: traiterDemande(id, statut)
+System -> Demande: modifierStatut(statut)
+Demande --> System: Statut modifié
+System -> Notif: envoyer("Décision demande")
+Notif --> Employe: Notification décision
+
+alt Demande acceptée
+    System -> Solde: mettreAJour()
+    Solde --> System: Solde actualisé
+end
+System --> RH: Confirmation traitement
+
+== Scénario : Consultation notification ==
+
+Employe -> System: consulterNotifications()
+System --> Employe: Liste notifications
+Employe -> System: marquerCommeLue(idNotif)
+System -> Notif: marquerCommeLue()
+Notif --> System: Notification lue
+System --> Employe: Confirmation
+
+@enduml

@@ -1,0 +1,665 @@
+[07-Oct-2025 23:33:01 Europe/Berlin] Début de profile1.php
+[07-Oct-2025 23:33:01 Europe/Berlin] Bibliothèque JWT chargée
+[07-Oct-2025 23:33:01 Europe/Berlin] Début logique principale
+[07-Oct-2025 23:33:01 Europe/Berlin] En-tête Authorization: non défini
+[07-Oct-2025 23:33:01 Europe/Berlin] Erreur: Token JWT manquant
+[07-Oct-2025 23:33:02 Europe/Berlin] Début de profile1.php
+[07-Oct-2025 23:33:02 Europe/Berlin] Bibliothèque JWT chargée
+[07-Oct-2025 23:33:02 Europe/Berlin] Début logique principale
+[07-Oct-2025 23:33:02 Europe/Berlin] En-tête Authorization: non défini
+[07-Oct-2025 23:33:02 Europe/Berlin] Erreur: Token JWT manquant
+[07-Oct-2025 23:33:06 Europe/Berlin] Début de profile1.php
+[07-Oct-2025 23:33:06 Europe/Berlin] Bibliothèque JWT chargée
+[07-Oct-2025 23:33:06 Europe/Berlin] Début logique principale
+[07-Oct-2025 23:33:06 Europe/Berlin] En-tête Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjExIiwiZW1haWwiOiJheml6YmVuYW1hcmFAZ21haWwuY29tIiwibm9tIjoiYXppeiIsInByZW5vbSI6ImJlbiBhbWFyYSIsInJvbGUiOiJFbXBsb3llIiwicG9zdGUiOiJEXHUwMGU5dmVsb3BwZXVyIiwiZXhwIjoxNzU5ODc1OTIwfQ.W0TuJhYwL88nYdIM7zaGYogEhj76USuPYue2B5e-Yxw
+[07-Oct-2025 23:33:06 Europe/Berlin] Token JWT: eyJ0eXAiOiJKV1QiLCJh...
+[07-Oct-2025 23:33:06 Europe/Berlin] JWT décodé avec succès: ID=11
+[07-Oct-2025 23:33:06 Europe/Berlin] Récupération des données pour user_id: 11
+[07-Oct-2025 23:33:06 Europe/Berlin] Connexion à la base de données réussie
+[07-Oct-2025 23:33:06 Europe/Berlin] Utilisateur trouvé: Array
+(
+    [id] => 11
+    [nom] => aziz
+    [prenom] => ben amara
+    [date_naissance] => 1999-10-05
+    [numero_telephone] => 88888888
+    [email] => azizbenamara@gmail.com
+    [photo_profil] => ����
+[07-Oct-2025 23:33:06 Europe/Berlin] Données emploi: Array
+(
+    [poste] => Développeur
+    [date_embauche] => 2020-01-01
+)
+
+[07-Oct-2025 23:33:06 Europe/Berlin] Réponse finale: Array
+(
+    [success] => 1
+    [user] => Array
+        (
+            [id] => 11
+            [nom] => aziz
+            [prenom] => ben amara
+            [date_naissance] => 05/10/1999
+            [numero_telephone] => 88888888
+            [email] => azizbenamara@gmail.com
+            [photo_profil] => ����
+[07-Oct-2025 23:33:10 Europe/Berlin] Début de profile1.php
+[07-Oct-2025 23:33:10 Europe/Berlin] Bibliothèque JWT chargée
+[07-Oct-2025 23:33:10 Europe/Berlin] Début logique principale
+[07-Oct-2025 23:33:10 Europe/Berlin] En-tête Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjExIiwiZW1haWwiOiJheml6YmVuYW1hcmFAZ21haWwuY29tIiwibm9tIjoiYXppeiIsInByZW5vbSI6ImJlbiBhbWFyYSIsInJvbGUiOiJFbXBsb3llIiwicG9zdGUiOiJEXHUwMGU5dmVsb3BwZXVyIiwiZXhwIjoxNzU5ODc1OTIwfQ.W0TuJhYwL88nYdIM7zaGYogEhj76USuPYue2B5e-Yxw
+[07-Oct-2025 23:33:10 Europe/Berlin] Token JWT: eyJ0eXAiOiJKV1QiLCJh...
+[07-Oct-2025 23:33:10 Europe/Berlin] JWT décodé avec succès: ID=11
+[07-Oct-2025 23:33:10 Europe/Berlin] Récupération des données pour user_id: 11
+[07-Oct-2025 23:33:10 Europe/Berlin] Connexion à la base de données réussie
+[07-Oct-2025 23:33:10 Europe/Berlin] Utilisateur trouvé: Array
+(
+    [id] => 11
+    [nom] => aziz
+    [prenom] => ben amara
+    [date_naissance] => 1999-10-05
+    [numero_telephone] => 88888888
+    [email] => azizbenamara@gmail.com
+    [photo_profil] => ����
+[07-Oct-2025 23:33:10 Europe/Berlin] Données emploi: Array
+(
+    [poste] => Développeur
+    [date_embauche] => 2020-01-01
+)
+
+[07-Oct-2025 23:33:10 Europe/Berlin] Réponse finale: Array
+(
+    [success] => 1
+    [user] => Array
+        (
+            [id] => 11
+            [nom] => aziz
+            [prenom] => ben amara
+            [date_naissance] => 05/10/1999
+            [numero_telephone] => 88888888
+            [email] => azizbenamara@gmail.com
+            [photo_profil] => ����
+[07-Oct-2025 23:39:03 Europe/Berlin] [2025-10-07 23:39:03] Début de profile1.php
+[07-Oct-2025 23:39:03 Europe/Berlin] [2025-10-07 23:39:03] Bibliothèque JWT chargée
+[07-Oct-2025 23:39:03 Europe/Berlin] [2025-10-07 23:39:03] Début logique principale
+[07-Oct-2025 23:39:03 Europe/Berlin] [2025-10-07 23:39:03] En-tête Authorization: non défini
+[07-Oct-2025 23:39:03 Europe/Berlin] [2025-10-07 23:39:03] Erreur: Token JWT manquant
+[07-Oct-2025 23:39:04 Europe/Berlin] [2025-10-07 23:39:04] Début de profile1.php
+[07-Oct-2025 23:39:04 Europe/Berlin] [2025-10-07 23:39:04] Bibliothèque JWT chargée
+[07-Oct-2025 23:39:04 Europe/Berlin] [2025-10-07 23:39:04] Début logique principale
+[07-Oct-2025 23:39:04 Europe/Berlin] [2025-10-07 23:39:04] En-tête Authorization: non défini
+[07-Oct-2025 23:39:04 Europe/Berlin] [2025-10-07 23:39:04] Erreur: Token JWT manquant
+[07-Oct-2025 23:39:08 Europe/Berlin] [2025-10-07 23:39:08] Début de profile1.php
+[07-Oct-2025 23:39:08 Europe/Berlin] [2025-10-07 23:39:08] Bibliothèque JWT chargée
+[07-Oct-2025 23:39:08 Europe/Berlin] [2025-10-07 23:39:08] Début logique principale
+[07-Oct-2025 23:39:08 Europe/Berlin] [2025-10-07 23:39:08] En-tête Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZC...
+[07-Oct-2025 23:39:08 Europe/Berlin] [2025-10-07 23:39:08] Token JWT: eyJ0eXAiOiJKV1QiLCJh...
+[07-Oct-2025 23:39:08 Europe/Berlin] [2025-10-07 23:39:08] JWT décodé avec succès: ID=11
+[07-Oct-2025 23:39:08 Europe/Berlin] [2025-10-07 23:39:08] Récupération des données pour user_id: 11
+[07-Oct-2025 23:39:08 Europe/Berlin] [2025-10-07 23:39:08] Connexion à la base de données réussie
+[07-Oct-2025 23:39:08 Europe/Berlin] [2025-10-07 23:39:08] Utilisateur trouvé: Array
+(
+    [id] => 11
+    [nom] => aziz
+    [prenom] => ben amara
+    [date_naissance] => 1999-10-05
+    [numero_telephone] => 88888888
+    [email] => azizbenamara@gmail.com
+    [photo_profil] => ����
+[07-Oct-2025 23:39:08 Europe/Berlin] [2025-10-07 23:39:08] Données emploi: Array
+(
+    [poste] => Développeur
+    [date_embauche] => 2020-01-01
+)
+
+[07-Oct-2025 23:39:08 Europe/Berlin] [2025-10-07 23:39:08] Réponse finale: Array
+(
+    [success] => 1
+    [user] => Array
+        (
+            [id] => 11
+            [nom] => aziz
+            [prenom] => ben amara
+            [date_naissance] => 05/10/1999
+            [numero_telephone] => 88888888
+            [email] => azizbenamara@gmail.com
+            [photo_profil] => ����
+[07-Oct-2025 23:39:09 Europe/Berlin] [2025-10-07 23:39:09] Début de profile1.php
+[07-Oct-2025 23:39:09 Europe/Berlin] [2025-10-07 23:39:09] Bibliothèque JWT chargée
+[07-Oct-2025 23:39:09 Europe/Berlin] [2025-10-07 23:39:09] Début logique principale
+[07-Oct-2025 23:39:09 Europe/Berlin] [2025-10-07 23:39:09] En-tête Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZC...
+[07-Oct-2025 23:39:09 Europe/Berlin] [2025-10-07 23:39:09] Token JWT: eyJ0eXAiOiJKV1QiLCJh...
+[07-Oct-2025 23:39:09 Europe/Berlin] [2025-10-07 23:39:09] JWT décodé avec succès: ID=11
+[07-Oct-2025 23:39:09 Europe/Berlin] [2025-10-07 23:39:09] Récupération des données pour user_id: 11
+[07-Oct-2025 23:39:09 Europe/Berlin] [2025-10-07 23:39:09] Connexion à la base de données réussie
+[07-Oct-2025 23:39:09 Europe/Berlin] [2025-10-07 23:39:09] Utilisateur trouvé: Array
+(
+    [id] => 11
+    [nom] => aziz
+    [prenom] => ben amara
+    [date_naissance] => 1999-10-05
+    [numero_telephone] => 88888888
+    [email] => azizbenamara@gmail.com
+    [photo_profil] => ����
+[07-Oct-2025 23:39:09 Europe/Berlin] [2025-10-07 23:39:09] Données emploi: Array
+(
+    [poste] => Développeur
+    [date_embauche] => 2020-01-01
+)
+
+[07-Oct-2025 23:39:09 Europe/Berlin] [2025-10-07 23:39:09] Réponse finale: Array
+(
+    [success] => 1
+    [user] => Array
+        (
+            [id] => 11
+            [nom] => aziz
+            [prenom] => ben amara
+            [date_naissance] => 05/10/1999
+            [numero_telephone] => 88888888
+            [email] => azizbenamara@gmail.com
+            [photo_profil] => ����
+[07-Oct-2025 23:50:07 Europe/Berlin] [2025-10-07 23:50:07] Début de profile1.php
+[07-Oct-2025 23:50:07 Europe/Berlin] [2025-10-07 23:50:07] Bibliothèque JWT chargée
+[07-Oct-2025 23:50:07 Europe/Berlin] [2025-10-07 23:50:07] Début logique principale
+[07-Oct-2025 23:50:07 Europe/Berlin] [2025-10-07 23:50:07] En-tête Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZC...
+[07-Oct-2025 23:50:07 Europe/Berlin] [2025-10-07 23:50:07] Token JWT: eyJ0eXAiOiJKV1QiLCJh...
+[07-Oct-2025 23:50:07 Europe/Berlin] [2025-10-07 23:50:07] JWT décodé avec succès: ID=11
+[07-Oct-2025 23:50:07 Europe/Berlin] [2025-10-07 23:50:07] Récupération des données pour user_id: 11
+[07-Oct-2025 23:50:07 Europe/Berlin] [2025-10-07 23:50:07] Connexion à la base de données réussie
+[07-Oct-2025 23:50:07 Europe/Berlin] [2025-10-07 23:50:07] Utilisateur trouvé: Array
+(
+    [id] => 11
+    [nom] => aziz
+    [prenom] => ben amara
+    [date_naissance] => 1999-10-05
+    [numero_telephone] => 88888888
+    [email] => azizbenamara@gmail.com
+    [photo_profil] => ����
+[07-Oct-2025 23:50:07 Europe/Berlin] [2025-10-07 23:50:07] Données emploi: Array
+(
+    [poste] => Développeur
+    [date_embauche] => 2020-01-01
+)
+
+[07-Oct-2025 23:50:07 Europe/Berlin] [2025-10-07 23:50:07] Réponse finale: Array
+(
+    [success] => 1
+    [user] => Array
+        (
+            [id] => 11
+            [nom] => aziz
+            [prenom] => ben amara
+            [date_naissance] => 05/10/1999
+            [numero_telephone] => 88888888
+            [email] => azizbenamara@gmail.com
+            [photo_profil] => ����
+[07-Oct-2025 23:53:52 Europe/Berlin] [2025-10-07 23:53:52] Début de profile1.php
+[07-Oct-2025 23:53:52 Europe/Berlin] [2025-10-07 23:53:52] Bibliothèque JWT chargée
+[07-Oct-2025 23:53:52 Europe/Berlin] [2025-10-07 23:53:52] Début logique principale
+[07-Oct-2025 23:53:52 Europe/Berlin] [2025-10-07 23:53:52] En-tête Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZC...
+[07-Oct-2025 23:53:52 Europe/Berlin] [2025-10-07 23:53:52] Token JWT: eyJ0eXAiOiJKV1QiLCJh...
+[07-Oct-2025 23:53:52 Europe/Berlin] [2025-10-07 23:53:52] JWT décodé avec succès: ID=11
+[07-Oct-2025 23:53:52 Europe/Berlin] [2025-10-07 23:53:52] Récupération des données pour user_id: 11
+[07-Oct-2025 23:53:52 Europe/Berlin] [2025-10-07 23:53:52] Connexion à la base de données réussie
+[07-Oct-2025 23:53:52 Europe/Berlin] [2025-10-07 23:53:52] Utilisateur trouvé: Array
+(
+    [id] => 11
+    [nom] => aziz
+    [prenom] => ben amara
+    [date_naissance] => 1999-10-05
+    [numero_telephone] => 88888888
+    [email] => azizbenamara@gmail.com
+    [photo_profil] => ����
+[07-Oct-2025 23:53:52 Europe/Berlin] [2025-10-07 23:53:52] Données emploi: Array
+(
+    [poste] => Développeur
+    [date_embauche] => 2020-01-01
+)
+
+[07-Oct-2025 23:53:52 Europe/Berlin] [2025-10-07 23:53:52] Réponse finale: Array
+(
+    [success] => 1
+    [user] => Array
+        (
+            [id] => 11
+            [nom] => aziz
+            [prenom] => ben amara
+            [date_naissance] => 05/10/1999
+            [numero_telephone] => 88888888
+            [email] => azizbenamara@gmail.com
+            [photo_profil] => ����
+[07-Oct-2025 23:53:54 Europe/Berlin] [2025-10-07 23:53:54] Début de profile1.php
+[07-Oct-2025 23:53:54 Europe/Berlin] [2025-10-07 23:53:54] Bibliothèque JWT chargée
+[07-Oct-2025 23:53:54 Europe/Berlin] [2025-10-07 23:53:54] Début logique principale
+[07-Oct-2025 23:53:54 Europe/Berlin] [2025-10-07 23:53:54] En-tête Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZC...
+[07-Oct-2025 23:53:54 Europe/Berlin] [2025-10-07 23:53:54] Token JWT: eyJ0eXAiOiJKV1QiLCJh...
+[07-Oct-2025 23:53:54 Europe/Berlin] [2025-10-07 23:53:54] JWT décodé avec succès: ID=11
+[07-Oct-2025 23:53:54 Europe/Berlin] [2025-10-07 23:53:54] Récupération des données pour user_id: 11
+[07-Oct-2025 23:53:54 Europe/Berlin] [2025-10-07 23:53:54] Connexion à la base de données réussie
+[07-Oct-2025 23:53:54 Europe/Berlin] [2025-10-07 23:53:54] Utilisateur trouvé: Array
+(
+    [id] => 11
+    [nom] => aziz
+    [prenom] => ben amara
+    [date_naissance] => 1999-10-05
+    [numero_telephone] => 88888888
+    [email] => azizbenamara@gmail.com
+    [photo_profil] => ����
+[07-Oct-2025 23:53:54 Europe/Berlin] [2025-10-07 23:53:54] Données emploi: Array
+(
+    [poste] => Développeur
+    [date_embauche] => 2020-01-01
+)
+
+[07-Oct-2025 23:53:54 Europe/Berlin] [2025-10-07 23:53:54] Réponse finale: Array
+(
+    [success] => 1
+    [user] => Array
+        (
+            [id] => 11
+            [nom] => aziz
+            [prenom] => ben amara
+            [date_naissance] => 05/10/1999
+            [numero_telephone] => 88888888
+            [email] => azizbenamara@gmail.com
+            [photo_profil] => ����
+[07-Oct-2025 23:55:00 Europe/Berlin] [2025-10-07 23:55:00] Début de profile1.php
+[07-Oct-2025 23:55:00 Europe/Berlin] [2025-10-07 23:55:00] Bibliothèque JWT chargée
+[07-Oct-2025 23:55:00 Europe/Berlin] [2025-10-07 23:55:00] Début logique principale
+[07-Oct-2025 23:55:00 Europe/Berlin] [2025-10-07 23:55:00] En-tête Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZC...
+[07-Oct-2025 23:55:00 Europe/Berlin] [2025-10-07 23:55:00] Token JWT: eyJ0eXAiOiJKV1QiLCJh...
+[07-Oct-2025 23:55:00 Europe/Berlin] [2025-10-07 23:55:00] JWT décodé avec succès: ID=11
+[07-Oct-2025 23:55:00 Europe/Berlin] [2025-10-07 23:55:00] Récupération des données pour user_id: 11
+[07-Oct-2025 23:55:00 Europe/Berlin] [2025-10-07 23:55:00] Connexion à la base de données réussie
+[07-Oct-2025 23:55:00 Europe/Berlin] [2025-10-07 23:55:00] Utilisateur trouvé: Array
+(
+    [id] => 11
+    [nom] => aziz
+    [prenom] => ben amara
+    [date_naissance] => 1999-10-05
+    [numero_telephone] => 88888888
+    [email] => azizbenamara@gmail.com
+    [photo_profil] => ����
+[07-Oct-2025 23:55:00 Europe/Berlin] [2025-10-07 23:55:00] Données emploi: Array
+(
+    [poste] => Développeur
+    [date_embauche] => 2020-01-01
+)
+
+[07-Oct-2025 23:55:00 Europe/Berlin] [2025-10-07 23:55:00] Réponse finale: Array
+(
+    [success] => 1
+    [user] => Array
+        (
+            [id] => 11
+            [nom] => aziz
+            [prenom] => ben amara
+            [date_naissance] => 05/10/1999
+            [numero_telephone] => 88888888
+            [email] => azizbenamara@gmail.com
+            [photo_profil] => ����
+[07-Oct-2025 23:59:12 Europe/Berlin] [2025-10-07 23:59:12] Début de profile1.php
+[07-Oct-2025 23:59:12 Europe/Berlin] [2025-10-07 23:59:12] Bibliothèque JWT chargée
+[07-Oct-2025 23:59:12 Europe/Berlin] [2025-10-07 23:59:12] Début logique principale
+[07-Oct-2025 23:59:12 Europe/Berlin] [2025-10-07 23:59:12] En-tête Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZC...
+[07-Oct-2025 23:59:12 Europe/Berlin] [2025-10-07 23:59:12] Token JWT: eyJ0eXAiOiJKV1QiLCJh...
+[07-Oct-2025 23:59:12 Europe/Berlin] [2025-10-07 23:59:12] JWT décodé avec succès: ID=11
+[07-Oct-2025 23:59:12 Europe/Berlin] [2025-10-07 23:59:12] Récupération des données pour user_id: 11
+[07-Oct-2025 23:59:12 Europe/Berlin] [2025-10-07 23:59:12] Connexion à la base de données réussie
+[07-Oct-2025 23:59:12 Europe/Berlin] [2025-10-07 23:59:12] Utilisateur trouvé: Array
+(
+    [id] => 11
+    [nom] => aziz
+    [prenom] => ben amara
+    [date_naissance] => 1999-10-05
+    [numero_telephone] => 88888888
+    [email] => azizbenamara@gmail.com
+    [photo_profil] => ����
+[07-Oct-2025 23:59:12 Europe/Berlin] [2025-10-07 23:59:12] Données emploi: Array
+(
+    [poste] => Développeur
+    [date_embauche] => 2020-01-01
+)
+
+[07-Oct-2025 23:59:12 Europe/Berlin] [2025-10-07 23:59:12] Réponse finale: Array
+(
+    [success] => 1
+    [user] => Array
+        (
+            [id] => 11
+            [nom] => aziz
+            [prenom] => ben amara
+            [date_naissance] => 05/10/1999
+            [numero_telephone] => 88888888
+            [email] => azizbenamara@gmail.com
+            [photo_profil] => ����
+[07-Oct-2025 23:59:12 Europe/Berlin] [2025-10-07 23:59:12] Début de profile1.php
+[07-Oct-2025 23:59:12 Europe/Berlin] [2025-10-07 23:59:12] Bibliothèque JWT chargée
+[07-Oct-2025 23:59:12 Europe/Berlin] [2025-10-07 23:59:12] Début logique principale
+[07-Oct-2025 23:59:12 Europe/Berlin] [2025-10-07 23:59:12] En-tête Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZC...
+[07-Oct-2025 23:59:12 Europe/Berlin] [2025-10-07 23:59:12] Token JWT: eyJ0eXAiOiJKV1QiLCJh...
+[07-Oct-2025 23:59:12 Europe/Berlin] [2025-10-07 23:59:12] JWT décodé avec succès: ID=11
+[07-Oct-2025 23:59:12 Europe/Berlin] [2025-10-07 23:59:12] Récupération des données pour user_id: 11
+[07-Oct-2025 23:59:12 Europe/Berlin] [2025-10-07 23:59:12] Connexion à la base de données réussie
+[07-Oct-2025 23:59:12 Europe/Berlin] [2025-10-07 23:59:12] Utilisateur trouvé: Array
+(
+    [id] => 11
+    [nom] => aziz
+    [prenom] => ben amara
+    [date_naissance] => 1999-10-05
+    [numero_telephone] => 88888888
+    [email] => azizbenamara@gmail.com
+    [photo_profil] => ����
+[07-Oct-2025 23:59:12 Europe/Berlin] [2025-10-07 23:59:12] Données emploi: Array
+(
+    [poste] => Développeur
+    [date_embauche] => 2020-01-01
+)
+
+[07-Oct-2025 23:59:12 Europe/Berlin] [2025-10-07 23:59:12] Réponse finale: Array
+(
+    [success] => 1
+    [user] => Array
+        (
+            [id] => 11
+            [nom] => aziz
+            [prenom] => ben amara
+            [date_naissance] => 05/10/1999
+            [numero_telephone] => 88888888
+            [email] => azizbenamara@gmail.com
+            [photo_profil] => ����
+[07-Oct-2025 23:59:17 Europe/Berlin] [2025-10-07 23:59:17] Début de profile1.php
+[07-Oct-2025 23:59:17 Europe/Berlin] [2025-10-07 23:59:17] Bibliothèque JWT chargée
+[07-Oct-2025 23:59:17 Europe/Berlin] [2025-10-07 23:59:17] Début logique principale
+[07-Oct-2025 23:59:17 Europe/Berlin] [2025-10-07 23:59:17] En-tête Authorization: non défini
+[07-Oct-2025 23:59:17 Europe/Berlin] [2025-10-07 23:59:17] Erreur: Token JWT manquant
+[07-Oct-2025 23:59:18 Europe/Berlin] [2025-10-07 23:59:18] Début de profile1.php
+[07-Oct-2025 23:59:18 Europe/Berlin] [2025-10-07 23:59:18] Bibliothèque JWT chargée
+[07-Oct-2025 23:59:18 Europe/Berlin] [2025-10-07 23:59:18] Début logique principale
+[07-Oct-2025 23:59:18 Europe/Berlin] [2025-10-07 23:59:18] En-tête Authorization: non défini
+[07-Oct-2025 23:59:18 Europe/Berlin] [2025-10-07 23:59:18] Erreur: Token JWT manquant
+[08-Oct-2025 00:03:36 Europe/Berlin] [2025-10-08 00:03:36] Début de profile1.php
+[08-Oct-2025 00:03:36 Europe/Berlin] [2025-10-08 00:03:36] Bibliothèque JWT chargée
+[08-Oct-2025 00:03:36 Europe/Berlin] [2025-10-08 00:03:36] Début logique principale
+[08-Oct-2025 00:03:36 Europe/Berlin] [2025-10-08 00:03:36] En-tête Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZC...
+[08-Oct-2025 00:03:36 Europe/Berlin] [2025-10-08 00:03:36] Token JWT: eyJ0eXAiOiJKV1QiLCJh...
+[08-Oct-2025 00:03:36 Europe/Berlin] [2025-10-08 00:03:36] JWT décodé avec succès: ID=11
+[08-Oct-2025 00:03:36 Europe/Berlin] [2025-10-08 00:03:36] Récupération des données pour user_id: 11
+[08-Oct-2025 00:03:36 Europe/Berlin] [2025-10-08 00:03:36] Connexion à la base de données réussie
+[08-Oct-2025 00:03:36 Europe/Berlin] [2025-10-08 00:03:36] Utilisateur trouvé: Array
+(
+    [id] => 11
+    [nom] => aziz
+    [prenom] => ben amara
+    [date_naissance] => 1999-10-05
+    [numero_telephone] => 88888888
+    [email] => azizbenamara@gmail.com
+    [photo_profil] => ����
+[08-Oct-2025 00:03:36 Europe/Berlin] [2025-10-08 00:03:36] Données emploi: Array
+(
+    [poste] => Développeur
+    [date_embauche] => 2020-01-01
+)
+
+[08-Oct-2025 00:03:36 Europe/Berlin] [2025-10-08 00:03:36] Réponse finale: Array
+(
+    [success] => 1
+    [user] => Array
+        (
+            [id] => 11
+            [nom] => aziz
+            [prenom] => ben amara
+            [date_naissance] => 05/10/1999
+            [numero_telephone] => 88888888
+            [email] => azizbenamara@gmail.com
+            [photo_profil] => ����
+[08-Oct-2025 00:15:26 Europe/Berlin] [2025-10-08 00:15:26] Début de profile1.php
+[08-Oct-2025 00:15:26 Europe/Berlin] [2025-10-08 00:15:26] Bibliothèque JWT chargée
+[08-Oct-2025 00:15:26 Europe/Berlin] [2025-10-08 00:15:26] Début logique principale
+[08-Oct-2025 00:15:26 Europe/Berlin] [2025-10-08 00:15:26] En-tête Authorization: non défini
+[08-Oct-2025 00:15:26 Europe/Berlin] [2025-10-08 00:15:26] Erreur: Token JWT manquant
+[08-Oct-2025 00:15:34 Europe/Berlin] [2025-10-08 00:15:34] Début de profile1.php
+[08-Oct-2025 00:15:34 Europe/Berlin] [2025-10-08 00:15:34] Bibliothèque JWT chargée
+[08-Oct-2025 00:15:34 Europe/Berlin] [2025-10-08 00:15:34] Début logique principale
+[08-Oct-2025 00:15:34 Europe/Berlin] [2025-10-08 00:15:34] En-tête Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZC...
+[08-Oct-2025 00:15:34 Europe/Berlin] [2025-10-08 00:15:34] Token JWT: eyJ0eXAiOiJKV1QiLCJh...
+[08-Oct-2025 00:15:34 Europe/Berlin] [2025-10-08 00:15:34] JWT décodé avec succès: ID=11
+[08-Oct-2025 00:15:34 Europe/Berlin] [2025-10-08 00:15:34] Récupération des données pour user_id: 11
+[08-Oct-2025 00:15:34 Europe/Berlin] [2025-10-08 00:15:34] Connexion à la base de données réussie
+[08-Oct-2025 00:15:34 Europe/Berlin] [2025-10-08 00:15:34] Utilisateur trouvé: Array
+(
+    [id] => 11
+    [nom] => aziz
+    [prenom] => ben amara
+    [date_naissance] => 1999-10-05
+    [numero_telephone] => 88888888
+    [email] => azizbenamara@gmail.com
+    [photo_profil] => ����
+[08-Oct-2025 00:15:34 Europe/Berlin] [2025-10-08 00:15:34] Données emploi: Array
+(
+    [poste] => Développeur
+    [date_embauche] => 2020-01-01
+)
+
+[08-Oct-2025 00:15:34 Europe/Berlin] [2025-10-08 00:15:34] Réponse finale: Array
+(
+    [success] => 1
+    [user] => Array
+        (
+            [id] => 11
+            [nom] => aziz
+            [prenom] => ben amara
+            [date_naissance] => 05/10/1999
+            [numero_telephone] => 88888888
+            [email] => azizbenamara@gmail.com
+            [photo_profil] => ����
+[08-Oct-2025 00:15:38 Europe/Berlin] [2025-10-08 00:15:38] Début de profile1.php
+[08-Oct-2025 00:15:38 Europe/Berlin] [2025-10-08 00:15:38] Bibliothèque JWT chargée
+[08-Oct-2025 00:15:38 Europe/Berlin] [2025-10-08 00:15:38] Début logique principale
+[08-Oct-2025 00:15:38 Europe/Berlin] [2025-10-08 00:15:38] En-tête Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZC...
+[08-Oct-2025 00:15:38 Europe/Berlin] [2025-10-08 00:15:38] Token JWT: eyJ0eXAiOiJKV1QiLCJh...
+[08-Oct-2025 00:15:38 Europe/Berlin] [2025-10-08 00:15:38] JWT décodé avec succès: ID=11
+[08-Oct-2025 00:15:38 Europe/Berlin] [2025-10-08 00:15:38] Récupération des données pour user_id: 11
+[08-Oct-2025 00:15:38 Europe/Berlin] [2025-10-08 00:15:38] Connexion à la base de données réussie
+[08-Oct-2025 00:15:38 Europe/Berlin] [2025-10-08 00:15:38] Utilisateur trouvé: Array
+(
+    [id] => 11
+    [nom] => aziz
+    [prenom] => ben amara
+    [date_naissance] => 1999-10-05
+    [numero_telephone] => 88888888
+    [email] => azizbenamara@gmail.com
+    [photo_profil] => ����
+[08-Oct-2025 00:15:38 Europe/Berlin] [2025-10-08 00:15:38] Données emploi: Array
+(
+    [poste] => Développeur
+    [date_embauche] => 2020-01-01
+)
+
+[08-Oct-2025 00:15:38 Europe/Berlin] [2025-10-08 00:15:38] Réponse finale: Array
+(
+    [success] => 1
+    [user] => Array
+        (
+            [id] => 11
+            [nom] => aziz
+            [prenom] => ben amara
+            [date_naissance] => 05/10/1999
+            [numero_telephone] => 88888888
+            [email] => azizbenamara@gmail.com
+            [photo_profil] => ����
+[08-Oct-2025 00:18:04 Europe/Berlin] [2025-10-08 00:18:04] Début de profile1.php
+[08-Oct-2025 00:18:04 Europe/Berlin] [2025-10-08 00:18:04] Bibliothèque JWT chargée
+[08-Oct-2025 00:18:04 Europe/Berlin] [2025-10-08 00:18:04] Début logique principale
+[08-Oct-2025 00:18:04 Europe/Berlin] [2025-10-08 00:18:04] En-tête Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZC...
+[08-Oct-2025 00:18:04 Europe/Berlin] [2025-10-08 00:18:04] Token JWT: eyJ0eXAiOiJKV1QiLCJh...
+[08-Oct-2025 00:18:04 Europe/Berlin] [2025-10-08 00:18:04] JWT décodé avec succès: ID=11
+[08-Oct-2025 00:18:04 Europe/Berlin] [2025-10-08 00:18:04] Récupération des données pour user_id: 11
+[08-Oct-2025 00:18:04 Europe/Berlin] [2025-10-08 00:18:04] Connexion à la base de données réussie
+[08-Oct-2025 00:18:04 Europe/Berlin] [2025-10-08 00:18:04] Utilisateur trouvé: Array
+(
+    [id] => 11
+    [nom] => aziz
+    [prenom] => ben amara
+    [date_naissance] => 1999-10-05
+    [numero_telephone] => 88888888
+    [email] => azizbenamara@gmail.com
+    [photo_profil] => ����
+[08-Oct-2025 00:18:04 Europe/Berlin] [2025-10-08 00:18:04] Données emploi: Array
+(
+    [poste] => Développeur
+    [date_embauche] => 2020-01-01
+)
+
+[08-Oct-2025 00:18:04 Europe/Berlin] [2025-10-08 00:18:04] Réponse finale: Array
+(
+    [success] => 1
+    [user] => Array
+        (
+            [id] => 11
+            [nom] => aziz
+            [prenom] => ben amara
+            [date_naissance] => 05/10/1999
+            [numero_telephone] => 88888888
+            [email] => azizbenamara@gmail.com
+            [photo_profil] => ����
+[08-Oct-2025 00:24:50 Europe/Berlin] [2025-10-08 00:24:50] Début de profile1.php
+[08-Oct-2025 00:24:50 Europe/Berlin] [2025-10-08 00:24:50] Bibliothèque JWT chargée
+[08-Oct-2025 00:24:50 Europe/Berlin] [2025-10-08 00:24:50] Début logique principale
+[08-Oct-2025 00:24:50 Europe/Berlin] [2025-10-08 00:24:50] En-tête Authorization: non défini
+[08-Oct-2025 00:24:50 Europe/Berlin] [2025-10-08 00:24:50] Erreur: Token JWT manquant
+[08-Oct-2025 00:24:51 Europe/Berlin] [2025-10-08 00:24:51] Début de profile1.php
+[08-Oct-2025 00:24:51 Europe/Berlin] [2025-10-08 00:24:51] Bibliothèque JWT chargée
+[08-Oct-2025 00:24:51 Europe/Berlin] [2025-10-08 00:24:51] Début logique principale
+[08-Oct-2025 00:24:51 Europe/Berlin] [2025-10-08 00:24:51] En-tête Authorization: non défini
+[08-Oct-2025 00:24:51 Europe/Berlin] [2025-10-08 00:24:51] Erreur: Token JWT manquant
+[08-Oct-2025 00:25:00 Europe/Berlin] [2025-10-08 00:25:00] Début de profile1.php
+[08-Oct-2025 00:25:00 Europe/Berlin] [2025-10-08 00:25:00] Bibliothèque JWT chargée
+[08-Oct-2025 00:25:00 Europe/Berlin] [2025-10-08 00:25:00] Début logique principale
+[08-Oct-2025 00:25:00 Europe/Berlin] [2025-10-08 00:25:00] En-tête Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZC...
+[08-Oct-2025 00:25:00 Europe/Berlin] [2025-10-08 00:25:00] Token JWT: eyJ0eXAiOiJKV1QiLCJh...
+[08-Oct-2025 00:25:00 Europe/Berlin] [2025-10-08 00:25:00] JWT décodé avec succès: ID=11
+[08-Oct-2025 00:25:00 Europe/Berlin] [2025-10-08 00:25:00] Récupération des données pour user_id: 11
+[08-Oct-2025 00:25:00 Europe/Berlin] [2025-10-08 00:25:00] Connexion à la base de données réussie
+[08-Oct-2025 00:25:00 Europe/Berlin] [2025-10-08 00:25:00] Utilisateur trouvé: Array
+(
+    [id] => 11
+    [nom] => aziz
+    [prenom] => ben amara
+    [date_naissance] => 1999-10-05
+    [numero_telephone] => 88888888
+    [email] => azizbenamara@gmail.com
+    [photo_profil] => ����
+[08-Oct-2025 00:25:00 Europe/Berlin] [2025-10-08 00:25:00] Données emploi: Array
+(
+    [poste] => Développeur
+    [date_embauche] => 2020-01-01
+)
+
+[08-Oct-2025 00:25:00 Europe/Berlin] [2025-10-08 00:25:00] Réponse finale: 
+[08-Oct-2025 00:25:55 Europe/Berlin] [2025-10-08 00:25:55] Début de profile1.php
+[08-Oct-2025 00:25:55 Europe/Berlin] [2025-10-08 00:25:55] Bibliothèque JWT chargée
+[08-Oct-2025 00:25:55 Europe/Berlin] [2025-10-08 00:25:55] Début logique principale
+[08-Oct-2025 00:25:55 Europe/Berlin] [2025-10-08 00:25:55] En-tête Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZC...
+[08-Oct-2025 00:25:55 Europe/Berlin] [2025-10-08 00:25:55] Token JWT: eyJ0eXAiOiJKV1QiLCJh...
+[08-Oct-2025 00:25:55 Europe/Berlin] [2025-10-08 00:25:55] JWT décodé avec succès: ID=11
+[08-Oct-2025 00:25:55 Europe/Berlin] [2025-10-08 00:25:55] Récupération des données pour user_id: 11
+[08-Oct-2025 00:25:55 Europe/Berlin] [2025-10-08 00:25:55] Connexion à la base de données réussie
+[08-Oct-2025 00:25:55 Europe/Berlin] [2025-10-08 00:25:55] Utilisateur trouvé: Array
+(
+    [id] => 11
+    [nom] => aziz
+    [prenom] => ben amara
+    [date_naissance] => 1999-10-05
+    [numero_telephone] => 88888888
+    [email] => azizbenamara@gmail.com
+    [photo_profil] => ����
+[08-Oct-2025 00:25:55 Europe/Berlin] [2025-10-08 00:25:55] Données emploi: Array
+(
+    [poste] => Développeur
+    [date_embauche] => 2020-01-01
+)
+
+[08-Oct-2025 00:25:55 Europe/Berlin] [2025-10-08 00:25:55] Réponse finale: 
+[08-Oct-2025 00:27:11 Europe/Berlin] [2025-10-08 00:27:11] Début de profile1.php
+[08-Oct-2025 00:27:11 Europe/Berlin] [2025-10-08 00:27:11] Bibliothèque JWT chargée
+[08-Oct-2025 00:27:11 Europe/Berlin] [2025-10-08 00:27:11] Début logique principale
+[08-Oct-2025 00:27:11 Europe/Berlin] [2025-10-08 00:27:11] En-tête Authorization: non défini
+[08-Oct-2025 00:27:11 Europe/Berlin] [2025-10-08 00:27:11] Erreur: Token JWT manquant
+[08-Oct-2025 00:27:18 Europe/Berlin] [2025-10-08 00:27:18] Début de profile1.php
+[08-Oct-2025 00:27:18 Europe/Berlin] [2025-10-08 00:27:18] Bibliothèque JWT chargée
+[08-Oct-2025 00:27:18 Europe/Berlin] [2025-10-08 00:27:18] Début logique principale
+[08-Oct-2025 00:27:18 Europe/Berlin] [2025-10-08 00:27:18] En-tête Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZC...
+[08-Oct-2025 00:27:18 Europe/Berlin] [2025-10-08 00:27:18] Token JWT: eyJ0eXAiOiJKV1QiLCJh...
+[08-Oct-2025 00:27:18 Europe/Berlin] [2025-10-08 00:27:18] JWT décodé avec succès: ID=11
+[08-Oct-2025 00:27:18 Europe/Berlin] [2025-10-08 00:27:18] Récupération des données pour user_id: 11
+[08-Oct-2025 00:27:18 Europe/Berlin] [2025-10-08 00:27:18] Connexion à la base de données réussie
+[08-Oct-2025 00:27:18 Europe/Berlin] [2025-10-08 00:27:18] Utilisateur trouvé: Array
+(
+    [id] => 11
+    [nom] => aziz
+    [prenom] => ben amara
+    [date_naissance] => 1999-10-05
+    [numero_telephone] => 88888888
+    [email] => azizbenamara@gmail.com
+    [photo_profil] => ����
+[08-Oct-2025 00:27:18 Europe/Berlin] [2025-10-08 00:27:18] Données emploi: Array
+(
+    [poste] => Développeur
+    [date_embauche] => 2020-01-01
+)
+
+[08-Oct-2025 00:27:18 Europe/Berlin] [2025-10-08 00:27:18] Réponse finale: 
+[08-Oct-2025 00:45:38 Europe/Berlin] [2025-10-08 00:45:38] Début de profile1.php
+[08-Oct-2025 00:45:38 Europe/Berlin] [2025-10-08 00:45:38] Bibliothèque JWT chargée
+[08-Oct-2025 00:45:38 Europe/Berlin] [2025-10-08 00:45:38] Début logique principale
+[08-Oct-2025 00:45:38 Europe/Berlin] [2025-10-08 00:45:38] En-tête Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZC...
+[08-Oct-2025 00:45:38 Europe/Berlin] [2025-10-08 00:45:38] Token JWT: eyJ0eXAiOiJKV1QiLCJh...
+[08-Oct-2025 00:45:38 Europe/Berlin] [2025-10-08 00:45:38] JWT décodé avec succès: ID=11
+[08-Oct-2025 00:45:38 Europe/Berlin] [2025-10-08 00:45:38] Récupération des données pour user_id: 11
+[08-Oct-2025 00:45:38 Europe/Berlin] [2025-10-08 00:45:38] Connexion à la base de données réussie
+[08-Oct-2025 00:45:38 Europe/Berlin] [2025-10-08 00:45:38] Utilisateur trouvé: Array
+(
+    [id] => 11
+    [nom] => aziz
+    [prenom] => ben amara
+    [date_naissance] => 1999-10-05
+    [numero_telephone] => 88888888
+    [email] => azizbenamara@gmail.com
+    [photo_profil] => ����
+[08-Oct-2025 00:45:38 Europe/Berlin] [2025-10-08 00:45:38] Données emploi: Array
+(
+    [poste] => Développeur
+    [date_embauche] => 2020-01-01
+)
+
+[08-Oct-2025 00:45:38 Europe/Berlin] [2025-10-08 00:45:38] Réponse finale: 
+[08-Oct-2025 00:48:57 Europe/Berlin] [2025-10-08 00:48:57] Début de profile1.php
+[08-Oct-2025 00:48:57 Europe/Berlin] [2025-10-08 00:48:57] Bibliothèque JWT chargée
+[08-Oct-2025 00:48:57 Europe/Berlin] [2025-10-08 00:48:57] Début logique principale
+[08-Oct-2025 00:48:57 Europe/Berlin] [2025-10-08 00:48:57] En-tête Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZC...
+[08-Oct-2025 00:48:57 Europe/Berlin] [2025-10-08 00:48:57] Token JWT: eyJ0eXAiOiJKV1QiLCJh...
+[08-Oct-2025 00:48:57 Europe/Berlin] [2025-10-08 00:48:57] JWT décodé avec succès: ID=11
+[08-Oct-2025 00:48:57 Europe/Berlin] [2025-10-08 00:48:57] Récupération des données pour user_id: 11
+[08-Oct-2025 00:48:57 Europe/Berlin] [2025-10-08 00:48:57] Connexion à la base de données réussie
+[08-Oct-2025 00:48:57 Europe/Berlin] [2025-10-08 00:48:57] Utilisateur trouvé: Array
+(
+    [id] => 11
+    [nom] => aziz
+    [prenom] => ben amara
+    [date_naissance] => 1999-10-05
+    [numero_telephone] => 88888888
+    [email] => azizbenamara@gmail.com
+    [photo_profil] => ����
+[08-Oct-2025 00:48:57 Europe/Berlin] [2025-10-08 00:48:57] Données emploi: Array
+(
+    [poste] => Développeur
+    [date_embauche] => 2020-01-01
+)
+
+[08-Oct-2025 00:48:57 Europe/Berlin] [2025-10-08 00:48:57] Réponse finale: 
+[08-Oct-2025 01:08:55 Europe/Berlin] [2025-10-08 01:08:55] Début de profile1.php
+[08-Oct-2025 01:08:55 Europe/Berlin] [2025-10-08 01:08:55] Bibliothèque JWT chargée
+[08-Oct-2025 01:08:55 Europe/Berlin] [2025-10-08 01:08:55] Début logique principale
+[08-Oct-2025 01:08:55 Europe/Berlin] [2025-10-08 01:08:55] En-tête Authorization: non défini
+[08-Oct-2025 01:08:55 Europe/Berlin] [2025-10-08 01:08:55] Erreur: Token JWT manquant

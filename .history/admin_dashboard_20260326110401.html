@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gestion RH - Affectations des employés</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+<style>
+  :root {
+    --primary-color: #4a6fa5;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --sidebar-width: 320px;
+    --transition-speed: 0.4s;
+    --accent-color: #4dabf7;
+  }
+  body {
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    min-height: 100vh;
+    padding-bottom: 20px;
+    margin-left: var(--sidebar-width);
+    transition: margin-left var(--transition-speed) ease;
+  }
+  #sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    position: fixed;
+    left: 0; top: 0;
+    z-index: 1050;
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    color: white;
+    box-shadow: 8px 0 30px rgba(0,0,0,0.2);
+    transition: all var(--transition-speed) cubic-bezier(0.4,0,0.2,1);
+    overflow-y: auto;
+    border-right: 1px solid rgba(255,255,255,0.1);
+  }
+  .sidebar-header { padding: 30px 25px; background: rgba(15,23,42,0.8); border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .sidebar-brand { display: flex; align-items: center; gap: 15px; font-size: 1.4rem; font-weight: 700; color: white; text-decoration: none; }
+  .sidebar-brand i { color: var(--accent-color); font-size: 2rem; }
+  .sidebar-user { padding: 30px 25px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .user-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(255,255,255,0.2); }
+  .sidebar-nav { padding: 25px 0; }
+  .sidebar-nav .nav-link {
+    color: rgba(255,255,255,0.8); padding: 16px 30px;
+    display: flex; align-items: center; gap: 18px;
+    transition: all 0.3s ease;
+    margin: 5px 15px; border-radius: 12px;
+    text-decoration: none;
+  }
+  .sidebar-nav .nav-link:hover { color: white; background: rgba(255,255,255,0.05); border-left-color: var(--accent-color); transform: translateX(10px); }
+  .sidebar-nav .nav-link.active { color: white; background: linear-gradient(90deg,rgba(77,171,247,0.15),transparent); border-left: 4px solid var(--accent-color); }
+  .sidebar-nav .nav-link i { width: 26px; text-align: center; font-size: 1.3rem; }
+  .logout-btn {
+    width: 90%;
+    margin: 20px auto;
+    background: linear-gradient(135deg,rgba(239,68,68,0.15),rgba(220,38,38,0.1));
+    border: 1px solid rgba(239,68,68,0.2);
+    color: #fecaca;
+    padding: 14px 20px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+  }
+  .container { margin-top: 30px; margin-bottom: 30px; margin-left: 40px; margin-right: 40px; max-width: calc(100% - 80px); }
+  .section-container { display: none; opacity: 0; transform: translateY(20px); transition: all 0.5s ease; }
+  .section-container.active { display: block; opacity: 1; transform: translateY(0); }
+  .card { border: none; border-radius: 15px; box-shadow: 0 6px 20px rgba(0,0,0,0.08); transition: all var(--transition-speed) ease; overflow: hidden; }
+  .card:hover { transform: translateY(-5px); box-shadow: 0 12px 25px rgba(0,0,0,0.12); }
+  .btn { border-radius: 10px; font-weight: 500; padding: 10px 20px; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: none; }
+  .btn-primary { background: linear-gradient(135deg,var(--primary-color),#3a5795); color: white; }
+  .btn-success { background: linear-gradient(135deg,var(--success-color),#1e7e34); color: white; }
+  .btn-warning { background: linear-gradient(135deg,var(--warning-color),#e0a800); color: #000; }
+  .btn-secondary { background: linear-gradient(135deg,var(--secondary-color),#545b62); color: white; }
+  .table { background: white; border-radius: 15px; overflow: hidden; }
+  .table thead { background: linear-gradient(90deg,var(--primary-color),#5a7bb5); color: white; }
+  .table thead th { border: none; padding: 18px 15px; font-weight: 600; }
+  .table tbody tr:hover { background-color: rgba(74,111,165,0.05); }
+  .badge-salle { background: linear-gradient(135deg,#4dabf7,#3b82f6); color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; }
+  .schedule-card { background: linear-gradient(135deg,#f8f9fa,#e9ecef); border-radius: 12px; padding: 15px; margin-bottom: 15px; border-left: 4px solid var(--primary-color); }
+  .time-badge { background: var(--primary-color); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; }
+  .modal-content { border-radius: 20px; border: none; }
+  .modal-header { background: linear-gradient(90deg,var(--primary-color),#5a7bb5); color: white; border: none; padding: 20px 30px; }
+  .form-control, .form-select { border-radius: 10px; padding: 10px 15px; }
+  @media (max-width: 992px) { body { margin-left: 0; } #sidebar { width: 100%; height: auto; position: relative; } .container { margin-left: 20px; margin-right: 20px; max-width: 100%; } }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div class="sidebar-header">
+    <a class="sidebar-brand" href="#"><i class="fas fa-user-tie"></i><span>Espace RH</span></a>
+  </div>
+  <div class="sidebar-user">
+    <img src="https://ui-avatars.com/api/?name=RH&size=80&background=4a6fa5&color=fff&bold=true" class="user-avatar" alt="Photo">
+    <div id="welcomeText" class="mt-2 fw-bold">Bienvenue</div>
+    <div class="small text-secondary" id="userEmail"></div>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="#" class="nav-link" onclick="showSection('dashboard')"><i class="fas fa-tachometer-alt"></i><span>Tableau de bord</span></a>
+    <a href="#" class="nav-link active" onclick="showSection('affectations')"><i class="fas fa-calendar-alt"></i><span>Gestion des affectations</span></a>
+    <a href="#" class="nav-link" onclick="showSection('planning')"><i class="fas fa-clock"></i><span>Planning des employés</span></a>
+    <a href="#" class="nav-link" onclick="showSection('salles')"><i class="fas fa-building"></i><span>Gestion des salles</span></a>
+  </nav>
+  <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i><span>Déconnexion</span></button>
+</div>
+
+<!-- CONTENU PRINCIPAL -->
+<div class="container">
+  <div id="errorContent" class="alert alert-danger d-none"></div>
+  <div id="successContent" class="alert alert-success d-none"></div>
+
+  <!-- SECTION TABLEAU DE BORD -->
+  <div id="dashboard" class="section-container">
+    <h2 class="mb-4"><i class="fas fa-chart-line me-2 text-primary"></i>Tableau de bord</h2>
+    <div class="row">
+      <div class="col-md-3 mb-4">
+        <div class="card text-center">
+          <div class="card-body">
+            <i class="fas fa-users fa-3x text-primary mb-3"></i>
+            <h3 id="totalEmployes">0</h3>
+            <p class="text-muted">Employés</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 mb-4">
+        <div class="card text-center">
+          <div class="card-body">
+            <i class="fas fa-building fa-3x text-success mb-3"></i>
+            <h3 id="totalSalles">0</h3>
+            <p class="text-muted">Salles</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 mb-4">
+        <div class="card text-center">
+          <div class="card-body">
+            <i class="fas fa-check-circle fa-3x text-info mb-3"></i>
+            <h3 id="totalAffectes">0</h3>
+            <p class="text-muted">Employés affectés</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION GESTION DES AFFECTATIONS -->
+  <div id="affectations" class="section-container active">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2><i class="fas fa-user-clock me-2 text-primary"></i>Affectation des employés</h2>
+      <button class="btn btn-primary" onclick="openAffectationModal()">
+        <i class="fas fa-plus me-2"></i>Nouvelle affectation
+      </button>
+    </div>
+    
+    <!-- Filtres -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4">
+            <label class="form-label">Filtrer par employé</label>
+            <select id="filterEmployeAffect" class="form-select" onchange="filterAffectations()">
+              <option value="">Tous les employés</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Filtrer par salle</label>
+            <select id="filterSalleAffect" class="form-select" onchange="filterAffectations()">
+              <option value="">Toutes les salles</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Filtrer par statut</label>
+            <select id="filterStatutAffect" class="form-select" onchange="filterAffectations()">
+              <option value="">Tous</option>
+              <option value="actif">Actif</option>
+              <option value="inactif">Inactif</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tableau des affectations -->
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr><th>Employé</th><th>Poste</th><th>Salle de travail</th><th>Heure d'arrivée</th><th>Heure de sortie</th><th>Statut</th><th>Actions</th>
+        </thead>
+        <tbody id="affectationsTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION PLANNING DES EMPLOYÉS -->
+  <div id="planning" class="section-container">
+    <h2 class="mb-4"><i class="fas fa-calendar-week me-2 text-primary"></i>Planning des employés</h2>
+    <div class="row mb-4">
+      <div class="col-md-4">
+        <label class="form-label">Sélectionner un employé</label>
+        <select id="selectEmployePlanning" class="form-select" onchange="afficherPlanningEmploye()">
+          <option value="">Choisir un employé...</option>
+        </select>
+      </div>
+    </div>
+    <div id="planningEmploye" class="card">
+      <div class="card-body text-center text-muted">
+        <i class="fas fa-user fa-3x mb-3"></i>
+        <p>Sélectionnez un employé pour voir son planning</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION GESTION DES SALLES -->
+  <div id="salles" class="section-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2><i class="fas fa-door-open me-2 text-primary"></i>Gestion des salles</h2>
+      <button class="btn btn-primary" onclick="openSalleModal()">
+        <i class="fas fa-plus me-2"></i>Ajouter une salle
+      </button>
+    </div>
+    <div class="row" id="sallesList"></div>
+  </div>
+</div>
+
+<!-- MODAL AFFECTATION -->
+<div class="modal fade" id="affectationModal" tabindex="-1" data-bs-backdrop="static">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-user-check me-2"></i>Affecter un employé</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="affectationForm">
+          <div class="mb-3">
+            <label class="form-label fw-bold">Employé *</label>
+            <select id="affectEmploye" class="form-select" required>
+              <option value="">Sélectionner un employé</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Salle de travail *</label>
+            <select id="affectSalle" class="form-select" required>
+              <option value="">Sélectionner une salle</option>
+            </select>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Heure d'arrivée *</label>
+              <input type="time" id="affectHeureArrivee" class="form-control" required value="08:00">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Heure de sortie *</label>
+              <input type="time" id="affectHeureSortie" class="form-control" required value="17:00">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Date d'effet</label>
+            <input type="date" id="affectDateDebut" class="form-control" value="">
+          </div>
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            Ces horaires seront appliqués quotidiennement pour cet employé.
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-primary" onclick="saveAffectation()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SALLE -->
+<div class="modal fade" id="salleModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-building me-2"></i>Ajouter une salle</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="salleForm">
+          <div class="mb-3">
+            <label class="form-label">Nom de la salle *</label>
+            <input type="text" id="salleNom" class="form-control" placeholder="Ex: Salle de réunion A" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Capacité</label>
+            <input type="number" id="salleCapacite" class="form-control" placeholder="Nombre de places" value="10">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Équipements</label>
+            <input type="text" id="salleEquipements" class="form-control" placeholder="Vidéoprojecteur, tableau, etc.">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-primary" onclick="saveSalle()">Ajouter</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ==================== DONNÉES ====================
+let employes = [];
+let salles = [];
+let affectations = [];
+
+// ==================== INITIALISATION ====================
+document.addEventListener('DOMContentLoaded', () => {
+  // Vérifier l'authentification
+  const token = localStorage.getItem('jwt');
+  const role = localStorage.getItem('role');
+  if (!token || role !== 'responsable_rh') {
+    alert("Accès refusé. Veuillez vous connecter en tant que responsable RH.");
+    window.location.href = "connexion.html";
+    return;
+  }
+  
+  // Charger les données
+  chargerEmployes();
+  chargerSalles();
+  chargerAffectations();
+  
+  // Mettre à jour les informations utilisateur
+  const nom = localStorage.getItem('nom') || 'Responsable RH';
+  const email = localStorage.getItem('email') || '';
+  document.getElementById('welcomeText').innerHTML = `Bienvenue, ${nom} !`;
+  document.getElementById('userEmail').innerText = email;
+});
+
+// ==================== CHARGEMENT DES DONNÉES ====================
+function chargerEmployes() {
+  const token = localStorage.getItem('jwt');
+  fetch('admin_api.php', {
+    headers: { 'Authorization': `Bearer ${token}` }
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (Array.isArray(data)) {
+      employes = data;
+      miseAJourSelectsEmployes();
+      document.getElementById('totalEmployes').innerText = employes.length;
+    }
+  })
+  .catch(err => console.error('Erreur chargement employés:', err));
+}
+
+function chargerSalles() {
+  const sallesStockees = localStorage.getItem('salles_rh');
+  if (sallesStockees) {
+    salles = JSON.parse(sallesStockees);
+  } else {
+    // Salles par défaut
+    salles = [
+      { id: 1, nom: "Salle de réunion A", capacite: 15, equipements: "Vidéoprojecteur, Tableau blanc" },
+      { id: 2, nom: "Bureau partagé B", capacite: 8, equipements: "Ordinateurs, Imprimante" },
+      { id: 3, nom: "Salle créative", capacite: 12, equipements: "Paperboard, Écran tactile" },
+      { id: 4, nom: "Espace calme", capacite: 4, equipements: "Isolation phonique" }
+    ];
+    localStorage.setItem('salles_rh', JSON.stringify(salles));
+  }
+  afficherSalles();
+  miseAJourSelectsSalles();
+  document.getElementById('totalSalles').innerText = salles.length;
+}
+
+function chargerAffectations() {
+  const affectationsStockees = localStorage.getItem('affectations_rh');
+  if (affectationsStockees) {
+    affectations = JSON.parse(affectationsStockees);
+  } else {
+    affectations = [];
+    sauvegarderAffectations();
+  }
+  afficherAffectations();
+  document.getElementById('totalAffectes').innerText = affectations.filter(a => a.statut === 'actif').length;
+}
+
+function sauvegarderAffectations() {
+  localStorage.setItem('affectations_rh', JSON.stringify(affectations));
+}
+
+// ==================== AFFICHAGE DES AFFECTATIONS ====================
+function afficherAffectations() {
+  const tbody = document.getElementById('affectationsTableBody');
+  if (!tbody) return;
+  
+  const employeFilter = document.getElementById('filterEmployeAffect')?.value || '';
+  const salleFilter = document.getElementById('filterSalleAffect')?.value || '';
+  const statutFilter = document.getElementById('filterStatutAffect')?.value || '';
+  
+  let affectationsFiltrees = affectations.filter(a => {
+    if (employeFilter && a.employeId != employeFilter) return false;
+    if (salleFilter && a.salleId != salleFilter) return false;
+    if (statutFilter && a.statut !== statutFilter) return false;
+    return true;
+  });
+  
+  if (affectationsFiltrees.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5 text-muted">Aucune affectation trouvée</td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = affectationsFiltrees.map(a => {
+    const employe = employes.find(e => e.id == a.employeId);
+    const salle = salles.find(s => s.id == a.salleId);
+    const employeNom = employe ? `${employe.prenom || ''} ${employe.nom || ''}` : `Employé #${a.employeId}`;
+    const salleNom = salle ? salle.nom : `Salle #${a.salleId}`;
+    const statutBadge = a.statut === 'actif' 
+      ? '<span class="badge bg-success">Actif</span>' 
+      : '<span class="badge bg-secondary">Inactif</span>';
+    
+    return `
+      <tr>
+        <td><strong>${employeNom}</strong></td>
+        <td>${employe?.poste || '—'}</td>
+        <td><span class="badge-salle">${salleNom}</span></td>
+        <td><span class="time-badge"><i class="fas fa-sign-in-alt"></i> ${a.heureArrivee || '08:00'}</span></td>
+        <td><span class="time-badge"><i class="fas fa-sign-out-alt"></i> ${a.heureSortie || '17:00'}</span></td>
+        <td>${statutBadge}</td>
+        <td>
+          <button class="btn btn-sm btn-warning me-1" onclick="modifierAffectation(${a.id})"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-sm ${a.statut === 'actif' ? 'btn-secondary' : 'btn-success'}" onclick="toggleStatutAffectation(${a.id})">
+            <i class="fas fa-${a.statut === 'actif' ? 'pause' : 'play'}"></i>
+          </button>
+          <button class="btn btn-sm btn-danger" onclick="supprimerAffectation(${a.id})"><i class="fas fa-trash"></i></button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function filterAffectations() {
+  afficherAffectations();
+}
+
+function miseAJourSelectsEmployes() {
+  const selectEmployeAffect = document.getElementById('filterEmployeAffect');
+  const selectAffectEmploye = document.getElementById('affectEmploye');
+  const selectEmployePlanning = document.getElementById('selectEmployePlanning');
+  
+  const options = employes.map(e => `<option value="${e.id}">${e.prenom || ''} ${e.nom || ''} (${e.poste || '—'})</option>`).join('');
+  
+  if (selectEmployeAffect) selectEmployeAffect.innerHTML = '<option value="">Tous les employés</option>' + options;
+  if (selectAffectEmploye) selectAffectEmploye.innerHTML = '<option value="">Sélectionner un employé</option>' + options;
+  if (selectEmployePlanning) selectEmployePlanning.innerHTML = '<option value="">Choisir un employé...</option>' + options;
+}
+
+function miseAJourSelectsSalles() {
+  const selectSalleAffect = document.getElementById('filterSalleAffect');
+  const selectAffectSalle = document.getElementById('affectSalle');
+  
+  const options = salles.map(s => `<option value="${s.id}">${s.nom}</option>`).join('');
+  
+  if (selectSalleAffect) selectSalleAffect.innerHTML = '<option value="">Toutes les salles</option>' + options;
+  if (selectAffectSalle) selectAffectSalle.innerHTML = '<option value="">Sélectionner une salle</option>' + options;
+}
+
+// ==================== GESTION DES AFFECTATIONS ====================
+let affectationEditId = null;
+
+function openAffectationModal() {
+  affectationEditId = null;
+  document.getElementById('affectationForm').reset();
+  document.getElementById('affectHeureArrivee').value = '08:00';
+  document.getElementById('affectHeureSortie').value = '17:00';
+  document.getElementById('affectDateDebut').value = new Date().toISOString().split('T')[0];
+  
+  const modal = new bootstrap.Modal(document.getElementById('affectationModal'));
+  modal.show();
+}
+
+function modifierAffectation(id) {
+  const affectation = affectations.find(a => a.id === id);
+  if (!affectation) return;
+  
+  affectationEditId = id;
+  document.getElementById('affectEmploye').value = affectation.employeId;
+  document.getElementById('affectSalle').value = affectation.salleId;
+  document.getElementById('affectHeureArrivee').value = affectation.heureArrivee || '08:00';
+  document.getElementById('affectHeureSortie').value = affectation.heureSortie || '17:00';
+  document.getElementById('affectDateDebut').value = affectation.dateDebut || new Date().toISOString().split('T')[0];
+  
+  const modal = new bootstrap.Modal(document.getElementById('affectationModal'));
+  modal.show();
+}
+
+function saveAffectation() {
+  const employeId = document.getElementById('affectEmploye').value;
+  const salleId = document.getElementById('affectSalle').value;
+  const heureArrivee = document.getElementById('affectHeureArrivee').value;
+  const heureSortie = document.getElementById('affectHeureSortie').value;
+  const dateDebut = document.getElementById('affectDateDebut').value;
+  
+  if (!employeId || !salleId) {
+    showError("Veuillez sélectionner un employé et une salle");
+    return;
+  }
+  
+  if (affectationEditId) {
+    // Modification
+    const index = affectations.findIndex(a => a.id === affectationEditId);
+    if (index !== -1) {
+      affectations[index] = {
+        ...affectations[index],
+        employeId: parseInt(employeId),
+        salleId: parseInt(salleId),
+        heureArrivee,
+        heureSortie,
+        dateDebut,
+        dateModification: new Date().toISOString()
+      };
+      showSuccess("Affectation modifiée avec succès !");
+    }
+  } else {
+    // Nouvelle affectation
+    const newId = Date.now();
+    affectations.push({
+      id: newId,
+      employeId: parseInt(employeId),
+      salleId: parseInt(salleId),
+      heureArrivee,
+      heureSortie,
+      dateDebut,
+      statut: 'actif',
+      dateCreation: new Date().toISOString()
+    });
+    showSuccess("Affectation créée avec succès !");
+  }
+  
+  sauvegarderAffectations();
+  afficherAffectations();
+  document.getElementById('totalAffectes').innerText = affectations.filter(a => a.statut === 'actif').length;
+  
+  const modal = bootstrap.Modal.getInstance(document.getElementById('affectationModal'));
+  modal.hide();
+}
+
+function toggleStatutAffectation(id) {
+  const affectation = affectations.find(a => a.id === id);
+  if (affectation) {
+    affectation.statut = affectation.statut === 'actif' ? 'inactif' : 'actif';
+    sauvegarderAffectations();
+    afficherAffectations();
+    document.getElementById('totalAffectes').innerText = affectations.filter(a => a.statut === 'actif').length;
+    showSuccess(`Affectation ${affectation.statut === 'actif' ? 'activée' : 'désactivée'}`);
+  }
+}
+
+function supprimerAffectation(id) {
+  if (confirm("Êtes-vous sûr de vouloir supprimer cette affectation ?")) {
+    affectations = affectations.filter(a => a.id !== id);
+    sauvegarderAffectations();
+    afficherAffectations();
+    document.getElementById('totalAffectes').innerText = affectations.filter(a => a.statut === 'actif').length;
+    showSuccess("Affectation supprimée");
+  }
+}
+
+// ==================== PLANNING EMPLOYÉ ====================
+function afficherPlanningEmploye() {
+  const employeId = document.getElementById('selectEmployePlanning').value;
+  const planningDiv = document.getElementById('planningEmploye');
+  
+  if (!employeId) {
+    planningDiv.innerHTML = `
+      <div class="card-body text-center text-muted">
+        <i class="fas fa-user fa-3x mb-3"></i>
+        <p>Sélectionnez un employé pour voir son planning</p>
+      </div>
+    `;
+    return;
+  }
+  
+  const employe = employes.find(e => e.id == employeId);
+  const affectation = affectations.find(a => a.employeId == employeId && a.statut === 'actif');
+  const salle = affectation ? salles.find(s => s.id == affectation.salleId) : null;
+  
+  if (!affectation) {
+    planningDiv.innerHTML = `
+      <div class="card-body text-center text-warning">
+        <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+        <p>Cet employé n'a pas encore d'affectation active.</p>
+        <button class="btn btn-primary mt-2" onclick="openAffectationModal()">+ Ajouter une affectation</button>
+      </div>
+    `;
+    return;
+  }
+  
+  planningDiv.innerHTML = `
+    <div class="card-body">
+      <h5 class="card-title mb-4">${employe?.prenom || ''} ${employe?.nom || ''}</h5>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="schedule-card">
+            <h6><i class="fas fa-building me-2 text-primary"></i>Lieu de travail</h6>
+            <p class="mb-0 fw-bold">${salle?.nom || 'Non défini'}</p>
+            <small class="text-muted">Capacité: ${salle?.capacite || '—'} personnes | ${salle?.equipements || ''}</small>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="schedule-card">
+            <h6><i class="fas fa-clock me-2 text-primary"></i>Horaires quotidiens</h6>
+            <p class="mb-0"><i class="fas fa-sign-in-alt me-2 text-success"></i>Arrivée : <strong>${affectation.heureArrivee || '08:00'}</strong></p>
+            <p><i class="fas fa-sign-out-alt me-2 text-danger"></i>Départ : <strong>${affectation.heureSortie || '17:00'}</strong></p>
+            <small class="text-muted">Effectif depuis le ${formatDate(affectation.dateDebut)}</small>
+          </div>
+        </div>
+      </div>
+      <div class="alert alert-info mt-3 mb-0">
+        <i class="fas fa-info-circle me-2"></i>
+        ${affectation.heureArrivee && affectation.heureSortie ? 
+          `L'employé doit être présent de ${affectation.heureArrivee} à ${affectation.heureSortie} dans ${salle?.nom || 'sa salle'}.` : 
+          'Horaires à définir.'}
+      </div>
+    </div>
+  `;
+}
+
+// ==================== GESTION DES SALLES ====================
+function afficherSalles() {
+  const container = document.getElementById('sallesList');
+  if (!container) return;
+  
+  if (salles.length === 0) {
+    container.innerHTML = '<div class="col-12 text-center text-muted py-5">Aucune salle enregistrée</div>';
+    return;
+  }
+  
+  container.innerHTML = salles.map(s => `
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <h5 class="card-title mb-0"><i class="fas fa-door-open me-2 text-primary"></i>${s.nom}</h5>
+            <button class="btn btn-sm btn-danger" onclick="supprimerSalle(${s.id})"><i class="fas fa-trash"></i></button>
+          </div>
+          <p class="card-text mb-2"><i class="fas fa-users me-2 text-secondary"></i>Capacité : ${s.capacite} personnes</p>
+          <p class="card-text mb-2"><i class="fas fa-tools me-2 text-secondary"></i>Équipements : ${s.equipements || 'Aucun'}</p>
+          <hr>
+          <small class="text-muted">
+            <i class="fas fa-user-check me-1"></i>
+            ${affectations.filter(a => a.salleId === s.id && a.statut === 'actif').length} employé(s) affecté(s)
+          </small>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openSalleModal() {
+  document.getElementById('salleForm').reset();
+  const modal = new bootstrap.Modal(document.getElementById('salleModal'));
+  modal.show();
+}
+
+function saveSalle() {
+  const nom = document.getElementById('salleNom').value.trim();
+  const capacite = document.getElementById('salleCapacite').value;
+  const equipements = document.getElementById('salleEquipements').value;
+  
+  if (!nom) {
+    showError("Veuillez entrer un nom de salle");
+    return;
+  }
+  
+  const newId = Date.now();
+  salles.push({
+    id: newId,
+    nom: nom,
+    capacite: parseInt(capacite) || 10,
+    equipements: equipements || ''
+  });
+  
+  localStorage.setItem('salles_rh', JSON.stringify(salles));
+  afficherSalles();
+  miseAJourSelectsSalles();
+  document.getElementById('totalSalles').innerText = salles.length;
+  showSuccess(`Salle "${nom}" ajoutée !`);
+  
+  const modal = bootstrap.Modal.getInstance(document.getElementById('salleModal'));
+  modal.hide();
+}
+
+function supprimerSalle(id) {
+  const salle = salles.find(s => s.id === id);
+  if (!salle) return;
+  
+  const affectationsLiees = affectations.filter(a => a.salleId === id);
+  if (affectationsLiees.length > 0) {
+    if (!confirm(`${affectationsLiees.length} employé(s) sont affectés à cette salle. En supprimant la salle, ces affectations seront désactivées. Continuer ?`)) {
+      return;
+    }
+    // Désactiver les affectations liées
+    affectationsLiees.forEach(a => a.statut = 'inactif');
+    sauvegarderAffectations();
+    afficherAffectations();
+  }
+  
+  salles = salles.filter(s => s.id !== id);
+  localStorage.setItem('salles_rh', JSON.stringify(salles));
+  afficherSalles();
+  miseAJourSelectsSalles();
+  document.getElementById('totalSalles').innerText = salles.length;
+  document.getElementById('totalAffectes').innerText = affectations.filter(a => a.statut === 'actif').length;
+  showSuccess(`Salle "${salle.nom}" supprimée`);
+}
+
+// ==================== UTILITAIRES ====================
+function showSection(sectionId) {
+  document.querySelectorAll('.section-container').forEach(s => s.classList.remove('active'));
+  const section = document.getElementById(sectionId);
+  if (section) section.classList.add('active');
+  
+  document.querySelectorAll('.sidebar-nav .nav-link').forEach(l => l.classList.remove('active'));
+  const activeLink = document.querySelector(`.sidebar-nav .nav-link[onclick*="${sectionId}"]`);
+  if (activeLink) activeLink.classList.add('active');
+  
+  if (sectionId === 'planning') {
+    miseAJourSelectsEmployes();
+  }
+  if (sectionId === 'salles') {
+    afficherSalles();
+  }
+  if (sectionId === 'dashboard') {
+    document.getElementById('totalEmployes').innerText = employes.length;
+    document.getElementById('totalSalles').innerText = salles.length;
+    document.getElementById('totalAffectes').innerText = affectations.filter(a => a.statut === 'actif').length;
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorContent');
+  if (el) { el.textContent = msg; el.classList.remove('d-none'); setTimeout(() => el.classList.add('d-none'), 5000); }
+}
+
+function showSuccess(msg) {
+  const el = document.getElementById('successContent');
+  if (el) { el.textContent = msg; el.classList.remove('d-none'); setTimeout(() => el.classList.add('d-none'), 3000); }
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('fr-FR');
+  } catch(e) {
+    return dateStr;
+  }
+}
+
+function logout() {
+  if (confirm('Déconnexion ?')) {
+    localStorage.removeItem('jwt');
+    localStorage.removeItem('nom');
+    localStorage.removeItem('email');
+    localStorage.removeItem('role');
+    window.location.href = 'connexion.html';
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,2238 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tableau de bord directeur</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+<style>
+  :root {
+    --primary-color: #4a6fa5;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --sidebar-width: 320px;
+    --transition-speed: 0.4s;
+    --accent-color: #4dabf7;
+    --gray-color: #6c757d;
+  }
+  body {
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    min-height: 100vh;
+    padding-bottom: 20px;
+    margin-left: var(--sidebar-width);
+    transition: margin-left var(--transition-speed) ease;
+  }
+  #sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    position: fixed;
+    left: 0; top: 0;
+    z-index: 1050;
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    color: white;
+    box-shadow: 8px 0 30px rgba(0,0,0,0.2);
+    transition: all var(--transition-speed) cubic-bezier(0.4,0,0.2,1);
+    overflow-y: auto; overflow-x: hidden;
+    border-right: 1px solid rgba(255,255,255,0.1);
+  }
+  .sidebar-header {
+    padding: 30px 25px;
+    background: rgba(15,23,42,0.8);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .sidebar-brand {
+    display: flex; align-items: center; gap: 15px;
+    font-size: 1.4rem; font-weight: 700; color: white;
+    text-decoration: none; transition: transform 0.3s ease;
+  }
+  .sidebar-brand:hover { transform: translateX(5px); }
+  .sidebar-brand i { color: var(--accent-color); font-size: 2rem; }
+  .sidebar-user {
+    padding: 30px 25px; text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    background: rgba(30,41,59,0.6);
+  }
+  .user-avatar-wrapper { position: relative; width: fit-content; margin: 0 auto 20px; cursor: pointer; }
+  .user-avatar {
+    width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+    border: 3px solid rgba(255,255,255,0.2);
+    box-shadow: 0 8px 25px rgba(59,130,246,0.3);
+    transition: all 0.3s ease;
+  }
+  .user-avatar:hover { transform: scale(1.05); }
+  .online-indicator {
+    position: absolute; bottom: 5px; right: 5px;
+    width: 12px; height: 12px;
+    background: var(--success-color); border-radius: 50%;
+    border: 2px solid white; animation: pulse 2s infinite;
+  }
+  #welcomeText {
+    font-size: 1.2rem; font-weight: 600; margin-bottom: 5px;
+    background: linear-gradient(90deg,#fff,#cbd5e1);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .user-email { font-size: 0.9rem; opacity: 0.7; color: #cbd5e1; }
+  .sidebar-nav { padding: 25px 0; }
+  .sidebar-nav .nav-link {
+    color: rgba(255,255,255,0.8); padding: 16px 30px;
+    display: flex; align-items: center; gap: 18px;
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    border-left: 4px solid transparent;
+    margin: 5px 15px; border-radius: 12px; position: relative; overflow: hidden;
+  }
+  .sidebar-nav .nav-link:hover {
+    color: white; background: rgba(255,255,255,0.05);
+    border-left-color: var(--accent-color); transform: translateX(10px);
+  }
+  .sidebar-nav .nav-link.active {
+    color: white;
+    background: linear-gradient(90deg,rgba(77,171,247,0.15),transparent);
+    border-left-color: var(--accent-color);
+  }
+  .sidebar-nav .nav-link i { width: 26px; text-align: center; font-size: 1.3rem; transition: transform 0.3s ease; }
+  .sidebar-nav .nav-link:hover i { transform: scale(1.2); color: var(--accent-color); }
+  .stats-section { padding: 25px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .stats-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; color: rgba(255,255,255,0.9); }
+  .stats-header i { color: var(--accent-color); }
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .stat-item {
+    background: rgba(255,255,255,0.05); border-radius: 10px; padding: 15px;
+    text-align: center; transition: all 0.3s ease; border: 1px solid rgba(255,255,255,0.05);
+  }
+  .stat-item:hover { background: rgba(255,255,255,0.08); transform: translateY(-3px); }
+  .stat-value { font-size: 1.5rem; font-weight: 700; color: white; margin-bottom: 5px; }
+  .stat-label { font-size: 0.8rem; color: rgba(255,255,255,0.6); }
+  .sidebar-footer {
+    padding: 25px; border-top: 1px solid rgba(255,255,255,0.08);
+    background: rgba(15,23,42,0.8);
+  }
+  .notification-container { margin-bottom: 15px; }
+  .notification-btn {
+    width: 100%;
+    background: linear-gradient(135deg,rgba(77,171,247,0.15),rgba(59,130,246,0.1));
+    border: 1px solid rgba(77,171,247,0.2); color: white;
+    padding: 14px 20px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: all 0.3s ease;
+  }
+  .notification-btn:hover {
+    background: linear-gradient(135deg,rgba(77,171,247,0.25),rgba(59,130246,0.2));
+    transform: translateY(-2px);
+  }
+  .notification-content { display: flex; align-items: center; gap: 15px; }
+  .notification-content i { color: var(--accent-color); }
+  .notification-badge {
+    background: linear-gradient(135deg,#ef4444,#dc2626); color: white;
+    font-weight: 600; font-size: 0.8rem; min-width: 24px; height: 24px;
+    border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    animation: pulse 2s infinite;
+  }
+  .logout-btn {
+    width: 100%;
+    background: linear-gradient(135deg,rgba(239,68,68,0.15),rgba(220,38,38,0.1));
+    border: 1px solid rgba(239,68,68,0.2); color: #fecaca;
+    padding: 14px 20px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    transition: all 0.3s ease; font-weight: 500;
+  }
+  .logout-btn:hover { background: linear-gradient(135deg,rgba(239,68,68,0.25),rgba(220,38,38,0.2)); color: white; transform: translateY(-2px); }
+  .dropdown-menu.notifications-dropdown {
+    border-radius: 20px; border: none;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    padding: 0; max-height: 500px; overflow-y: auto;
+    min-width: 380px;
+    background: linear-gradient(135deg,#1e293b,#0f172a);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .dropdown-header { background: rgba(30,41,59,0.8); color: white; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 20px; font-weight: 600; }
+  .notification-item { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease; cursor: pointer; }
+  .notification-item:hover { background: rgba(255,255,255,0.05); }
+  .notification-item.unread { background: rgba(77,171,247,0.07); border-left: 3px solid var(--accent-color); }
+  .notification-item .notif-icon { width: 36px; height: 36px; border-radius: 10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:1rem; }
+  .notification-item .notif-icon.conge  { background: rgba(40,167,69,0.15); color: #28a745; }
+  .notification-item .notif-icon.retard { background: rgba(253,126,20,0.15); color: #fd7e14; }
+  .notification-item .notif-icon.info   { background: rgba(77,171,247,0.15); color: var(--accent-color); }
+  .notification-message { color: rgba(255,255,255,0.9); font-size: 0.9rem; margin-bottom: 3px; line-height: 1.4; }
+  .notification-time { color: rgba(255,255,255,0.45); font-size: 0.78rem; }
+  .notif-unread-dot { width:8px; height:8px; background:#4dabf7; border-radius:50%; flex-shrink:0; margin-top:4px; }
+  .dropdown-footer { padding: 15px 20px; text-align: center; }
+  .mark-all-read { color: var(--accent-color); text-decoration: none; font-weight: 500; font-size:0.9rem; }
+  .mark-all-read:hover { color: white; text-decoration: underline; }
+
+  /* Toast notification */
+  .notif-toast {
+    position: fixed; bottom: 30px; right: 30px; z-index: 9999;
+    background: linear-gradient(135deg,#1e293b,#0f172a);
+    color: white; border-radius: 16px; padding: 18px 22px;
+    min-width: 320px; max-width: 400px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: flex-start; gap: 14px;
+    transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+  .notif-toast.show { transform: translateX(0); }
+  .notif-toast .toast-icon { width: 42px; height: 42px; border-radius: 12px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0; }
+  .notif-toast .toast-icon.conge  { background: rgba(40,167,69,0.2); color: #4ade80; }
+  .notif-toast .toast-icon.retard { background: rgba(253,126,20,0.2); color: #fb923c; }
+  .notif-toast .toast-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 3px; }
+  .notif-toast .toast-body  { font-size: 0.85rem; color: rgba(255,255,255,0.75); line-height: 1.4; }
+  .notif-toast .toast-close { background:none; border:none; color:rgba(255,255,255,0.5); font-size:1.1rem; cursor:pointer; padding:0; margin-left:auto; align-self:flex-start; transition:color .2s; }
+  .notif-toast .toast-close:hover { color: white; }
+  .notif-toast .toast-bar { position:absolute; bottom:0; left:0; height:3px; border-radius:0 0 16px 16px; width:100%; background: linear-gradient(90deg,var(--accent-color),#3b82f6); animation: shrinkBar 5s linear forwards; }
+  @keyframes shrinkBar { from{width:100%} to{width:0} }
+
+  .container {
+    margin-top: 30px; margin-bottom: 30px;
+    margin-left: 40px; margin-right: 40px;
+    animation: slideIn 0.8s cubic-bezier(0.4,0,0.2,1);
+    max-width: calc(100% - 80px);
+  }
+  .navbar { display: none; }
+  #pageFooter { display: none; }
+  .btn-gray { background: linear-gradient(135deg,#6c757d,#545b62); color: white; border: none; }
+  .btn-gray:hover { background: linear-gradient(135deg,#5a6268,#484e55); color: white; transform: translateY(-2px); }
+  @media (max-width: 992px) {
+    body { margin-left: 0; }
+    #sidebar { width: 100%; height: auto; position: relative; }
+    .container { margin-left: 20px; margin-right: 20px; max-width: 100%; }
+  }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(239,68,68,0); }
+    100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+  }
+  #sidebar::-webkit-scrollbar { width: 6px; }
+  #sidebar::-webkit-scrollbar-thumb { background: linear-gradient(135deg,var(--accent-color),#3b82f6); border-radius: 3px; }
+  .card { border: none; border-radius: 15px; box-shadow: 0 6px 20px rgba(0,0,0,0.08); transition: all var(--transition-speed) ease; overflow: hidden; }
+  .card:hover { transform: translateY(-5px); box-shadow: 0 12px 25px rgba(0,0,0,0.12); }
+  #adminCard { background: linear-gradient(135deg,var(--primary-color),#3a5795); border-radius: 15px; }
+  .section-container { display: none; opacity: 0; transform: translateY(20px); transition: all 0.5s ease; }
+  .section-container.active { display: block; opacity: 1; transform: translateY(0); animation: slideUp 0.5s ease-out; }
+  .filter-container {
+    background: white; padding: 20px; border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 30px;
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 15px;
+  }
+  .btn { border-radius: 10px; font-weight: 500; padding: 10px 20px; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: none; }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+  .btn-primary { background: linear-gradient(135deg,var(--primary-color),#3a5795); }
+  .btn-success { background: linear-gradient(135deg,var(--success-color),#1e7e34); }
+  .btn-secondary { background: linear-gradient(135deg,var(--secondary-color),#545b62); }
+  .btn-info { background: linear-gradient(135deg,#17a2b8,#138496); color: white; }
+  .table-responsive { border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+  .table { margin-bottom: 0; background: white; }
+  .table thead { background: linear-gradient(90deg,var(--primary-color),#5a7bb5); color: white; }
+  .table thead th { border: none; padding: 18px 15px; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; }
+  .table tbody tr { transition: all 0.2s ease; }
+  .table tbody tr:hover { background-color: rgba(74,111,165,0.05); }
+  .table td { padding: 15px; vertical-align: middle; border-color: #f1f5f9; }
+  .badge { font-size: 0.8rem; padding: 6px 12px; border-radius: 50px; font-weight: 500; text-transform: uppercase; }
+  .badge-en_attente { background: linear-gradient(135deg,var(--warning-color),#e0a800); color: #000; }
+  .badge-accepte { background: linear-gradient(135deg,var(--success-color),#1e7e34); color: #fff; }
+  .badge-refuse { background: linear-gradient(135deg,var(--danger-color),#c82333); color: #fff; }
+  .badge-lu { background: linear-gradient(135deg,#6c757d,#495057); color: #fff; }
+  .badge-non-lu { background: linear-gradient(135deg,#fd7e14,#e65c00); color: #fff; }
+  .btn-sm { padding: 6px 12px; border-radius: 8px; font-size: 0.85rem; margin: 0 3px; }
+  .modal-content { border-radius: 20px; border: none; box-shadow: 0 15px 40px rgba(0,0,0,0.15); overflow: hidden; }
+  .modal-header { background: linear-gradient(90deg,var(--primary-color),#5a7bb5); color: white; border: none; padding: 20px 30px; }
+  .modal-body { padding: 25px 30px; }
+  .alert { border-radius: 12px; border: none; padding: 15px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 20px; }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  .employee-name-link { color: var(--primary-color) !important; text-decoration: none !important; font-weight: 500 !important; transition: all 0.2s ease !important; padding: 2px 6px !important; border-radius: 4px !important; }
+  .employee-name-link:hover { background-color: rgba(74,111,165,0.1) !important; text-decoration: underline !important; }
+  .avatar-preview { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-color); margin: 0 auto 20px; display: block; }
+  .upload-area { border: 2px dashed var(--primary-color); border-radius: 15px; padding: 30px; text-align: center; cursor: pointer; transition: all 0.3s ease; background: rgba(74,111,165,0.05); }
+  .upload-area:hover { background: rgba(74,111,165,0.1); }
+  .upload-area i { font-size: 3rem; color: var(--primary-color); margin-bottom: 10px; }
+  .retard-info-card { background: linear-gradient(135deg,#fff9f0,#fff3e0); border: 1px solid #ffe0b2; border-radius: 15px; padding: 20px; margin-bottom: 20px; }
+  .retard-info-card .info-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.06); }
+  .retard-info-card .info-row:last-child { border-bottom: none; }
+  .retard-info-card .info-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .retard-info-card .info-label { font-size: 0.82rem; color: #888; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.4px; font-weight: 600; }
+  .retard-info-card .info-value { font-size: 0.97rem; font-weight: 600; color: #2d3748; }
+  .retard-duration-badge { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg,#fd7e14,#e65c00); color: white; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 1rem; }
+  .retard-modal-header-info { background: rgba(255,255,255,0.15); border-radius: 12px; padding: 12px 18px; display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+  .retard-modal-header-info .emp-avatar { width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; border: 2px solid rgba(255,255,255,0.4); }
+  .retard-modal-header-info .emp-name { font-size: 1.1rem; font-weight: 700; color: white; }
+  .retard-modal-header-info .emp-sub { font-size: 0.82rem; color: rgba(255,255,255,0.75); }
+  .document-zone { background: linear-gradient(135deg,#f0f4ff,#e8eeff); border: 1px solid #c5d0f0; border-radius: 12px; padding: 20px; text-align: center; }
+  .remarque-zone { background: linear-gradient(135deg,#f0fff4,#e8f8ec); border: 1px solid #b2dfdb; border-radius: 12px; padding: 20px; margin-top: 15px; }
+  .remarque-zone label { font-weight: 600; color: #2e7d32; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .remarque-zone textarea { border: 1px solid #b2dfdb; border-radius: 10px; background: white; resize: vertical; }
+  .btn-mark-read { background: linear-gradient(135deg,#fd7e14,#e65c00); color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s ease; }
+  .btn-mark-read:hover { background: linear-gradient(135deg,#e65c00,#d45500); color: white; transform: translateY(-2px); }
+  .btn-voir-details { background: linear-gradient(135deg,var(--primary-color),#3a5795); color: white; border: none; padding: 6px 14px; border-radius: 8px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s ease; cursor: pointer; }
+  .btn-voir-details:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(74,111,165,0.35); color: white; }
+  .retard-timeline { display: flex; align-items: center; margin: 18px 0; background: white; border-radius: 12px; padding: 15px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .timeline-step { flex: 1; text-align: center; }
+  .timeline-step .step-circle { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-size: 1rem; }
+  .timeline-step .step-label { font-size: 0.75rem; font-weight: 600; color: #555; }
+  .timeline-step .step-time { font-size: 0.7rem; color: #999; }
+  .timeline-connector { flex: 0.5; height: 3px; border-radius: 2px; }
+  .new-indicator { display: inline-block; width: 8px; height: 8px; background: #fd7e14; border-radius: 50%; margin-right: 6px; animation: pulse 2s infinite; vertical-align: middle; }
+  .btn-outline-danger { border: 2px solid var(--danger-color); color: var(--danger-color); background: transparent; }
+  .btn-outline-danger:hover { background: var(--danger-color); color: white; }
+  .stats-retard-card { background: linear-gradient(135deg,#fff9f0,#fff3e0); border-left: 4px solid #fd7e14; padding: 15px; border-radius: 10px; margin-bottom: 10px; }
+  .stats-retard-value { font-size: 2rem; font-weight: 700; color: #fd7e14; line-height: 1; }
+  .stats-retard-label { font-size: 0.85rem; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+  .chart-container { position: relative; height: 250px; width: 100%; }
+  .heure-badge { background: #e9ecef; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem; color: #495057; display: inline-flex; align-items: center; gap: 5px; }
+  .salle-badge { background: linear-gradient(135deg,#4dabf7,#3b82f6); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 5px; }
+  .checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .form-check-inline {
+    margin-right: 8px;
+  }
+  .form-check-label {
+    font-size: 0.75rem;
+  }
+</style>
+</head>
+<body>
+
+<!-- TOAST NOTIFICATION -->
+<div class="notif-toast" id="notifToast">
+  <div class="toast-icon" id="toastIcon"><i class="fas fa-bell"></i></div>
+  <div style="flex:1; min-width:0;">
+    <div class="toast-title" id="toastTitle">Nouvelle notification</div>
+    <div class="toast-body"  id="toastBody">—</div>
+  </div>
+  <button class="toast-close" onclick="closeToast()"><i class="fas fa-times"></i></button>
+  <div class="toast-bar"></div>
+</div>
+
+<!-- SIDEBAR -->
+<div id="sidebar" class="d-flex flex-column">
+  <div class="sidebar-header">
+    <a class="sidebar-brand" href="#">
+      <i class="fas fa-user-shield"></i>
+      <span>Espace RH</span>
+    </a>
+  </div>
+  <div class="sidebar-user">
+    <div class="user-avatar-wrapper" onclick="openAvatarModal()">
+      <img src="https://ui-avatars.com/api/?name=RH&size=100&background=4a6fa5&color=fff&bold=true"
+           class="user-avatar" alt="Photo de profil" id="sidebarAvatar">
+      <span class="online-indicator"></span>
+    </div>
+    <div id="welcomeText" class="mb-1">Bienvenue</div>
+    <div class="user-email" id="userEmail"></div>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="#" class="nav-link active" onclick="showSection('dashboard')">
+      <i class="fas fa-tachometer-alt"></i><span>Tableau de bord</span>
+    </a>
+    <a href="#" class="nav-link" onclick="showSection('gestionTemps')">
+      <i class="fas fa-clock"></i><span>Gestion des temps</span>
+    </a>
+    <a href="#" class="nav-link" onclick="showSection('statistics')">
+      <i class="fas fa-chart-line"></i><span>Statistiques</span>
+    </a>
+    <a href="#" class="nav-link" onclick="showSection('historiqueSalle')">
+      <i class="fas fa-history"></i><span>Historique des salles</span>
+    </a>
+    <a href="#" class="nav-link" onclick="showJustificatifAdmin()">
+      <i class="fas fa-clock"></i><span>Annonces de retard</span>
+      <span id="justificatifBadge" style="display:none; background:#fd7e14; color:white; border-radius:10px; padding:2px 8px; font-size:0.75rem; margin-left:auto;">0</span>
+    </a>
+  </nav>
+  <div class="stats-section">
+    <div class="stats-header">
+      <i class="fas fa-chart-pie"></i><span>Aperçu rapide</span>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-item" id="statEmployees"><div class="stat-value">0</div><div class="stat-label">Employés</div></div>
+      <div class="stat-item" id="statPending"><div class="stat-value">0</div><div class="stat-label">En attente</div></div>
+      <div class="stat-item" id="statPresent"><div class="stat-value">0</div><div class="stat-label">Présents</div></div>
+      <div class="stat-item" id="statAbsent"><div class="stat-value">0</div><div class="stat-label">Absents</div></div>
+    </div>
+  </div>
+  <div class="sidebar-footer">
+    <div class="notification-container">
+      <div class="nav-item dropdown">
+        <button class="notification-btn" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+          <div class="notification-content">
+            <i class="fas fa-bell"></i><span class="notification-text">Notifications</span>
+          </div>
+          <span id="notificationCount" class="notification-badge" style="display:none;">0</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end notifications-dropdown" style="position:fixed;bottom:90px;left:20px;top:auto;right:auto;">
+          <li>
+            <div class="dropdown-header d-flex align-items-center justify-content-between">
+              <span><i class="fas fa-bell me-2" style="color:var(--accent-color);"></i>Notifications</span>
+              <span id="notifHeaderCount" class="notification-badge" style="display:none;position:static;animation:none;">0</span>
+            </div>
+          </li>
+          <div id="notificationList"></div>
+          <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,0.08);margin:0;"></li>
+          <li class="dropdown-footer">
+            <a class="mark-all-read" href="#" onclick="markAllAsRead(); return false;">
+              <i class="fas fa-check-double me-1"></i>Tout marquer comme lu
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="logout()">
+      <i class="fas fa-sign-out-alt"></i><span>Déconnexion</span>
+    </button>
+  </div>
+</div>
+
+<!-- CONTENU PRINCIPAL -->
+<div class="container mt-4">
+  <h2>Bienvenue sur notre plateforme !</h2>
+  <div id="errorContent" class="alert alert-danger d-none"></div>
+  <div id="successContent" class="alert alert-success d-none"></div>
+
+  <div id="adminCard" class="card bg-primary text-white mb-4" style="max-width:32rem;display:none;">
+    <div class="card-body">
+      <h5 class="card-title mb-3">Informations du responsable RH</h5>
+      <p class="card-text mb-1"><strong>Nom :</strong> <span id="adminName"></span></p>
+      <p class="card-text"><strong>Email :</strong> <span id="adminEmail"></span></p>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="section-container active">
+    <h3>Gestion des employés</h3>
+    <div class="filter-container">
+      <div id="filterPosteContainer">
+        <label for="filterPoste" class="form-label">Filtrer par poste :</label>
+        <select id="filterPoste" class="form-select" style="max-width:300px;">
+          <option value="">Tous les postes</option>
+          <option value="Full-stuck Developer">Full-stuck Developer</option>
+          <option value="Mobile Developer">Mobile Developer</option>
+          <option value="AI Developer">AI Developer</option>
+          <option value="Cloud Developer">Cloud Developer</option>
+        </select>
+      </div>
+      <div>
+        <button class="btn btn-gray me-2" onclick="openPosteModal()"><i class="fas fa-plus-circle me-1"></i>Ajouter un poste</button>
+        <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#addUserModal"><i class="fas fa-user-plus me-1"></i>Ajouter un employé</button>
+        <button class="btn btn-primary me-2" onclick="showSection('dashboard')"><i class="fas fa-tachometer-alt me-1"></i>Gestion des employés</button>
+        <button class="btn btn-secondary" onclick="showSection('conges')"><i class="fas fa-calendar-alt me-1"></i>Gestion des congés</button>
+        <button class="btn btn-success ms-2" onclick="showSection('presence')"><i class="fas fa-user-check me-1"></i>Suivi de présence</button>
+      </div>
+    </div>
+    <table class="table table-striped">
+      <thead><tr><th>ID</th><th>Nom</th><th>Email</th><th>Poste</th><th>Rôle</th><th>Actions</th></thead>
+      <tbody id="usersTableBody"></tbody>
+     </table>
+  </div>
+
+  <!-- GESTION DES TEMPS (HORAIRE ET SALLE) -->
+  <div id="gestionTemps" class="section-container">
+    <h3><i class="fas fa-clock me-2"></i>Gestion des horaires et salles de travail</h3>
+    <div class="alert alert-info mb-4">
+      <i class="fas fa-info-circle me-2"></i>
+      Définissez pour chaque employé les jours de travail, l'heure d'arrivée, l'heure de sortie et la salle de travail.
+    </div>
+    
+    <div class="filter-container mb-4">
+      <div>
+        <label class="form-label">Filtrer par employé :</label>
+        <input type="text" id="searchEmployeTemps" class="form-control" placeholder="Rechercher un employé..." onkeyup="filterEmployesTemps()" style="width: 250px;">
+      </div>
+      <div>
+        <label class="form-label">Filtrer par salle :</label>
+        <select id="filterSalleTemps" class="form-select" onchange="filterEmployesTemps()" style="width: 200px;">
+          <option value="">Toutes les salles</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="ouvrirModalTempsGlobal()">
+        <i class="fas fa-edit me-2"></i>Modifier les horaires (multi-sélection)
+      </button>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Employé</th>
+            <th>Salle</th>
+            <th>Heure Arrivée</th>
+            <th>Heure Sortie</th>
+            <th>Jours de travail</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="employesTempsTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- STATISTIQUES -->
+  <div id="statistics" class="section-container">
+    <h3>Statistiques</h3>
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-white" style="border-bottom: 1px solid #ffe0b2;">
+            <h5 class="mb-0" style="color: #fd7e14;"><i class="fas fa-clock me-2"></i>Statistiques des annonces de retard</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-3 col-sm-6 mb-3"><div class="stats-retard-card"><div class="stats-retard-value" id="statRetardTotal">0</div><div class="stats-retard-label">Total annonces</div></div></div>
+              <div class="col-md-3 col-sm-6 mb-3"><div class="stats-retard-card" style="border-left-color:#fd7e14;"><div class="stats-retard-value" id="statRetardNonLus">0</div><div class="stats-retard-label">Non lues</div></div></div>
+              <div class="col-md-3 col-sm-6 mb-3"><div class="stats-retard-card" style="border-left-color:#28a745;"><div class="stats-retard-value" id="statRetardLus">0</div><div class="stats-retard-label">Lues</div></div></div>
+              <div class="col-md-3 col-sm-6 mb-3"><div class="stats-retard-card" style="border-left-color:#dc3545;"><div class="stats-retard-value" id="statRetardMoyenne">0</div><div class="stats-retard-label">Retard moyen (min)</div></div></div>
+            </div>
+            <div class="row mt-3">
+              <div class="col-md-6 mb-4"><div class="card"><div class="card-body"><h6 class="card-subtitle mb-2 text-muted">Répartition par statut</h6><div class="chart-container"><canvas id="retardStatutChart"></canvas></div></div></div></div>
+              <div class="col-md-6 mb-4"><div class="card"><div class="card-body"><h6 class="card-subtitle mb-2 text-muted">Retards par jour (7 derniers jours)</h6><div class="chart-container"><canvas id="retardTimelineChart"></canvas></div></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-4"><div class="card"><div class="card-body"><h5 class="card-title">Répartition par poste</h5><div class="chart-container"><canvas id="posteChart"></canvas></div></div></div></div>
+      <div class="col-md-6 mb-4"><div class="card"><div class="card-body"><h5 class="card-title">Statut des congés</h5><div class="chart-container"><canvas id="congeChart"></canvas></div></div></div></div>
+    </div>
+  </div>
+
+  <!-- CONGÉS -->
+  <div id="conges" class="section-container">
+    <h3>Gestion des demandes de congé</h3>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead><tr><th>ID</th><th>Employé</th><th>Type</th><th>Date Début</th><th>Date Fin</th><th>Jours</th><th>Statut</th><th>Actions</th></tr></thead>
+        <tbody id="congesTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PRÉSENCE -->
+  <div id="presence" class="section-container">
+    <h3>Suivi de présence</h3>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead><tr><th>ID</th><th>Employé</th><th>Date</th><th>Heure d'arrivée</th><th>Heure de départ</th><th>Statut</th></tr></thead>
+        <tbody id="presenceTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- HISTORIQUE SALLES -->
+  <div id="historiqueSalle" class="section-container">
+    <h3>Historique d'accès aux salles</h3>
+    <div class="card mb-4"><div class="card-body">
+      <div class="row">
+        <div class="col-md-4"><label class="form-label">Filtrer par salle :</label><select id="filterSalle" class="form-select" onchange="filterHistorique()"><option value="">Toutes les salles</option><option value="Salle de réunion">Salle de réunion</option><option value="Bureau RH">Bureau RH</option><option value="Salle serveur">Salle serveur</option><option value="Cafétéria">Cafétéria</option><option value="Salle de formation">Salle de formation</option></select></div>
+        <div class="col-md-4"><label class="form-label">Filtrer par employé :</label><select id="filterEmploye" class="form-select" onchange="filterHistorique()"><option value="">Tous les employés</option></select></div>
+        <div class="col-md-4"><label class="form-label">Filtrer par date :</label><input type="date" id="filterDate" class="form-control" onchange="filterHistorique()"></div>
+      </div>
+    </div></div>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead><tr><th>ID</th><th>Employé</th><th>Salle</th><th>Date</th><th>Heure d'entrée</th><th>Heure de sortie</th><th>Durée</th></tr></thead>
+        <tbody id="historiqueTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ANNONCES DE RETARD -->
+  <div id="justificatifAdmin" class="section-container">
+    <div class="d-flex align-items-start gap-3 mb-4">
+      <div>
+        <h3 class="mb-1"><i class="fas fa-clock text-warning me-2"></i>Annonces de retard</h3>
+        <p class="text-muted mb-0" style="font-size:0.95rem;">Les employés vous informent ici qu'ils arriveront en retard.</p>
+      </div>
+      <div class="ms-auto text-end">
+        <div style="background:linear-gradient(135deg,#fd7e14,#e65c00);color:white;border-radius:12px;padding:12px 20px;text-align:center;min-width:100px;">
+          <div style="font-size:1.6rem;font-weight:700;" id="countNonLus">0</div>
+          <div style="font-size:0.75rem;opacity:0.9;">Non lues</div>
+        </div>
+      </div>
+    </div>
+    <div class="filter-container">
+      <div><label class="form-label">Statut :</label><select id="filterJustificatifStatut" class="form-select" style="max-width:180px;" onchange="filterJustificatifs()"><option value="">Tous</option><option value="non lu">Non lus</option><option value="lu">Lus</option></select></div>
+      <div><label class="form-label">Date :</label><input type="date" id="filterJustificatifDate" class="form-control" style="max-width:200px;" onchange="filterJustificatifs()"></div>
+      <div><label class="form-label">Rechercher :</label><input type="text" id="searchJustificatifEmploye" class="form-control" placeholder="Nom de l'employé..." style="max-width:250px;" onkeyup="filterJustificatifs()"></div>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead><tr><th>ID</th><th>Employé</th><th>Date du retard</th><th>Heure prévue</th><th>Durée estimée</th><th>Raison</th><th>Document</th><th>Statut</th><th>Action</th></tr></thead>
+        <tbody id="justificatifsTableBody"><tr><td colspan="9" class="text-center">Chargement...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MODIFICATION HORAIRES INDIVIDUEL -->
+<div class="modal fade" id="modalModifierHoraire" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-clock me-2"></i>Modifier les horaires</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editEmployeId">
+        <div class="mb-3">
+          <label class="form-label fw-bold">Employé</label>
+          <p class="form-control-static" id="editEmployeNom"></p>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Salle de travail</label>
+          <select id="editSalle" class="form-select">
+            <option value="">Sélectionner une salle</option>
+          </select>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Heure d'arrivée</label>
+            <input type="time" id="editHeureArrivee" class="form-control" required>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Heure de sortie</label>
+            <input type="time" id="editHeureSortie" class="form-control" required>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Jours de travail</label>
+          <div id="editJoursContainer" class="checkbox-group">
+            <!-- Les jours seront ajoutés dynamiquement -->
+          </div>
+        </div>
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle me-2"></i>
+          Ces horaires seront appliqués pour les jours sélectionnés.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-primary" onclick="enregistrerHoraireEmploye()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MODIFICATION HORAIRES GLOBAL -->
+<div class="modal fade" id="modalModifierHoraireGlobal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-users me-2"></i>Modifier les horaires en masse</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          Vous allez modifier les horaires de plusieurs employés à la fois.
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Sélectionner les employés</label>
+          <select id="globalEmployesSelect" class="form-select" multiple size="8">
+          </select>
+          <small class="text-muted">Maintenez Ctrl (ou Cmd) pour sélectionner plusieurs employés</small>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Nouvelle heure d'arrivée</label>
+            <input type="time" id="globalHeureArrivee" class="form-control">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Nouvelle heure de sortie</label>
+            <input type="time" id="globalHeureSortie" class="form-control">
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Nouvelle salle (optionnel)</label>
+          <select id="globalSalle" class="form-select">
+            <option value="">Ne pas changer</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-primary" onclick="enregistrerHorairesGlobal()">Appliquer les modifications</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL AJOUTER EMPLOYÉ -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title">Ajouter un employé</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <form id="addUserForm">
+        <input type="text" id="addNom" class="form-control mb-2" placeholder="Nom" required>
+        <input type="text" id="addPrenom" class="form-control mb-2" placeholder="Prénom" required>
+        <input type="date" id="addDateNaissance" class="form-control mb-2" required>
+        <input type="email" id="addEmail" class="form-control mb-2" placeholder="Email" required>
+        <input type="tel" id="addTelephone" class="form-control mb-2" placeholder="Téléphone" required>
+        <input type="password" id="addMotDePasse" class="form-control mb-2" placeholder="Mot de passe" minlength="8" required>
+        <select id="addPoste" class="form-control mb-2" required><option value="">Sélectionner un poste</option></select>
+        <button type="submit" class="btn btn-success w-100">Ajouter l'employé</button>
+      </form>
+      <div id="addUserError" class="mt-2"></div>
+    </div>
+  </div></div>
+</div>
+
+<!-- MODAL GESTION DES POSTES -->
+<div class="modal fade" id="addPosteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title">Gestion des postes</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <ul class="nav nav-tabs mb-3">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#add-tab-pane" type="button">Ajouter</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#delete-tab-pane" type="button">Supprimer</button></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="add-tab-pane">
+          <form id="addPosteForm"><div class="mb-3"><label class="form-label">Nom du poste *</label><input type="text" class="form-control" id="posteName" placeholder="Ex: Data Scientist" required></div><button type="submit" class="btn btn-gray w-100"><i class="fas fa-plus-circle me-2"></i>Ajouter le poste</button></form>
+          <div id="addPosteError" class="mt-2 text-danger"></div>
+        </div>
+        <div class="tab-pane fade" id="delete-tab-pane">
+          <div class="mb-3">
+            <label class="form-label">Sélectionner un poste à supprimer</label>
+            <select id="deletePosteSelect" class="form-select mb-3"><option value="">Sélectionner un poste...</option></select>
+            <div class="alert alert-warning"><i class="fas fa-exclamation-triangle me-2"></i><strong>Attention :</strong> Les employés avec ce poste verront leur poste réinitialisé.</div>
+            <button type="button" class="btn btn-danger w-100" onclick="deletePoste()"><i class="fas fa-trash me-2"></i>Supprimer le poste sélectionné</button>
+          </div>
+          <div id="deletePosteError" class="mt-2 text-danger"></div>
+        </div>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+<!-- MODAL PHOTO DE PROFIL -->
+<div class="modal fade" id="avatarModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title"><i class="fas fa-camera me-2"></i>Photo de profil</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <div class="text-center mb-4"><img src="https://ui-avatars.com/api/?name=RH&size=150&background=4a6fa5&color=fff&bold=true" class="avatar-preview" id="avatarPreview" alt="Aperçu"></div>
+      <form id="avatarForm" enctype="multipart/form-data">
+        <div class="upload-area" onclick="document.getElementById('avatarInput').click()">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <h6 class="mt-3">Cliquez pour choisir une photo</h6>
+          <p class="text-muted small">PNG, JPG, JPEG (max 2 Mo)</p>
+          <input type="file" id="avatarInput" name="photo" accept="image/png,image/jpeg,image/jpg" style="display:none;" onchange="previewAvatar(this)">
+        </div>
+        <div class="mt-4 d-flex gap-2">
+          <button type="button" class="btn btn-outline-danger flex-grow-1" onclick="deleteAvatar()"><i class="fas fa-trash-alt me-2"></i>Supprimer</button>
+          <button type="submit" class="btn btn-primary flex-grow-1"><i class="fas fa-save me-2"></i>Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// ==================== ÉTAT GLOBAL ====================
+let usersList = [], congesList = [], notificationsList = [], presenceList = [], historiqueList = [], adminData = {};
+let allJustificatifs = [], filteredJustificatifs = [];
+let autoMarkDone = false;
+let currentJustificatifId = null;
+
+// DONNÉES POUR LES HORAIRES ET SALLES
+let planningEmployes = JSON.parse(localStorage.getItem('planningEmployes')) || {};
+
+const JOURS_SEMAINE = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+
+// Liste des salles disponibles
+let sallesDisponibles = [
+  "Salle de réunion A",
+  "Salle de réunion B",
+  "Bureau open space",
+  "Bureau RH",
+  "Salle serveur",
+  "Cafétéria",
+  "Salle de formation",
+  "Espace créatif",
+  "Salle de conférence"
+];
+
+// IDs connus côté client pour détecter les NOUVELLES notifications
+let knownNotifIds  = new Set(JSON.parse(localStorage.getItem('knownNotifIds')  || '[]'));
+let knownCongeIds  = new Set(JSON.parse(localStorage.getItem('knownCongeIds')  || '[]'));
+let knownRetardIds = new Set(JSON.parse(localStorage.getItem('knownRetardIds') || '[]'));
+let toastTimer = null;
+
+// Notifications locales persistées
+let localNotifs = JSON.parse(localStorage.getItem('localNotifs') || '[]');
+
+// ==================== PERSISTANCE ====================
+function persistKnownIds() {
+  try {
+    localStorage.setItem('knownNotifIds',  JSON.stringify([...knownNotifIds]));
+    localStorage.setItem('knownCongeIds',  JSON.stringify([...knownCongeIds]));
+    localStorage.setItem('knownRetardIds', JSON.stringify([...knownRetardIds]));
+    localStorage.setItem('localNotifs',    JSON.stringify(localNotifs));
+    localStorage.setItem('planningEmployes', JSON.stringify(planningEmployes));
+  } catch(e) {
+    console.warn('Erreur persistance localStorage:', e);
+  }
+}
+
+// ==================== CHARGEMENT/SAUVEGARDE DES HORAIRES ====================
+function getPlanningEmploye(employeId) {
+  if (!planningEmployes[employeId]) {
+    planningEmployes[employeId] = {
+      salle: sallesDisponibles[0],
+      arrivee: "09:00",
+      sortie: "18:00",
+      jours: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven']
+    };
+    persistKnownIds();
+  }
+  return planningEmployes[employeId];
+}
+
+function setPlanningEmploye(employeId, salle, arrivee, sortie, jours) {
+  planningEmployes[employeId] = {
+    salle: salle,
+    arrivee: arrivee,
+    sortie: sortie,
+    jours: jours
+  };
+  persistKnownIds();
+}
+
+// ==================== AFFICHAGE DES EMPLOYÉS AVEC HORAIRES ====================
+function afficherGestionTemps() {
+  const tbody = document.getElementById('employesTempsTableBody');
+  if (!tbody) return;
+  
+  const searchTerm = document.getElementById('searchEmployeTemps')?.value.toLowerCase() || '';
+  const salleFilter = document.getElementById('filterSalleTemps')?.value || '';
+  
+  let employesFiltres = usersList.filter(user => {
+    const nomComplet = `${user.prenom || ''} ${user.nom || ''}`.toLowerCase();
+    const matchSearch = searchTerm === '' || nomComplet.includes(searchTerm);
+    const plan = getPlanningEmploye(user.id);
+    const matchSalle = salleFilter === '' || plan.salle === salleFilter;
+    return matchSearch && matchSalle;
+  });
+  
+  if (employesFiltres.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Aucun employé trouvé</td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = employesFiltres.map(user => {
+    const plan = getPlanningEmploye(user.id);
+    const nomComplet = `${user.prenom || ''} ${user.nom || ''}`;
+    return `
+      <tr>
+        <td>${user.id}</td>
+        <td><strong>${nomComplet}</strong></td>
+        <td><span class="salle-badge"><i class="fas fa-building me-1"></i>${plan.salle}</span></td>
+        <td><span class="heure-badge"><i class="fas fa-sign-in-alt me-1"></i>${plan.arrivee}</span></td>
+        <td><span class="heure-badge"><i class="fas fa-sign-out-alt me-1"></i>${plan.sortie}</span></td>
+        <td>
+          <div class="d-flex gap-1 flex-wrap">
+            ${JOURS_SEMAINE.map(jour => `
+              <span class="badge ${plan.jours.includes(jour) ? 'bg-success' : 'bg-secondary'}">${jour}</span>
+            `).join('')}
+          </div>
+        </td>
+        <td>
+          <button class="btn btn-sm btn-primary" onclick="ouvrirModalModifierHoraire(${user.id}, '${nomComplet}')">
+            <i class="fas fa-edit me-1"></i>Modifier
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function filterEmployesTemps() {
+  afficherGestionTemps();
+}
+
+// ==================== MODAL MODIFICATION INDIVIDUELLE ====================
+function ouvrirModalModifierHoraire(employeId, employeNom) {
+  const plan = getPlanningEmploye(employeId);
+  
+  document.getElementById('editEmployeId').value = employeId;
+  document.getElementById('editEmployeNom').innerHTML = `<i class="fas fa-user me-2"></i>${employeNom}`;
+  document.getElementById('editHeureArrivee').value = plan.arrivee;
+  document.getElementById('editHeureSortie').value = plan.sortie;
+  
+  // Remplir la liste des salles
+  const salleSelect = document.getElementById('editSalle');
+  salleSelect.innerHTML = '<option value="">Sélectionner une salle</option>' + 
+    sallesDisponibles.map(salle => `<option value="${salle}" ${plan.salle === salle ? 'selected' : ''}>${salle}</option>`).join('');
+  
+  // Remplir les jours
+  const joursContainer = document.getElementById('editJoursContainer');
+  joursContainer.innerHTML = JOURS_SEMAINE.map(jour => `
+    <div class="form-check form-check-inline">
+      <input class="form-check-input edit-jour-check" type="checkbox" value="${jour}" id="editJour-${jour}" ${plan.jours.includes(jour) ? 'checked' : ''}>
+      <label class="form-check-label" for="editJour-${jour}" style="font-size: 0.85rem;">${jour}</label>
+    </div>
+  `).join('');
+  
+  const modal = new bootstrap.Modal(document.getElementById('modalModifierHoraire'));
+  modal.show();
+}
+
+function enregistrerHoraireEmploye() {
+  const employeId = document.getElementById('editEmployeId').value;
+  const salle = document.getElementById('editSalle').value;
+  const arrivee = document.getElementById('editHeureArrivee').value;
+  const sortie = document.getElementById('editHeureSortie').value;
+  
+  const checkboxes = document.querySelectorAll('.edit-jour-check:checked');
+  const joursSelectionnes = Array.from(checkboxes).map(cb => cb.value);
+  
+  if (!salle) {
+    showError("Veuillez sélectionner une salle");
+    return;
+  }
+  if (!arrivee || !sortie) {
+    showError("Veuillez définir les horaires d'arrivée et de sortie");
+    return;
+  }
+  if (joursSelectionnes.length === 0) {
+    showError("Veuillez sélectionner au moins un jour de travail");
+    return;
+  }
+  
+  const token = localStorage.getItem('jwt');
+  
+  fetch('save_planning.php', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      employe_id: employeId,
+      salle: salle,
+      heure_arrivee: arrivee,
+      heure_sortie: sortie,
+      jours_travail: joursSelectionnes
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      setPlanningEmploye(employeId, salle, arrivee, sortie, joursSelectionnes);
+      afficherGestionTemps();
+      
+      const modal = bootstrap.Modal.getInstance(document.getElementById('modalModifierHoraire'));
+      modal.hide();
+      
+      showSuccess(data.message);
+    } else {
+      showError(data.message);
+    }
+  })
+  .catch(err => showError('Erreur de connexion'));
+}
+// ==================== MODIFICATION EN MASSE ====================
+function ouvrirModalTempsGlobal() {
+  // Remplir la liste des employés
+  const selectGlobal = document.getElementById('globalEmployesSelect');
+  selectGlobal.innerHTML = usersList.map(user => {
+    const nomComplet = `${user.prenom || ''} ${user.nom || ''}`;
+    return `<option value="${user.id}">${nomComplet} - ${user.poste || '—'}</option>`;
+  }).join('');
+  
+  // Remplir la liste des salles
+  const salleGlobal = document.getElementById('globalSalle');
+  salleGlobal.innerHTML = '<option value="">Ne pas changer</option>' + 
+    sallesDisponibles.map(salle => `<option value="${salle}">${salle}</option>`).join('');
+  
+  const modal = new bootstrap.Modal(document.getElementById('modalModifierHoraireGlobal'));
+  modal.show();
+}
+
+function enregistrerHorairesGlobal() {
+  const selectedOptions = document.getElementById('globalEmployesSelect').selectedOptions;
+  const employesIds = Array.from(selectedOptions).map(opt => opt.value);
+  const nouvelleHeureArrivee = document.getElementById('globalHeureArrivee').value;
+  const nouvelleHeureSortie = document.getElementById('globalHeureSortie').value;
+  const nouvelleSalle = document.getElementById('globalSalle').value;
+  
+  if (employesIds.length === 0) {
+    showError("Veuillez sélectionner au moins un employé");
+    return;
+  }
+  
+  let compteur = 0;
+  employesIds.forEach(id => {
+    const plan = getPlanningEmploye(id);
+    const nouvelleArrivee = nouvelleHeureArrivee || plan.arrivee;
+    const nouvelleSortie = nouvelleHeureSortie || plan.sortie;
+    const salle = nouvelleSalle || plan.salle;
+    
+    if (nouvelleHeureArrivee || nouvelleHeureSortie || nouvelleSalle) {
+      setPlanningEmploye(id, salle, nouvelleArrivee, nouvelleSortie, plan.jours);
+      compteur++;
+    }
+  });
+  
+  afficherGestionTemps();
+  
+  const modal = bootstrap.Modal.getInstance(document.getElementById('modalModifierHoraireGlobal'));
+  modal.hide();
+  
+  showSuccess(`${compteur} employé(s) ont été modifiés avec succès`);
+}
+
+// ==================== INITIALISATION DES SALLES DANS LES FILTRES ====================
+function initialiserFiltreSalles() {
+  const filterSalle = document.getElementById('filterSalleTemps');
+  if (filterSalle) {
+    filterSalle.innerHTML = '<option value="">Toutes les salles</option>' + 
+      sallesDisponibles.map(salle => `<option value="${salle}">${salle}</option>`).join('');
+  }
+}
+
+// ==================== FONCTIONS EXISTANTES (CONSERVÉES) ====================
+function formatHeure(heure) {
+  if (!heure) return '—';
+  return heure.substring(0, 5);
+}
+
+function calculerDuree(debut, fin) {
+  if (!debut) return '—';
+  if (!fin) return 'En cours';
+  try {
+    const [h1, m1] = debut.split(':').map(Number);
+    const [h2, m2] = fin.split(':').map(Number);
+    const minutes1 = h1 * 60 + m1;
+    const minutes2 = h2 * 60 + m2;
+    const diff = minutes2 - minutes1;
+    if (diff < 0) return '—';
+    const heures = Math.floor(diff / 60);
+    const minutes = diff % 60;
+    if (heures === 0) return `${minutes} min`;
+    if (minutes === 0) return `${heures}h`;
+    return `${heures}h ${minutes}min`;
+  } catch (e) {
+    return '—';
+  }
+}
+
+function filterHistorique() {
+  if (!historiqueList || !historiqueList.length) return;
+  const salle   = document.getElementById('filterSalle')?.value   || '';
+  const employe = document.getElementById('filterEmploye')?.value || '';
+  const date    = document.getElementById('filterDate')?.value    || '';
+  let filtered  = [...historiqueList];
+  if (salle)   filtered = filtered.filter(h => h.salle === salle);
+  if (employe) filtered = filtered.filter(h => h.employe_nom === employe);
+  if (date)    filtered = filtered.filter(h => new Date(h.date_entree).toISOString().split('T')[0] === date);
+  renderHistorique(filtered);
+}
+
+function populateEmployeFilter() {
+  const select = document.getElementById('filterEmploye');
+  if (!select || !historiqueList || !historiqueList.length) return;
+  const employes = [...new Set(historiqueList.map(h => h.employe_nom).filter(Boolean))];
+  select.innerHTML = '<option value="">Tous les employés</option>';
+  employes.forEach(emp => {
+    const option = document.createElement('option');
+    option.value = emp;
+    option.textContent = emp;
+    select.appendChild(option);
+  });
+}
+
+function renderHistorique(historique) {
+  const tbody = document.getElementById('historiqueTableBody');
+  if (!tbody) return;
+  if (!historique || !historique.length) {
+    tbody.innerHTML = '<td colspan="7" class="text-center">Aucun historique</td></tr>';
+    return;
+  }
+  tbody.innerHTML = historique.map(h => `
+      <tr>
+        <td>${h.id || '—'}</td>
+        <td>${h.employe_nom || '—'}</td>
+        <td><span class="badge bg-info">${h.salle || '—'}</span></td>
+        <td>${formatDate(h.date_entree)}</td>
+        <td>${formatHeure(h.heure_entree)}</td>
+        <td>${h.heure_sortie ? formatHeure(h.heure_sortie) : 'En cours'}</td>
+        <td>${calculerDuree(h.heure_entree, h.heure_sortie)}</td>
+      </tr>
+   `).join('');
+}
+
+function renderPresence(presences) {
+  const tbody = document.getElementById('presenceTableBody');
+  if (!tbody) return;
+  if (!presences || !presences.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center">Aucune donnée</td></tr>';
+    return;
+  }
+  tbody.innerHTML = presences.map(p => `
+      <tr>
+        <td>${p.id || '—'}</td>
+        <td>${p.employe || '—'}</td>
+        <td>${p.date || '—'}</td>
+        <td>${p.heure_arrivee || '—'}</td>
+        <td>${p.heure_depart || '—'}</td>
+        <td>${p.statut || '—'}</td>
+      </tr>
+   `).join('');
+}
+
+function showToast(type, title, body) {
+  const toast   = document.getElementById('notifToast');
+  if (!toast) return;
+  const icon    = document.getElementById('toastIcon');
+  const titleEl = document.getElementById('toastTitle');
+  const bodyEl  = document.getElementById('toastBody');
+  if (titleEl) titleEl.textContent = title;
+  if (bodyEl)  bodyEl.textContent  = body;
+  if (icon) {
+    icon.className = `toast-icon ${type}`;
+    icon.innerHTML = type === 'conge' ? '<i class="fas fa-calendar-alt"></i>' : '<i class="fas fa-clock"></i>';
+  }
+  const bar = toast.querySelector('.toast-bar');
+  if (bar) { bar.style.animation = 'none'; bar.offsetHeight; bar.style.animation = 'shrinkBar 5s linear forwards'; }
+  toast.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(closeToast, 5000);
+}
+
+function closeToast() {
+  const toast = document.getElementById('notifToast');
+  if (toast) toast.classList.remove('show');
+  if (toastTimer) clearTimeout(toastTimer);
+}
+
+function updateUserInfo() {
+  const nom   = localStorage.getItem('nom')   || 'Responsable RH';
+  const email = localStorage.getItem('email') || '';
+  const welcomeEl    = document.getElementById('welcomeText');
+  const userEmailEl  = document.getElementById('userEmail');
+  const adminNameEl  = document.getElementById('adminName');
+  const adminEmailEl = document.getElementById('adminEmail');
+  const adminCardEl  = document.getElementById('adminCard');
+  if (welcomeEl)    welcomeEl.textContent  = `Bienvenue, ${nom} !`;
+  if (userEmailEl)  userEmailEl.textContent = email;
+  if (adminNameEl)  adminNameEl.textContent = nom;
+  if (adminEmailEl) adminEmailEl.textContent = email;
+  if (adminCardEl)  adminCardEl.style.display = 'block';
+}
+
+function loadAdminData() {
+  adminData = {
+    nom: localStorage.getItem('nom') || 'Responsable RH',
+    email: localStorage.getItem('email') || '',
+    photo_profil: localStorage.getItem('adminPhoto') || null
+  };
+  updateAdminUI();
+}
+
+function updateAdminUI() {
+  const el   = document.getElementById('sidebarAvatar');
+  const prev = document.getElementById('avatarPreview');
+  if (!el) return;
+  const initials = adminData.nom.split(' ').map(n => n[0]).join('').toUpperCase() || 'RH';
+  const src = adminData.photo_profil ||
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&size=100&background=4a6fa5&color=fff&bold=true`;
+  el.src = src;
+  if (prev) prev.src = src.replace('size=100', 'size=150');
+}
+
+function openAvatarModal() {
+  loadAdminData();
+  const modal = document.getElementById('avatarModal');
+  if (modal) new bootstrap.Modal(modal).show();
+}
+
+function previewAvatar(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = e => { const p = document.getElementById('avatarPreview'); if (p) p.src = e.target.result; };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+async function uploadAvatar(file) {
+  const token = localStorage.getItem('jwt');
+  if (!token) { showError('Connectez-vous d\'abord'); return; }
+  const formData = new FormData();
+  formData.append('photo', file);
+  try {
+    const res  = await fetch('uploadProfilePic.php', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: formData });
+    const data = await res.json();
+    if (data.success) {
+      localStorage.setItem('adminPhoto', data.photo_url);
+      adminData.photo_profil = data.photo_url;
+      updateAdminUI();
+      showSuccess('Photo mise à jour !');
+      const modal = document.getElementById('avatarModal');
+      if (modal) bootstrap.Modal.getInstance(modal)?.hide();
+      const input = document.getElementById('avatarInput');
+      if (input) input.value = '';
+    } else { showError(data.message || 'Erreur upload'); }
+  } catch(e) { showError('Erreur de connexion'); }
+}
+
+async function deleteAvatar() {
+  if (!confirm('Supprimer la photo ?')) return;
+  const token = localStorage.getItem('jwt');
+  try {
+    const res  = await fetch('delete_photo.php', { method: 'POST', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' } });
+    const data = await res.json();
+    if (data.success) {
+      localStorage.removeItem('adminPhoto');
+      adminData.photo_profil = null;
+      updateAdminUI();
+      showSuccess('Photo supprimée !');
+      const modal = document.getElementById('avatarModal');
+      if (modal) bootstrap.Modal.getInstance(modal)?.hide();
+    } else { showError(data.message); }
+  } catch(e) { showError('Erreur de connexion'); }
+}
+
+function showSection(id) {
+  const fp = document.getElementById('filterPosteContainer');
+  if (fp) fp.style.display = ['conges', 'statistics', 'historiqueSalle', 'justificatifAdmin', 'gestionTemps'].includes(id) ? 'none' : 'block';
+  document.querySelectorAll('.section-container').forEach(s => s.classList.remove('active'));
+  const section = document.getElementById(id);
+  if (section) section.classList.add('active');
+  if (id === 'dashboard')        fetchUsers();
+  else if (id === 'conges')      fetchConges();
+  else if (id === 'presence')    fetchPresence();
+  else if (id === 'historiqueSalle') fetchHistorique();
+  else if (id === 'gestionTemps') {
+    fetchUsers(); // S'assurer d'avoir la liste des employés
+    setTimeout(() => {
+      afficherGestionTemps();
+    }, 500);
+  }
+  else if (id === 'statistics') {
+    updateStatistics();
+    createCharts();
+    if (allJustificatifs.length === 0) {
+      loadJustificatifsAdmin().then(() => { setTimeout(() => { createRetardCharts(); updateRetardStatistics(); }, 100); });
+    } else { setTimeout(() => { createRetardCharts(); updateRetardStatistics(); }, 100); }
+  }
+  else if (id === 'justificatifAdmin') loadJustificatifsAdmin();
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorContent');
+  if (el) { el.textContent = msg; el.classList.remove('d-none'); setTimeout(() => el.classList.add('d-none'), 5000); }
+}
+
+function showSuccess(msg) {
+  const el = document.getElementById('successContent');
+  if (el) { el.textContent = msg; el.classList.remove('d-none'); setTimeout(() => el.classList.add('d-none'), 3000); }
+}
+
+function logout() {
+  if (confirm('Vous déconnecter ?')) {
+    ['jwt', 'nom', 'email', 'role', 'adminData', 'adminPhoto',
+     'knownNotifIds', 'knownCongeIds', 'knownRetardIds', 'localNotifs', 'planningEmployes'
+    ].forEach(k => localStorage.removeItem(k));
+    window.location.href = 'connexion.html';
+  }
+}
+
+function getAllNotifications() {
+  return [...localNotifs, ...notificationsList];
+}
+
+function updateNotificationBadge() {
+  const all = getAllNotifications();
+  const unreadCount = all.filter(n => n.statut === 'non_lu' || n.statut === 'non lu').length;
+  const badge       = document.getElementById('notificationCount');
+  const headerBadge = document.getElementById('notifHeaderCount');
+  if (badge) {
+    badge.textContent = unreadCount;
+    badge.style.display = unreadCount > 0 ? 'flex' : 'none';
+  }
+  if (headerBadge) {
+    headerBadge.textContent = unreadCount;
+    headerBadge.style.display = unreadCount > 0 ? 'flex' : 'none';
+  }
+}
+
+function updateDropdownNotifications() {
+  const list = document.getElementById('notificationList');
+  if (!list) return;
+  const all = getAllNotifications();
+  if (!all.length) {
+    list.innerHTML = `<li class="notification-item">
+      <div class="d-flex align-items-center gap-3">
+        <div class="notif-icon info"><i class="fas fa-bell-slash"></i></div>
+        <div class="notification-message">Aucune notification</div>
+      </div>
+    </li>`;
+    return;
+  }
+  list.innerHTML = all.slice(0, 20).map(n => {
+    const unread    = n.statut === 'non_lu' || n.statut === 'non lu';
+    const iconClass = n.type === 'conge' ? 'conge' : n.type === 'retard' ? 'retard' : 'info';
+    const iconTag   = n.type === 'conge'
+      ? '<i class="fas fa-calendar-alt"></i>'
+      : n.type === 'retard'
+        ? '<i class="fas fa-clock"></i>'
+        : '<i class="fas fa-bell"></i>';
+    return `<li class="notification-item ${unread ? 'unread' : ''}" onclick="handleNotifClick('${n.id}','${n.type || ''}')">
+      <div class="d-flex align-items-start gap-3">
+        <div class="notif-icon ${iconClass}">${iconTag}</div>
+        <div style="flex:1;min-width:0;">
+          <div class="notification-message">${n.message || 'Notification'}</div>
+          <div class="notification-time">${formatDateTime(n.created_at) || ''}</div>
+        </div>
+        ${unread ? '<div class="notif-unread-dot"></div>' : ''}
+      </div>
+    </li>`;
+  }).join('');
+}
+
+function handleNotifClick(id, type) {
+  localNotifs = localNotifs.filter(n => n.id !== id);
+  notificationsList = notificationsList.filter(n => String(n.id) !== String(id));
+  persistKnownIds();
+  updateNotificationBadge();
+  updateDropdownNotifications();
+  if (type === 'conge')  showSection('conges');
+  if (type === 'retard') showJustificatifAdmin();
+}
+
+function addLocalNotification(type, message) {
+  const notification = {
+    id: 'local_' + Date.now(),
+    type, message,
+    statut: 'non_lu',
+    created_at: new Date().toISOString()
+  };
+  localNotifs.unshift(notification);
+  persistKnownIds();
+  updateNotificationBadge();
+  updateDropdownNotifications();
+}
+
+function markAllAsRead() {
+  localNotifs = [];
+  persistKnownIds();
+  const token = localStorage.getItem('jwt');
+  if (token) {
+    fetch('notifications.php', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({action: 'mark_read'})
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) notificationsList = [];
+      updateNotificationBadge();
+      updateDropdownNotifications();
+      showSuccess('Notifications supprimées');
+    })
+    .catch(console.error);
+  } else {
+    notificationsList = [];
+    updateNotificationBadge();
+    updateDropdownNotifications();
+  }
+  return false;
+}
+
+function fetchNotifications() {
+  const token = localStorage.getItem('jwt');
+  if (!token) return;
+  fetch('notifications.php?action=get_notifications', {
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      const prevIds = new Set(notificationsList.map(n => String(n.id)));
+      notificationsList = data.notifications || [];
+      notificationsList.forEach(n => {
+        const key = String(n.id);
+        if (!prevIds.has(key) && prevIds.size > 0 && !knownNotifIds.has(key)) {
+          showToast('info', 'Nouvelle notification', n.message || '');
+        }
+        knownNotifIds.add(key);
+      });
+      persistKnownIds();
+      updateNotificationBadge();
+      updateDropdownNotifications();
+    }
+  })
+  .catch(console.error);
+}
+
+function syncPostesAcrossSelects() {
+  const src = document.getElementById('filterPoste');
+  if (!src) return;
+  const postes = Array.from(src.options).slice(1).map(o => ({ value: o.value, text: o.textContent }));
+  ['addPoste', 'deletePosteSelect', 'editPoste'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    const cur = sel.value;
+    sel.innerHTML = id === 'deletePosteSelect'
+      ? '<option value="">Sélectionner un poste...</option>'
+      : '<option value="">Sélectionner un poste</option>';
+    postes.forEach(p => {
+      const o = document.createElement('option');
+      o.value = p.value; o.textContent = p.text;
+      if (p.value === cur) o.selected = true;
+      sel.appendChild(o);
+    });
+  });
+}
+
+function updatePosteSelects() { syncPostesAcrossSelects(); }
+
+function addPoste() {
+  const name = document.getElementById('posteName').value.trim();
+  if (!name) { document.getElementById('addPosteError').textContent = "Nom requis"; return; }
+  const sel = document.getElementById('filterPoste');
+  if (Array.from(sel.options).some(o => o.value.toLowerCase() === name.toLowerCase())) {
+    document.getElementById('addPosteError').textContent = "Ce poste existe déjà"; return;
+  }
+  const option = document.createElement('option');
+  option.value = name; option.textContent = name; sel.appendChild(option);
+  updatePosteSelects();
+  showSuccess(`Poste "${name}" ajouté !`);
+  const modal = document.getElementById('addPosteModal');
+  if (modal) bootstrap.Modal.getInstance(modal)?.hide();
+  document.getElementById('addPosteForm').reset();
+  document.getElementById('addPosteError').textContent = '';
+}
+
+function initializeDefaultPostes() {
+  const defaults = ["Full-stuck Developer", "Mobile Developer", "AI Developer", "Cloud Developer"];
+  const sel = document.getElementById('filterPoste');
+  if (!sel) return;
+  while (sel.options.length > 1) sel.remove(1);
+  defaults.forEach(p => {
+    const option = document.createElement('option');
+    option.value = p; option.textContent = p; sel.appendChild(option);
+  });
+  updatePosteSelects();
+}
+
+function openPosteModal() {
+  syncPostesAcrossSelects();
+  const modal = document.getElementById('addPosteModal');
+  if (modal) new bootstrap.Modal(modal).show();
+}
+
+function deletePoste() {
+  const sel  = document.getElementById('deletePosteSelect');
+  const val  = sel.value;
+  const name = sel.options[sel.selectedIndex]?.text;
+  if (!val) { document.getElementById('deletePosteError').textContent = "Sélectionnez un poste"; return; }
+  if (!confirm(`Supprimer "${name}" ?`)) return;
+  const src = document.getElementById('filterPoste');
+  const opt = Array.from(src.options).find(o => o.value === val);
+  if (opt) {
+    src.removeChild(opt);
+    updatePosteSelects();
+    updateUsersPosteAfterDeletion(val);
+    showSuccess(`Poste "${name}" supprimé !`);
+    sel.value = "";
+  }
+}
+
+function updateUsersPosteAfterDeletion(poste) {
+  usersList.forEach(u => { if (u.poste === poste) u.poste = "Non défini"; });
+  renderUsers(usersList);
+  const token = localStorage.getItem('jwt');
+  if (token) {
+    fetch('admin_api.php', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({action: 'update_postes', deleted_poste: poste})
+    }).catch(console.error);
+  }
+}
+
+function fetchUsers(poste = '') {
+  const token = localStorage.getItem('jwt');
+  if (!token) { logout(); return; }
+  fetch('admin_api.php' + (poste ? `?poste=${encodeURIComponent(poste)}` : ''), {
+    method: 'GET',
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+  })
+  .then(res => {
+    if (res.status === 401) { logout(); throw new Error('Token invalide'); }
+    if (!res.ok) throw new Error('Erreur ' + res.status);
+    return res.json();
+  })
+  .then(data => {
+    if (data.error) showError(data.error);
+    else { 
+      usersList = Array.isArray(data) ? data : [];
+      renderUsers(usersList);
+      updateStatistics();
+      afficherGestionTemps(); // Rafraîchir l'affichage
+      initialiserFiltreSalles(); // Initialiser le filtre des salles
+    }
+  })
+  .catch(err => showError(err.message));
+}
+
+function renderUsers(users) {
+  const tbody = document.getElementById('usersTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = users.length ? users.map(u =>
+    `<tr>
+      <td>${u.id}</td>
+      <td><a href="employee_details.html?id=${u.id}" class="employee-name-link">${u.prenom || ''} ${u.nom || ''}</a></td>
+      <td>${u.email || ''}</td>
+      <td>${u.poste || 'Non défini'}</td>
+      <td>${u.role || ''}</td>
+      <td>
+        <button class="btn btn-warning btn-sm me-1" onclick="modifierUser(${u.id})"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-danger btn-sm" onclick="supprimerUser(${u.id})"><i class="fas fa-trash"></i></button>
+      </td>
+    </tr>`).join('') :
+    `<tr><td colspan="6" class="text-center">Aucun utilisateur</td></tr>`;
+}
+
+function addUser() {
+  const token          = localStorage.getItem('jwt');
+  const nom            = document.getElementById('addNom').value;
+  const prenom         = document.getElementById('addPrenom').value;
+  const date_naissance = document.getElementById('addDateNaissance').value;
+  const email          = document.getElementById('addEmail').value;
+  const telephone      = document.getElementById('addTelephone').value;
+  const mot_de_passe   = document.getElementById('addMotDePasse').value;
+  const poste          = document.getElementById('addPoste').value;
+  if (!nom || !prenom || !date_naissance || !email || !telephone || !mot_de_passe || !poste) { showError("Tous les champs sont requis"); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError("Email invalide"); return; }
+  if (mot_de_passe.length < 8) { showError("Mot de passe trop court"); return; }
+  fetch('admin_api.php', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nom, prenom, date_naissance, email, numero_telephone: telephone, mot_de_passe, poste })
+  })
+  .then(res => {
+    if (!res.ok) return res.json().then(d => { throw new Error(d.error || `Erreur ${res.status}`); });
+    return res.json();
+  })
+  .then(data => {
+    if (data.success) {
+      showSuccess("Employé ajouté !");
+      const modal = document.getElementById('addUserModal');
+      if (modal) bootstrap.Modal.getInstance(modal)?.hide();
+      document.getElementById('addUserForm').reset();
+      fetchUsers();
+    } else { showError(data.message || "Erreur"); }
+  })
+  .catch(err => showError(err.message));
+}
+
+function modifierUser(userId) {
+  const user = usersList.find(u => u.id == userId);
+  if (!user) { showError("Utilisateur non trouvé"); return; }
+  document.getElementById('editUserId').value  = user.id;
+  document.getElementById('editNom').value     = user.nom   || '';
+  document.getElementById('editEmail').value   = user.email || '';
+  document.getElementById('editRole').value    = user.role  || '';
+  const sel = document.getElementById('editPoste');
+  const src = document.getElementById('filterPoste');
+  sel.innerHTML = '<option value="">Sélectionner un poste</option>';
+  for (let i = 1; i < src.options.length; i++) {
+    const option = document.createElement('option');
+    option.value = src.options[i].value;
+    option.textContent = src.options[i].textContent;
+    if (option.value === user.poste) option.selected = true;
+    sel.appendChild(option);
+  }
+  const modal = document.getElementById('editUserModal');
+  if (modal) new bootstrap.Modal(modal).show();
+}
+
+function updateUser() {
+  const token  = localStorage.getItem('jwt');
+  const userId = document.getElementById('editUserId').value;
+  const nom    = document.getElementById('editNom').value;
+  const email  = document.getElementById('editEmail').value;
+  const poste  = document.getElementById('editPoste').value;
+  const role   = document.getElementById('editRole').value;
+  if (!nom || !email || !poste || !role) { showError("Tous les champs requis"); return; }
+  const btn = document.querySelector('#editUserModal .btn-primary');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+  btn.disabled = true;
+  fetch('admin_api.php', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({id: parseInt(userId), nom, email, poste, role})
+  })
+  .then(res => { if (!res.ok) throw new Error('Erreur ' + res.status); return res.json(); })
+  .then(data => {
+    if (data.error) throw new Error(data.error);
+    const modal = document.getElementById('editUserModal');
+    if (modal) bootstrap.Modal.getInstance(modal)?.hide();
+    showSuccess('Modifié !');
+    fetchUsers();
+  })
+  .catch(err => showError(err.message))
+  .finally(() => { btn.innerHTML = originalText; btn.disabled = false; });
+}
+
+function supprimerUser(userId) {
+  if (!confirm('Supprimer cet utilisateur ?')) return;
+  const token = localStorage.getItem('jwt');
+  if (!token) { logout(); return; }
+  fetch(`admin_api.php?id=${userId}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+  })
+  .then(res => { if (!res.ok) throw new Error('Erreur ' + res.status); return res.json(); })
+  .then(data => {
+    if (data.error) showError(data.error);
+    else { 
+      showSuccess('Supprimé !'); 
+      fetchUsers();
+      // Supprimer aussi les horaires associés
+      delete planningEmployes[userId];
+      persistKnownIds();
+    }
+  })
+  .catch(err => showError(err.message));
+}
+
+function fetchConges() {
+  const token = localStorage.getItem('jwt');
+  if (!token) { logout(); return; }
+  fetch('admin_conges.php?action=get_conges', {
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+  })
+  .then(res => { if (!res.ok) throw new Error('Erreur ' + res.status); return res.json(); })
+  .then(data => {
+    congesList = data.data || data || [];
+    congesList.forEach(c => {
+      const key = String(c.id);
+      if (!knownCongeIds.has(key) && knownCongeIds.size > 0) {
+        const msg = `📅 ${c.employe || 'Un employé'} a soumis une demande de congé (${c.type || '—'}) du ${formatDate(c.date_debut)} au ${formatDate(c.date_fin)}.`;
+        addLocalNotification('conge', msg);
+        showToast('conge', 'Nouvelle demande de congé', `${c.employe || 'Un employé'} — ${c.type || '—'}`);
+      }
+      knownCongeIds.add(key);
+    });
+    persistKnownIds();
+    renderConges(congesList);
+    updateStatistics();
+  })
+  .catch(err => showError(err.message));
+}
+
+function renderConges(conges) {
+  const tbody = document.getElementById('congesTableBody');
+  if (!tbody) return;
+  if (!Array.isArray(conges)) conges = [];
+  tbody.innerHTML = conges.length ? conges.map(c => {
+    const statusClass = c.statut ? `badge-${c.statut.toLowerCase()}` : 'badge-en_attente';
+    const canEdit = !c.statut || c.statut.toLowerCase() === 'en_attente';
+    return `<tr data-id="${c.id}">
+      <td>${c.id}</td>
+      <td>${c.employe || 'N/A'}</td>
+      <td>${c.type || 'N/A'}</td>
+      <td>${formatDate(c.date_debut)}</td>
+      <td>${formatDate(c.date_fin)}</td>
+      <td>${c.nb_jours || calculateDays(c.date_debut, c.date_fin)}</td>
+      <td><span class="badge ${statusClass}">${getStatusText(c.statut)}</span></td>
+      <td>${canEdit ? `<button class="btn btn-sm btn-primary" onclick="openModal(${c.id})"><i class="fas fa-edit me-1"></i>Traiter</button>` : 'Traité'}</td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="8" class="text-center">Aucune demande</td></tr>`;
+}
+
+function getStatusText(status) {
+  if (!status) return 'En attente';
+  switch(status.toLowerCase()) {
+    case 'accepte': return 'Approuvé';
+    case 'refuse':  return 'Refusé';
+    case 'en_attente': return 'En attente';
+    default: return status;
+  }
+}
+
+function openModal(id) {
+  document.getElementById('demandeId').value    = id;
+  document.getElementById('actionSelect').value = '';
+  document.getElementById('adminComment').value = '';
+  const modal = document.getElementById('traitementModal');
+  if (modal) new bootstrap.Modal(modal).show();
+}
+
+function traiterDemande() {
+  const token      = localStorage.getItem('jwt');
+  const demandeId  = document.getElementById('demandeId').value;
+  const statut     = document.getElementById('actionSelect').value;
+  const commentaire = document.getElementById('adminComment').value;
+  if (!statut) { showError("Sélectionnez une action"); return; }
+  fetch('admin_conges.php', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({action: 'traiter_conge', demande_id: demandeId, statut, commentaire})
+  })
+  .then(res => { if (!res.ok) throw new Error('Erreur ' + res.status); return res.json(); })
+  .then(data => {
+    if (data.error) throw new Error(data.error);
+    const modal = document.getElementById('traitementModal');
+    if (modal) bootstrap.Modal.getInstance(modal)?.hide();
+    const row = document.querySelector(`tr[data-id="${demandeId}"]`);
+    if (row) {
+      row.cells[6].innerHTML = `<span class="badge badge-${statut}">${getStatusText(statut)}</span>`;
+      row.cells[7].innerHTML = 'Traité';
+    }
+    showSuccess(`Demande ${statut === 'accepte' ? 'approuvée' : 'refusée'} !`);
+    updateStatistics();
+  })
+  .catch(err => showError(err.message));
+}
+
+function formatDate(d) {
+  if (!d) return 'N/A';
+  try { return new Date(d).toLocaleDateString('fr-FR', {day: '2-digit', month: '2-digit', year: 'numeric'}); }
+  catch(e) { return 'N/A'; }
+}
+
+function calculateDays(s, e) {
+  if (!s || !e) return 'N/A';
+  try { return Math.ceil(Math.abs(new Date(e) - new Date(s)) / (1000 * 60 * 60 * 24)) + 1; }
+  catch(err) { return 'N/A'; }
+}
+
+function formatDateTime(dt) {
+  if (!dt) return '';
+  try { return new Date(dt).toLocaleDateString('fr-FR', {day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'}); }
+  catch(e) { return ''; }
+}
+
+function updateStatistics() {
+  const statEmployees = document.querySelector('#statEmployees .stat-value');
+  const statPending   = document.querySelector('#statPending .stat-value');
+  const statPresent   = document.querySelector('#statPresent .stat-value');
+  const statAbsent    = document.querySelector('#statAbsent .stat-value');
+  if (statEmployees) statEmployees.textContent = usersList.length;
+  if (statPending)   statPending.textContent   = congesList.filter(c => !c.statut || c.statut.toLowerCase() === 'en_attente').length;
+  const today = new Date().toISOString().split('T')[0];
+  if (presenceList && presenceList.length > 0) {
+    const present = presenceList.filter(p => {
+      const date = p.date || p.date_entree;
+      return date === today && (!p.heure_depart || p.heure_depart === '-' || p.heure_depart === null);
+    }).length;
+    if (statPresent) statPresent.textContent = present;
+    if (statAbsent)  statAbsent.textContent  = usersList.length - present;
+  } else {
+    const estimated = Math.floor(usersList.length * 0.7);
+    if (statPresent) statPresent.textContent = estimated;
+    if (statAbsent)  statAbsent.textContent  = usersList.length - estimated;
+  }
+}
+
+function createCharts() {
+  const posteCanvas = document.getElementById('posteChart');
+  if (posteCanvas) {
+    const parent = posteCanvas.parentElement;
+    parent.innerHTML = '<canvas id="posteChart"></canvas>';
+    const newCanvas = document.getElementById('posteChart');
+    const posteData = {};
+    usersList.forEach(u => { const p = u.poste || 'Non défini'; posteData[p] = (posteData[p] || 0) + 1; });
+    if (Object.keys(posteData).length > 0) {
+      new Chart(newCanvas, {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(posteData),
+          datasets: [{ data: Object.values(posteData), backgroundColor: ['#FF6B6B','#4ECDC4','#45B7D1','#96CEB4','#FFE194','#E6B89C','#B83B5E','#2F9292'], borderWidth: 3, borderColor: '#fff', hoverOffset: 10 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '60%' }
+      });
+    }
+  }
+  const congeCanvas = document.getElementById('congeChart');
+  if (congeCanvas) {
+    const parent = congeCanvas.parentElement;
+    parent.innerHTML = '<canvas id="congeChart"></canvas>';
+    const newCanvas = document.getElementById('congeChart');
+    const congeStatus = {'En attente': 0, 'Approuvé': 0, 'Refusé': 0};
+    congesList.forEach(c => { const status = c.statut ? getStatusText(c.statut) : 'En attente'; congeStatus[status] = (congeStatus[status] || 0) + 1; });
+    new Chart(newCanvas, {
+      type: 'bar',
+      data: {
+        labels: Object.keys(congeStatus),
+        datasets: [{ label: 'Demandes', data: Object.values(congeStatus), backgroundColor: ['#FFB347','#4CAF50','#F44336'], borderColor: ['#E68A2E','#2E7D32','#C62828'], borderWidth: 2, borderRadius: 8 }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } } } }
+    });
+  }
+}
+
+function updateRetardStatistics() {
+  if (!allJustificatifs || !allJustificatifs.length) {
+    ['statRetardTotal','statRetardNonLus','statRetardLus','statRetardMoyenne'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '0'; });
+    return;
+  }
+  const totalEl   = document.getElementById('statRetardTotal');
+  const nonLusEl  = document.getElementById('statRetardNonLus');
+  const lusEl     = document.getElementById('statRetardLus');
+  const moyenneEl = document.getElementById('statRetardMoyenne');
+  if (totalEl)  totalEl.textContent  = allJustificatifs.length;
+  if (nonLusEl) nonLusEl.textContent = allJustificatifs.filter(j => !j.statut || j.statut === 'non lu').length;
+  if (lusEl)    lusEl.textContent    = allJustificatifs.filter(j => j.statut === 'lu').length;
+  let total = 0, count = 0;
+  allJustificatifs.forEach(j => { if (j.duree_retard) { total += parseInt(j.duree_retard); count++; } });
+  if (moyenneEl) moyenneEl.textContent = count > 0 ? Math.round(total / count) : 0;
+}
+
+function createRetardCharts() {
+  if (!allJustificatifs) return;
+  const nonLus = allJustificatifs.filter(j => !j.statut || j.statut === 'non lu').length;
+  const lus    = allJustificatifs.filter(j => j.statut === 'lu').length;
+  const statutCanvas = document.getElementById('retardStatutChart');
+  if (statutCanvas) {
+    const parent = statutCanvas.parentElement;
+    parent.innerHTML = '<canvas id="retardStatutChart"></canvas>';
+    const newCanvas = document.getElementById('retardStatutChart');
+    new Chart(newCanvas, {
+      type: 'doughnut',
+      data: { labels: ['Non lus', 'Lus'], datasets: [{ data: [nonLus, lus], backgroundColor: ['#fd7e14','#6c757d'], borderColor: ['#e65c00','#495057'], borderWidth: 2, hoverOffset: 10 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '60%' }
+    });
+  }
+  const timelineCanvas = document.getElementById('retardTimelineChart');
+  if (timelineCanvas) {
+    const parent = timelineCanvas.parentElement;
+    parent.innerHTML = '<canvas id="retardTimelineChart"></canvas>';
+    const newCanvas = document.getElementById('retardTimelineChart');
+    const labels = [], counts = {};
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      labels.push(d.toLocaleDateString('fr-FR', { weekday: 'short' }) + ' ' + d.getDate() + '/' + (d.getMonth() + 1));
+      counts[dateStr] = 0;
+    }
+    allJustificatifs.forEach(j => { if (j.created_at) { const dateStr = new Date(j.created_at).toISOString().split('T')[0]; if (dateStr in counts) counts[dateStr]++; } });
+    new Chart(newCanvas, {
+      type: 'line',
+      data: { labels, datasets: [{ label: 'Retards', data: Object.values(counts), borderColor: '#fd7e14', backgroundColor: 'rgba(253,126,20,0.1)', borderWidth: 3, pointBackgroundColor: '#fd7e14', pointBorderColor: '#fff', pointBorderWidth: 2, pointRadius: 5, fill: true, tension: 0.3 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } } } }
+    });
+  }
+}
+
+function fetchPresence() {
+  const token = localStorage.getItem('jwt');
+  if (!token) { logout(); return; }
+  fetch('presence.php?action=get_presence', {
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) { presenceList = data.presences || []; renderPresence(presenceList); updateStatistics(); }
+    else { showError(data.error || 'Erreur'); }
+  })
+  .catch(err => showError(err.message));
+}
+
+function fetchPresenceDuJour() {
+  const token = localStorage.getItem('jwt');
+  if (!token) return;
+  const today = new Date().toISOString().split('T')[0];
+  fetch(`presence.php?action=get_presence&date=${today}`, {
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+  })
+  .then(res => res.json())
+  .then(data => { if (data.success) { presenceList = data.presences || []; updateStatistics(); } })
+  .catch(console.error);
+}
+
+function fetchHistorique() {
+  const token = localStorage.getItem('jwt');
+  if (!token) { logout(); return; }
+  fetch('api_historique_salles.php?action=get_historique', {
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) { historiqueList = data.historique || []; renderHistorique(historiqueList); populateEmployeFilter(); }
+    else { showError(data.error); }
+  })
+  .catch(err => showError(err.message));
+}
+
+function showJustificatifAdmin() { showSection('justificatifAdmin'); }
+
+async function loadJustificatifsAdmin() {
+  const token = localStorage.getItem('jwt');
+  if (!token) { logout(); return Promise.reject(); }
+  try {
+    const res = await fetch('admin_justificatifs.php', {
+      method: 'GET',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+    });
+    if (res.status === 401) { logout(); return Promise.reject(); }
+    const data = await res.json();
+    if (data.success) {
+      const previous = new Set(allJustificatifs.map(j => String(j.id)));
+      allJustificatifs     = data.justificatifs || [];
+      filteredJustificatifs = [...allJustificatifs];
+      allJustificatifs.forEach(j => {
+        const key = String(j.id);
+        if (!previous.has(key) && previous.size > 0 && !knownRetardIds.has(key)) {
+          const msg = `⏰ ${j.nom_employe || 'Un employé'} a envoyé une annonce de retard pour le ${formatDate(j.date_absence)} (${formatDureeRetard(j.duree_retard)}).`;
+          addLocalNotification('retard', msg);
+          showToast('retard', 'Nouvelle annonce de retard', `${j.nom_employe || 'Un employé'} — ${formatDureeRetard(j.duree_retard)}`);
+        }
+        knownRetardIds.add(key);
+      });
+      persistKnownIds();
+      renderJustificatifs(filteredJustificatifs);
+      updateJustificatifBadge();
+      updateRetardStatistics();
+      return Promise.resolve(allJustificatifs);
+    } else { showError(data.message || 'Erreur'); return Promise.reject(); }
+  } catch(e) { showError('Erreur de connexion'); return Promise.reject(e); }
+}
+
+function renderJustificatifs(list) {
+  const tbody = document.getElementById('justificatifsTableBody');
+  if (!tbody) return;
+  if (!list || !list.length) {
+    tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4"><i class="fas fa-inbox fa-2x text-muted mb-2 d-block"></i>Aucune annonce de retard reçue</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(j => {
+    const nonLu     = !j.statut || j.statut === 'non lu';
+    const statutHtml = nonLu
+      ? `<span class="badge badge-non-lu"><i class="fas fa-envelope me-1"></i>Non lu</span>`
+      : `<span class="badge badge-lu"><i class="fas fa-envelope-open me-1"></i>Lu</span>`;
+    const nomDisplay = nonLu ? `<span class="new-indicator"></span><strong>${j.nom_employe}</strong>` : j.nom_employe;
+    const docHtml    = j.document
+      ? `<span class="badge bg-success" style="cursor:pointer;" onclick="viewDocument('${j.document}')"><i class="fas fa-paperclip me-1"></i>Joint</span>`
+      : `<span class="text-muted">—</span>`;
+      return `<tr style="${nonLu ? 'background:rgba(253,126,20,0.04);' : ''}">
+      <td>${j.id}</td>
+      <td>${nomDisplay}</td>
+      <td>${formatDate(j.date_absence)}</td>
+      <td><strong>${j.heure_arrivee_prevue || '09:00'}</strong></td>
+      <td><span class="badge badge-non-lu" style="background:linear-gradient(135deg,#fd7e14,#e65c00);"><i class="fas fa-hourglass-half me-1"></i>${formatDureeRetard(j.duree_retard)}</span></td>
+      <td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${j.raison || ''}">${j.raison || '—'}</td>
+      <td>${docHtml}</td>
+      <td>${statutHtml}</td>
+      <td><button class="btn-voir-details" onclick="ouvrirDetailRetard(${j.id})"><i class="fas fa-eye"></i> Voir les détails</button></td>
+    </tr>`;
+  }).join('');
+}
+
+async function ouvrirDetailRetard(id) {
+  const j = allJustificatifs.find(x => x.id == id);
+  if (!j) return;
+  autoMarkDone = false;
+  currentJustificatifId = id;
+  const initiales = (j.nom_employe || '?').split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+  const set = (elId, val) => { const el = document.getElementById(elId); if (el) el.textContent = val; };
+  set('modalEmpInitiales', initiales);
+  set('modalEmpNom', j.nom_employe || '—');
+  set('modalEmpDateEnvoi', j.created_at ? formatDateTime(j.created_at) : formatDate(j.date_absence));
+  set('tl-envoi',  j.created_at ? formatDateTime(j.created_at) : '—');
+  set('tl-prevu',  j.heure_arrivee_prevue || '09:00');
+  if (j.heure_arrivee_prevue && j.duree_retard) {
+    try {
+      const [h, m] = j.heure_arrivee_prevue.split(':').map(Number);
+      const total  = h * 60 + m + parseInt(j.duree_retard);
+      set('tl-arrive', `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')} (estimée)`);
+    } catch(e) { set('tl-arrive', '—'); }
+  } else { set('tl-arrive', '—'); }
+  const modalDureeRetard = document.getElementById('modalDureeRetard');
+  if (modalDureeRetard) modalDureeRetard.innerHTML = `<i class="fas fa-hourglass-half"></i> ${formatDureeRetard(j.duree_retard)}`;
+  set('modalRaisonDetail',      j.raison      || '—');
+  set('modalCommentaireDetail', j.commentaire || 'Aucun commentaire');
+  const docIcon              = document.getElementById('docIcon');
+  const docNomFichier        = document.getElementById('docNomFichier');
+  const docLienTelechargement = document.getElementById('docLienTelechargement');
+  if (j.document) {
+    const ext = j.document.split('.').pop().toLowerCase();
+    if (docIcon) {
+      docIcon.className = ext === 'pdf' ? 'fas fa-file-pdf fa-3x mb-2' : ['jpg','jpeg','png','gif'].includes(ext) ? 'fas fa-file-image fa-3x mb-2' : 'fas fa-file fa-3x mb-2';
+      docIcon.style.color = ext === 'pdf' ? '#e74c3c' : ['jpg','jpeg','png','gif'].includes(ext) ? '#3498db' : '#95a5a6';
+    }
+    if (docNomFichier) docNomFichier.textContent = j.document.split('/').pop();
+    if (docLienTelechargement) { docLienTelechargement.href = j.document; docLienTelechargement.style.display = 'inline-flex'; }
+  } else {
+    if (docIcon) { docIcon.className = 'fas fa-file-slash fa-3x mb-2'; docIcon.style.color = '#bdc3c7'; }
+    if (docNomFichier) docNomFichier.textContent = 'Aucun document joint';
+    if (docLienTelechargement) docLienTelechargement.style.display = 'none';
+  }
+  const btnMarquerLu = document.getElementById('btnMarquerLu');
+  const autoMarkInfo = document.getElementById('autoMarkInfo');
+  if (!j.statut || j.statut === 'non lu') {
+    if (btnMarquerLu) btnMarquerLu.style.display = 'inline-flex';
+    if (autoMarkInfo) autoMarkInfo.style.display = 'none';
+  } else {
+    if (btnMarquerLu) btnMarquerLu.style.display = 'none';
+    if (autoMarkInfo) autoMarkInfo.style.display = 'none';
+  }
+  const detailJustificatifId = document.getElementById('detailJustificatifId');
+  if (detailJustificatifId) detailJustificatifId.value = j.id;
+  const modal = document.getElementById('detailRetardModal');
+  if (modal) new bootstrap.Modal(modal).show();
+  if (!j.statut || j.statut === 'non lu') setTimeout(() => marquerLuAuto(id), 100);
+}
+
+async function marquerLuAuto(id) {
+  if (autoMarkDone || !id) return;
+  const token = localStorage.getItem('jwt');
+  if (!token) return;
+  try {
+    const res  = await fetch('admin_justificatifs.php', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({action: 'marquer_lu', id})
+    });
+    const data = await res.json();
+    if (data.success) {
+      const j = allJustificatifs.find(x => x.id == id);
+      if (j) { j.statut = 'lu'; autoMarkDone = true; updateJustificatifBadge(); renderJustificatifs(filteredJustificatifs); updateRetardStatistics(); }
+      localNotifs = localNotifs.filter(n => !(n.type === 'retard' && n.message && n.message.includes(j?.nom_employe || '___NOMATCH___')));
+      persistKnownIds();
+      updateNotificationBadge();
+      updateDropdownNotifications();
+      const btn = document.getElementById('btnMarquerLu');
+      if (btn) btn.style.display = 'none';
+      const aim = document.getElementById('autoMarkInfo');
+      if (aim) aim.style.display = 'block';
+    }
+  } catch(e) { console.error('Erreur marquage auto:', e); }
+}
+
+async function marquerLuManuellement() {
+  const id    = document.getElementById('detailJustificatifId').value;
+  const token = localStorage.getItem('jwt');
+  if (!token || !id) return;
+  try {
+    const res  = await fetch('admin_justificatifs.php', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({action: 'marquer_lu', id})
+    });
+    const data = await res.json();
+    if (data.success) {
+      const j = allJustificatifs.find(x => x.id == id);
+      if (j) j.statut = 'lu';
+      const btn = document.getElementById('btnMarquerLu');
+      if (btn) btn.style.display = 'none';
+      updateJustificatifBadge();
+      renderJustificatifs(filteredJustificatifs);
+      updateRetardStatistics();
+      showSuccess('Annonce marquée comme lue');
+    } else { showError(data.message); }
+  } catch(e) { showError('Erreur de connexion'); }
+}
+
+function formatDureeRetard(d) {
+  if (!d) return '—';
+  const minutes = parseInt(d);
+  if (minutes < 60) return `${minutes} min`;
+  const heures = Math.floor(minutes / 60);
+  const reste  = minutes % 60;
+  return reste > 0 ? `${heures}h ${reste}min` : `${heures}h`;
+}
+
+function updateJustificatifBadge() {
+  const nonLus      = allJustificatifs.filter(j => !j.statut || j.statut === 'non lu').length;
+  const badge       = document.getElementById('justificatifBadge');
+  const countNonLus = document.getElementById('countNonLus');
+  if (badge)       { badge.textContent = nonLus; badge.style.display = nonLus > 0 ? 'inline-block' : 'none'; }
+  if (countNonLus)   countNonLus.textContent = nonLus;
+}
+
+function filterJustificatifs() {
+  const statut = document.getElementById('filterJustificatifStatut')?.value || '';
+  const date   = document.getElementById('filterJustificatifDate')?.value   || '';
+  const search = document.getElementById('searchJustificatifEmploye')?.value.toLowerCase() || '';
+  filteredJustificatifs = allJustificatifs.filter(j => {
+    if (statut && j.statut !== statut) return false;
+    if (date   && j.date_absence !== date) return false;
+    if (search && !j.nom_employe?.toLowerCase().includes(search)) return false;
+    return true;
+  });
+  renderJustificatifs(filteredJustificatifs);
+}
+
+function viewDocument(path) { window.open(path, '_blank'); }
+
+function startPolling() {
+  setInterval(() => {
+    fetchConges();
+    loadJustificatifsAdmin();
+    fetchNotifications();
+  }, 30000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const token = localStorage.getItem('jwt');
+  const role  = localStorage.getItem('role');
+
+  if (!token || role !== 'responsable_rh') {
+    alert("Accès refusé !");
+    window.location.href = "connexion.html";
+    return;
+  }
+  
+  console.log("DOM chargé, initialisation...");
+  loadAdminData();
+  updateUserInfo();
+  showSection('dashboard');
+  initializeDefaultPostes();
+
+  document.querySelectorAll('.sidebar-nav .nav-link').forEach(l => {
+    l.addEventListener('click', function() {
+      document.querySelectorAll('.sidebar-nav .nav-link').forEach(x => x.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  fetchUsers();
+  fetchConges();
+  fetchPresence();
+  fetchPresenceDuJour();
+  fetchNotifications();
+  loadJustificatifsAdmin();
+  initialiserFiltreSalles();
+
+  setInterval(updateStatistics, 5000);
+  setInterval(fetchPresenceDuJour, 60000);
+  startPolling();
+
+  const filterPoste = document.getElementById('filterPoste');
+  if (filterPoste) filterPoste.addEventListener('change', e => fetchUsers(e.target.value));
+
+  const addPosteForm = document.getElementById('addPosteForm');
+  if (addPosteForm) addPosteForm.addEventListener('submit', e => { e.preventDefault(); addPoste(); });
+
+  const addUserForm = document.getElementById('addUserForm');
+  if (addUserForm) addUserForm.addEventListener('submit', e => { e.preventDefault(); addUser(); });
+
+  const avatarForm = document.getElementById('avatarForm');
+  if (avatarForm) avatarForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const file = document.getElementById('avatarInput').files[0];
+    if (file) uploadAvatar(file);
+    else showError('Choisissez une image');
+  });
+
+  const detailModal = document.getElementById('detailRetardModal');
+  if (detailModal) {
+    detailModal.addEventListener('hidden.bs.modal', () => {
+      autoMarkDone = false;
+      currentJustificatifId = null;
+    });
+  }
+
+  console.log("Initialisation terminée");
+});
+
+// MODAL TRAITEMENT CONGÉ (à ajouter si manquant)
+const traitementModalHtml = `
+<div class="modal fade" id="traitementModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title">Traiter la demande</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <form id="traitementForm">
+        <input type="hidden" id="demandeId">
+        <div class="mb-3"><label class="form-label">Action</label><select class="form-select" id="actionSelect" required><option value="">Sélectionner...</option><option value="accepte">Approuver</option><option value="refuse">Rejeter</option></select></div>
+        <div class="mb-3"><label class="form-label">Commentaire</label><textarea class="form-control" id="adminComment" rows="3"></textarea></div>
+      </form>
+    </div>
+    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button><button type="button" class="btn btn-primary" onclick="traiterDemande()">Confirmer</button></div>
+  </div></div>
+</div>
+`;
+
+// MODAL MODIFIER UTILISATEUR
+const editUserModalHtml = `
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title">Modifier Utilisateur</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <form id="editUserForm">
+        <input type="hidden" id="editUserId">
+        <div class="mb-3"><label class="form-label">Nom</label><input type="text" class="form-control" id="editNom" required></div>
+        <div class="mb-3"><label class="form-label">Email</label><input type="email" class="form-control" id="editEmail" required></div>
+        <div class="mb-3"><label class="form-label">Poste</label><div class="input-group"><select class="form-control" id="editPoste" required><option value="">Sélectionner un poste</option></select><button class="btn btn-outline-secondary" type="button" onclick="openPosteModal()"><i class="fas fa-plus"></i></button></div></div>
+        <div class="mb-3"><label class="form-label">Rôle</label><input type="text" class="form-control" id="editRole" required></div>
+      </form>
+    </div>
+    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button><button type="button" class="btn btn-primary" onclick="updateUser()">Enregistrer</button></div>
+  </div></div>
+</div>
+`;
+
+// MODAL DÉTAIL RETARD
+const detailRetardModalHtml = `
+<div class="modal fade" id="detailRetardModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" style="background:linear-gradient(135deg,#e65c00,#fd7e14);flex-direction:column;align-items:flex-start;">
+        <div class="d-flex align-items-center justify-content-between w-100">
+          <h5 class="modal-title"><i class="fas fa-clock me-2"></i>Détail de l'annonce de retard</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="retard-modal-header-info mt-2 w-100">
+          <div class="emp-avatar" id="modalEmpInitiales">?</div>
+          <div><div class="emp-name" id="modalEmpNom">—</div><div class="emp-sub"><i class="fas fa-calendar-day me-1"></i>Annonce envoyée le <span id="modalEmpDateEnvoi">—</span></div></div>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="retard-timeline">
+          <div class="timeline-step"><div class="step-circle" style="background:#e8f4fd;color:#3498db;"><i class="fas fa-paper-plane"></i></div><div class="step-label">Annonce envoyée</div><div class="step-time" id="tl-envoi">—</div></div>
+          <div class="timeline-connector" style="background:linear-gradient(90deg,#3498db,#fd7e14);"></div>
+          <div class="timeline-step"><div class="step-circle" style="background:#fff3e0;color:#fd7e14;"><i class="fas fa-clock"></i></div><div class="step-label">Heure prévue</div><div class="step-time" id="tl-prevu">—</div></div>
+          <div class="timeline-connector" style="background:linear-gradient(90deg,#fd7e14,#4caf50);"></div>
+          <div class="timeline-step"><div class="step-circle" style="background:#e8f5e9;color:#4caf50;"><i class="fas fa-user-check"></i></div><div class="step-label">Arrivée estimée</div><div class="step-time" id="tl-arrive">—</div></div>
+        </div>
+        <div class="retard-info-card">
+          <div class="info-row"><div class="info-icon" style="background:#fff3e0;"><i class="fas fa-stopwatch" style="color:#fd7e14;"></i></div><div><div class="info-label">Durée estimée du retard</div><div class="info-value"><span class="retard-duration-badge" id="modalDureeRetard"><i class="fas fa-hourglass-half"></i> —</span></div></div></div>
+          <div class="info-row"><div class="info-icon" style="background:#e8f4fd;"><i class="fas fa-comment-alt" style="color:#3498db;"></i></div><div><div class="info-label">Raison communiquée</div><div class="info-value" id="modalRaisonDetail">—</div></div></div>
+          <div class="info-row"><div class="info-icon" style="background:#f3e8fd;"><i class="fas fa-align-left" style="color:#9b59b6;"></i></div><div><div class="info-label">Commentaire de l'employé</div><div class="info-value" id="modalCommentaireDetail" style="font-style:italic;color:#555;">—</div></div></div>
+        </div>
+        <div id="documentSection" class="document-zone mb-3">
+          <i class="fas fa-file fa-3x mb-2" id="docIcon"></i>
+          <p class="mb-2 fw-semibold" id="docNomFichier">Aucun document joint</p>
+          <a href="#" id="docLienTelechargement" target="_blank" class="btn btn-sm btn-primary" style="display:none;"><i class="fas fa-download me-1"></i>Télécharger le justificatif</a>
+        </div>
+        <input type="hidden" id="detailJustificatifId">
+        <div class="alert alert-info mt-3 mb-0" id="autoMarkInfo" style="font-size:0.9rem; display: none;"><i class="fas fa-info-circle me-2"></i>Cette annonce a été automatiquement marquée comme lue.</div>
+      </div>
+      <div class="modal-footer" style="border-top:1px solid rgba(0,0,0,0.05);">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+        <button type="button" class="btn btn-mark-read" id="btnMarquerLu" onclick="marquerLuManuellement()"><i class="fas fa-check-circle me-2"></i>Marquer comme lu</button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+// Ajouter les modaux manquants s'ils n'existent pas
+if (!document.getElementById('traitementModal')) {
+  document.body.insertAdjacentHTML('beforeend', traitementModalHtml);
+}
+if (!document.getElementById('editUserModal')) {
+  document.body.insertAdjacentHTML('beforeend', editUserModalHtml);
+}
+if (!document.getElementById('detailRetardModal')) {
+  document.body.insertAdjacentHTML('beforeend', detailRetardModalHtml);
+}
+</script>
+</body>
+</html>

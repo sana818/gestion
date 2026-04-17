@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connexion</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.1/css/bootstrap.min.css" />
+  <style>
+    body {
+      background-color: #f5f7fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    
+
+    .main-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+      background-color:white;
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      position: relative;
+    }
+
+    .main-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(30, 60, 114, 0.85);
+      backdrop-filter: blur(3px);
+    }
+
+    .login-card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 420px;
+      padding: 40px;
+      position: relative;
+      z-index: 1;
+      border-top: 5px solid #4dabf7;
+      overflow: hidden;
+    }
+
+    .login-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(90deg, #1e3c72, #4dabf7, #1e3c72);
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .login-header h2 {
+      color: #1e3c72;
+      font-weight: 700;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+
+    .login-header p {
+      color: #666;
+      font-size: 15px;
+    }
+
+    .rfid-icon {
+      background: linear-gradient(135deg, #1e3c72, #4dabf7);
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      box-shadow: 0 5px 15px rgba(77, 171, 247, 0.4);
+    }
+
+    .rfid-icon i {
+      font-size: 36px;
+      color: white;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+      position: relative;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .input-with-icon {
+      position: relative;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 14px 20px 14px 50px;
+      border: 2px solid #e1e5eb;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: all 0.3s;
+      background-color: #f8fafc;
+    }
+
+    .form-control:focus {
+      border-color: #4dabf7;
+      box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.2);
+      background-color: white;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #7b8ab8;
+      font-size: 18px;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #7b8ab8;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .password-toggle:hover {
+      color: #4dabf7;
+    }
+
+    .login-btn {
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 600;
+      width: 100%;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .login-btn:hover {
+      background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 7px 14px rgba(30, 60, 114, 0.3);
+    }
+
+    .login-btn:active {
+      transform: translateY(0);
+    }
+
+    .forgot-password {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #4dabf7;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 15px;
+    }
+
+    .forgot-password:hover {
+      text-decoration: underline;
+      color: #1e3c72;
+    }
+    
+    .error-message {
+      background-color: #ffeaea;
+      color: #d32f2f;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 14px;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+      animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    
+
+    @media (max-width: 768px) {
+      .login-card {
+        padding: 30px 25px;
+        max-width: 90%;
+      }
+      
+      
+    }
+
+    @media (max-width: 480px) {
+      .login-card {
+        padding: 25px 20px;
+      }
+      
+      .rfid-icon {
+        width: 70px;
+        height: 70px;
+      }
+      
+      .rfid-icon i {
+        font-size: 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+
+<div class="main-container">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="rfid-icon">
+        <i class="fas fa-fingerprint"></i>
+      </div>
+      <h2>S'identifier</h2>
+      <p>Smart Attendance Tracking System</p>
+    </div>
+
+    <div id="errorMessage" class="error-message"></div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label class="form-label" for="email">Email</label>
+        <div class="input-with-icon">
+          <input type="email" id="email" class="form-control" placeholder="entrez votre email" required />
+          <i class="fas fa-envelope input-icon"></i>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" for="mot_de_passe">Mot de passe</label>
+        <div class="input-with-icon">
+          <input type="password" id="mot_de_passe" class="form-control" placeholder="entrez votre mot de passe" required />
+          <i class="fas fa-lock input-icon"></i>
+          <button type="button" class="password-toggle" id="togglePassword">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+      </div>
+      
+      <button type="submit" class="login-btn">
+        <i class="fas fa-sign-in-alt"></i>Se connecter
+      </button>
+      
+      <a href="#" class="forgot-password">Mot de passe oublié ?</a>
+      
+      
+    </form>
+  </div>
+</div>
+
+
+
+
+</body>
+</html>

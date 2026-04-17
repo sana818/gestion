@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Inscription</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.1/css/bootstrap.min.css" integrity="sha512-Ez0cGzNzHR1tYAv56860NLspgUGuQw16GiOOp/I2LuTmpSK9xDXlgJz3XN4cnpXWDmkNBKXR/VDMTCnAaEooxA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">JWT</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link active" href="#">Inscription</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Connexion</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="wrapper">
+      <div class="form_container">
+        <h2>Créer votre compte :</h2>
+        <br>
+        <form id="formInscription">
+          <div class="mb-2">
+            Nom : <input type="text" name="nom" class="form-control" required>
+          </div>
+          <div class="mb-2">
+            Prénom : <input type="text" name="prenom" class="form-control" required>
+          </div>
+          <div class="mb-2">
+            Date de naissance : <input type="date" name="date" class="form-control" required>
+          </div>
+          <div class="mb-2">
+            Adresse mail : <input type="email" name="adresse" class="form-control" placeholder="@gmail.com" required>
+          </div>
+          <div class="mb-2">
+            Numéro de téléphone : <input type="tel" name="telephone" class="form-control" required>
+          </div>
+          <div class="mb-2">
+            Mot de passe : <input type="password" id="password" name="password" class="form-control" minlength="8" required>
+          </div>
+          <div class="mb-3">
+            Confirmation de mot de passe : <input type="password" id="confirm_password" name="confirm_password" class="form-control" minlength="8" required>
+          </div>
+          <button class="btn btn-dark" type="submit">S'inscrire</button>
+        </form>
+        <div id="errorMessage" class="text-danger mt-2"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+  <script>
+    document.getElementById("formInscription").addEventListener("submit", function(event) {
+      event.preventDefault(); 
+
+      const nom = document.querySelector('input[name="nom"]').value;
+      const motDePasse = document.getElementById("password").value;
+      const confirmation = document.getElementById("confirm_password").value;
+
+      if (motDePasse !== confirmation) {
+        document.getElementById("errorMessage").textContent = "Les mots de passe ne correspondent pas.";
+        return;
+      }
+      localStorage.setItem("username", nom);
+      window.location.href = "profil.html";
+    });
+  </script>
+
+</body>
+</html>

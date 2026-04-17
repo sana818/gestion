@@ -1,0 +1,27 @@
+import paho.mqtt.client as mqtt
+import sqlite3
+
+# Connexion à la base
+conn = sqlite3.connect("rfid.db")
+c = conn.cursor()
+c.execute("CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, name TEXT)")
+
+def on_connect(client, userdata, flags, rc):
+    print("Connected with result code "+str(rc))
+    client.subscribe("rfid/check")
+
+def on_message(client, userdata, msg):
+    card_id = msg.payload.decode()
+    c.execute("SELECT * FROM users WHERE id=?", (card_id,))
+    if c.fetchone():
+        client.publish("rfid/response", "autorisé")
+        print(f"ID {card_id} autorisé")
+    else:
+        client.publish("rfid/response", "refusé")
+        print(f"ID {card_id} refusé")
+
+client = mqtt.Client()
+client.on_connect = on_connect
+client.on_message = on_message
+client.connect("IP_du_broker", 1883, 60)
+client.loop_forever()

@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de bord Directeur - Gestion des RH</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Sidebar */
+        #sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 280px;
+            background: linear-gradient(180deg, var(--dark-color) 0%, #1a252f 100%);
+            color: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+
+        .sidebar-brand i {
+            color: var(--accent-color);
+            margin-right: 10px;
+        }
+
+        .user-info {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            background: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .user-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .user-role {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-link {
+            padding: 12px 25px;
+            color: rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(52, 152, 219, 0.2);
+            color: white;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .nav-link i {
+            width: 24px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        /* Main Content */
+        #main-content {
+            margin-left: 280px;
+            padding: 30px;
+            transition: all 0.3s;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin: 0;
+        }
+
+        /* Cards */
+        .stats-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .stats-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .stats-icon.primary { background: rgba(52, 152, 219, 0.1); color: #3498db; }
+        .stats-icon.success { background: rgba(39, 174, 96, 0.1); color: #27ae60; }
+        .stats-icon.warning { background: rgba(243, 156, 18, 0.1); color: #f39c12; }
+        .stats-icon.info { background: rgba(52, 73, 94, 0.1); color: #34495e; }
+
+        .stats-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+
+        .stats-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        /* Tables */
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .table-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin: 0;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            border-top: none;
+            border-bottom: 2px solid var(--accent-color);
+            color: var(--dark-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table tbody tr {
+            transition: background 0.3s;
+        }
+
+        .table tbody tr:hover {
+            background: rgba(52, 152, 219, 0.05);
+        }
+
+        .badge-role {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .badge-role.admin {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+
+        .badge-role.super_admin {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        .badge-status {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .badge-status.active {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+        }
+
+        .badge-status.inactive {
+            background: rgba(149, 165, 166, 0.1);
+            color: #95a5a6;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            border: none;
+            background: transparent;
+        }
+
+        .action-btn:hover {
+            background: rgba(52, 152, 219, 0.1);
+            transform: scale(1.1);
+        }
+
+        .action-btn.edit { color: #3498db; }
+        .action-btn.delete { color: #e74c3c; }
+        .action-btn.view { color: #2ecc71; }
+
+        /* Modal */
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 15px 15px 0 0;
+            padding: 20px 30px;
+        }
+
+        .modal-title {
+            font-weight: 600;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #eee;
+            padding: 20px 30px;
+        }
+
+        .btn-close-white {
+            filter: invert(1);
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--dark-color);
+            margin-bottom: 8px;
+        }
+
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid #e1e8ed;
+            padding: 10px 15px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        /* Charts */
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            #sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            #main-content {
+                margin-left: 0;
+            }
+            .page-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div id="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="sidebar-brand">
+                <i class="fas fa-user-tie"></i>
+                <span>Espace Directeur</span>
+            </a>
+        </div>
+        
+        <div class="user-info">
+            <div class="user-avatar" id="directorAvatar">
+                <span id="avatarInitials">D</span>
+            </div>
+            <div class="user-name" id="directorName">Directeur Général</div>
+            <div class="user-role" id="directorEmail">directeur@entreprise.com</div>
+        </div>
+
+        <div class="sidebar-nav">
+            <a href="#" class="nav-link active" onclick="showSection('dashboard')">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Tableau de bord</span>
+            </a>
+            <a href="#" class="nav-link" onclick="showSection('rh-list')">
+                <i class="fas fa-users-cog"></i>
+                <span>Responsables RH</span>
+            </a>
+            <a href="#" class="nav-link" onclick="showSection('statistics')">
+                <i class="fas fa-chart-line"></i>
+                <span>Statistiques</span>
+            </a>
+            <a href="#" class="nav-link" onclick="showSection('activity')">
+                <i class="fas fa-history"></i>
+                <span>Activités récentes</span>
+            </a>
+            <a href="#" class="nav-link" onclick="showSection('settings')">
+                <i class="fas fa-cog"></i>
+                <span>Paramètres</span>
+            </a>
+        </div>
+
+        <div style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <button class="btn btn-outline-light w-100" onclick="logout()">
+                <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main-content">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title" id="pageTitle">Tableau de bord</h1>
+            <div>
+                <span class="me-3">
+                    <i class="fas fa-calendar-alt me-2 text-primary"></i>
+                    <span id="currentDate"></span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Alert Messages -->
+        <div id="errorAlert" class="alert alert-danger d-none"></div>
+        <div id="successAlert" class="alert alert-success d-none"></div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard-section" class="section active">
+            <!-- Statistics Cards -->
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-icon primary">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stats-value" id="totalRH">0</div>
+                        <div class="stats-label">Responsables RH</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-icon success">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="stats-value" id="activeRH">0</div>
+                        <div class="stats-label">Actifs</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-icon warning">
+                            <i class="fas fa-user-clock"></i>
+                        </div>
+                        <div class="stats-value" id="pendingActions">0</div>
+                        <div class="stats-label">Actions en attente</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-icon info">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="stats-value" id="monthlyActivity">0</div>
+                        <div class="stats-label">Activités ce mois</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="chart-container">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="mb-0">Actions rapides</h5>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <button class="btn btn-primary w-100 py-3" onclick="openAddRHModal()">
+                                    <i class="fas fa-user-plus me-2"></i>
+                                    Ajouter un RH
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <button class="btn btn-success w-100 py-3" onclick="showSection('rh-list')">
+                                    <i class="fas fa-list me-2"></i>
+                                    Voir la liste
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <button class="btn btn-info w-100 py-3 text-white" onclick="showSection('statistics')">
+                                    <i class="fas fa-chart-pie me-2"></i>
+                                    Voir les stats
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <button class="btn btn-warning w-100 py-3" onclick="exportData()">
+                                    <i class="fas fa-download me-2"></i>
+                                    Exporter
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <h5 class="mb-4">Répartition des RH</h5>
+                        <canvas id="rhChart" style="height: 300px;"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <h5 class="mb-4">Activités mensuelles</h5>
+                        <canvas id="activityChart" style="height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent RH List -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h5 class="table-title">Responsables RH récents</h5>
+                            <button class="btn btn-sm btn-primary" onclick="showSection('rh-list')">
+                                Voir tout <i class="fas fa-arrow-right ms-2"></i>
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table" id="recentRHTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nom</th>
+                                        <th>Email</th>
+                                        <th>Statut</th>
+                                        <th>Date d'ajout</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentRHTableBody">
+                                    <tr><td colspan="6" class="text-center">Chargement...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RH List Section -->
+        <div id="rh-list-section" class="section">
+            <div class="table-container">
+                <div class="table-header">
+                    <h5 class="table-title">Liste des Responsables RH</h5>
+                    <button class="btn btn-primary" onclick="openAddRHModal()">
+                        <i class="fas fa-user-plus me-2"></i>Ajouter un RH
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nom</th>
+                                <th>Email</th>
+                                <th>Rôle</th>
+                                <th>Statut</th>
+                                <th>Date d'ajout</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rhTableBody">
+                            <tr><td colspan="7" class="text-center">Chargement...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Section -->
+        <div id="statistics-section" class="section">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <h5 class="mb-4">Statistiques des RH</h5>
+                        <canvas id="detailedRhChart" style="height: 300px;"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <h5 class="mb-4">Activités des RH</h5>
+                        <canvas id="detailedActivityChart" style="height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="chart-container">
+                        <h5 class="mb-4">Statistiques détaillées</h5>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="stats-card">
+                                    <div class="stats-value" id="totalEmployees">0</div>
+                                    <div class="stats-label">Employés gérés</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stats-card">
+                                    <div class="stats-value" id="totalConges">0</div>
+                                    <div class="stats-label">Congés traités</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stats-card">
+                                    <div class="stats-value" id="totalRetards">0</div>
+                                    <div class="stats-label">Retards signalés</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stats-card">
+                                    <div class="stats-value" id="activityRate">0%</div>
+                                    <div class="stats-label">Taux d'activité</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Section -->
+        <div id="activity-section" class="section">
+            <div class="table-container">
+                <div class="table-header">
+                    <h5 class="table-title">Activités récentes</h5>
+                    <div>
+                        <select class="form-select" id="activityFilter" style="width: 150px;" onchange="filterActivity()">
+                            <option value="">Toutes</option>
+                            <option value="ajout">Ajouts</option>
+                            <option value="modification">Modifications</option>
+                            <option value="suppression">Suppressions</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Action</th>
+                                <th>Utilisateur</th>
+                                <th>Détails</th>
+                                <th>IP</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activityTableBody">
+                            <tr><td colspan="5" class="text-center">Chargement...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div id="settings-section" class="section">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <h5 class="mb-4">Profil Directeur</h5>
+                        <form id="directorProfileForm">
+                            <div class="mb-3">
+                                <label class="form-label">Nom complet</label>
+                                <input type="text" class="form-control" id="directorFullName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" id="directorEmailInput" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Téléphone</label>
+                                <input type="tel" class="form-control" id="directorPhone">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Mettre à jour</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <h5 class="mb-4">Changer mot de passe</h5>
+                        <form id="changePasswordForm">
+                            <div class="mb-3">
+                                <label class="form-label">Mot de passe actuel</label>
+                                <input type="password" class="form-control" id="currentPassword" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Nouveau mot de passe</label>
+                                <input type="password" class="form-control" id="newPassword" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Confirmer</label>
+                                <input type="password" class="form-control" id="confirmPassword" required>
+                            </div>
+                            <button type="submit" class="btn btn-warning">Changer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Add/Edit RH Modal -->
+    <div class="modal fade" id="rhModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rhModalTitle">Ajouter un responsable RH</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="rhForm">
+                        <input type="hidden" id="rhId">
+                        <div class="mb-3">
+                            <label class="form-label">Nom complet *</label>
+                            <input type="text" class="form-control" id="rhNom" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email *</label>
+                            <input type="email" class="form-control" id="rhEmail" required>
+                        </div>
+                        <div class="mb-3" id="passwordField">
+                            <label class="form-label">Mot de passe *</label>
+                            <input type="password" class="form-control" id="rhPassword" minlength="8">
+                            <small class="text-muted">Minimum 8 caractères</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Téléphone</label>
+                            <input type="tel" class="form-control" id="rhTelephone">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Rôle</label>
+                            <select class="form-select" id="rhRole">
+                                <option value="admin">Responsable RH</option>
+                                <option value="super_admin">Super Admin RH</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Statut</label>
+                            <select class="form-select" id="rhStatus">
+                                <option value="active">Actif</option>
+                                <option value="inactive">Inactif</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" onclick="saveRH()">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Confirmation</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Êtes-vous sûr de vouloir supprimer ce responsable RH ?</p>
+                    <p class="text-danger"><small>Cette action est irréversible.</small></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmDelete()">Supprimer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // ==================== GLOBAL VARIABLES ====================
+        let rhList = [];
+        let activityList = [];
+        let currentRHId = null;
+        let charts = {};
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page chargée, initialisation...');
+            
+            // Vérifier le token
+            const token = localStorage.getItem('jwt');
+            if (!token) {
+                window.location.href = 'connexion.html';
+                return;
+            }
+
+            // Charger les données
+            loadDirectorInfo();
+            loadRHList();
+            loadActivityList();
+            updateDate();
+            
+            // Initialiser les graphiques
+            initCharts();
+            
+            // Ajouter les event listeners
+            document.getElementById('directorProfileForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                updateDirectorProfile();
+            });
+            
+            document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                changePassword();
+            });
+            
+            console.log('Initialisation terminée');
+        });
+
+        // ==================== UTILITY FUNCTIONS ====================
+        function updateDate() {
+            const date = new Date();
+            document.getElementById('currentDate').textContent = 
+                date.toLocaleDateString('fr-FR', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+        }
+
+        function showError(message) {
+            const alert = document.getElementById('errorAlert');
+            alert.textContent = message;
+            alert.classList.remove('d-none');
+            setTimeout(() => alert.classList.add('d-none'), 5000);
+        }
+
+        function showSuccess(message) {
+            const alert = document.getElementById('successAlert');
+            alert.textContent = message;
+            alert.classList.remove('d-none');
+            setTimeout(() => alert.classList.add('d-none'), 3000);
+        }
+
+        function showSection(sectionId) {
+            // Cacher toutes les sections
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            
+            // Afficher la section demandée
+            document.getElementById(sectionId + '-section').classList.add('active');
+            
+            // Mettre à jour le titre
+            const titles = {
+                'dashboard': 'Tableau de bord',
+                'rh-list': 'Gestion des Responsables RH',
+                'statistics': 'Statistiques',
+                'activity': 'Activités récentes',
+                'settings': 'Paramètres'
+            };
+            document.getElementById('pageTitle').textContent = titles[sectionId];
+            
+            // Mettre à jour la navigation
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            // Rafraîchir les données si nécessaire
+            if (sectionId === 'rh-list') loadRHList();
+            if (sectionId === 'activity') loadActivityList();
+            if (sectionId === 'statistics') updateStatistics();
+        }
+
+        // ==================== DIRECTOR FUNCTIONS ====================
+        function loadDirectorInfo() {
+            const token = localStorage.getItem('jwt');
+            const nom = localStorage.getItem('nom') || 'Directeur Général';
+            const email = localStorage.getItem('email') || 'directeur@entreprise.com';
+            
+            document.getElementById('directorName').textContent = nom;
+            document.getElementById('directorEmail').textContent = email;
+            document.getElementById('directorFullName').value = nom;
+            document.getElementById('directorEmailInput').value = email;
+            
+            // Initiales pour l'avatar
+            const initials = nom.split(' ').map(n => n[0]).join('').toUpperCase();
+            document.getElementById('avatarInitials').textContent = initials.substring(0, 2);
+        }
+
+        function updateDirectorProfile() {
+            const nom = document.getElementById('directorFullName').value;
+            const email = document.getElementById('directorEmailInput').value;
+            const telephone = document.getElementById('directorPhone').value;
+            
+            const token = localStorage.getItem('jwt');
+            
+            fetch('api/update_director.php', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ nom, email, telephone })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    localStorage.setItem('nom', nom);
+                    localStorage.setItem('email', email);
+                    loadDirectorInfo();
+                    showSuccess('Profil mis à jour');
+                } else {
+                    showError(data.message);
+                }
+            })
+            .catch(err => showError('Erreur de connexion'));
+        }
+
+        function changePassword() {
+            const current = document.getElementById('currentPassword').value;
+            const newPass = document.getElementById('newPassword').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            
+            if (newPass !== confirm) {
+                showError('Les mots de passe ne correspondent pas');
+                return;
+            }
+            
+            if (newPass.length < 8) {
+                showError('Le mot de passe doit contenir au moins 8 caractères');
+                return;
+            }
+            
+            const token = localStorage.getItem('jwt');
+            
+            fetch('api/change_password.php', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ current_password: current, new_password: newPass })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccess('Mot de passe changé');
+                    document.getElementById('changePasswordForm').reset();
+                } else {
+                    showError(data.message);
+                }
+            })
+            .catch(err => showError('Erreur de connexion'));
+        }
+
+        // ==================== RH MANAGEMENT ====================
+        function loadRHList() {
+            const token = localStorage.getItem('jwt');
+            
+            fetch('api/get_rh_list.php', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    rhList = data.rh || [];
+                    renderRHList();
+                    renderRecentRHList();
+                    updateDashboardStats();
+                    updateCharts();
+                } else {
+                    showError(data.message);
+                }
+            })
+            .catch(err => showError('Erreur de chargement'));
+        }
+
+        function renderRHList() {
+            const tbody = document.getElementById('rhTableBody');
+            
+            if (!rhList.length) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">Aucun responsable RH</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = rhList.map(rh => `
+                <tr>
+                    <td>${rh.id}</td>
+                    <td>${rh.nom}</td>
+                    <td>${rh.email}</td>
+                    <td><span class="badge-role ${rh.role === 'super_admin' ? 'super_admin' : 'admin'}">${rh.role === 'super_admin' ? 'Super Admin' : 'Admin'}</span></td>
+                    <td><span class="badge-status ${rh.statut === 'active' ? 'active' : 'inactive'}">${rh.statut === 'active' ? 'Actif' : 'Inactif'}</span></td>
+                    <td>${formatDate(rh.created_at)}</td>
+                    <td>
+                        <button class="action-btn edit" onclick="editRH(${rh.id})" title="Modifier">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete" onclick="deleteRH(${rh.id})" title="Supprimer">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <button class="action-btn view" onclick="viewRHActivity(${rh.id})" title="Voir activité">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderRecentRHList() {
+            const tbody = document.getElementById('recentRHTableBody');
+            const recent = rhList.slice(0, 5);
+            
+            if (!recent.length) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center">Aucun responsable RH</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = recent.map(rh => `
+                <tr>
+                    <td>${rh.id}</td>
+                    <td>${rh.nom}</td>
+                    <td>${rh.email}</td>
+                    <td><span class="badge-status ${rh.statut === 'active' ? 'active' : 'inactive'}">${rh.statut === 'active' ? 'Actif' : 'Inactif'}</span></td>
+                    <td>${formatDate(rh.created_at)}</td>
+                    <td>
+                        <button class="action-btn edit" onclick="editRH(${rh.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete" onclick="deleteRH(${rh.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openAddRHModal() {
+            document.getElementById('rhModalTitle').textContent = 'Ajouter un responsable RH';
+            document.getElementById('rhForm').reset();
+            document.getElementById('rhId').value = '';
+            document.getElementById('passwordField').style.display = 'block';
+            document.getElementById('rhPassword').required = true;
+            new bootstrap.Modal(document.getElementById('rhModal')).show();
+        }
+
+        function editRH(id) {
+            const rh = rhList.find(r => r.id == id);
+            if (!rh) return;
+            
+            document.getElementById('rhModalTitle').textContent = 'Modifier le responsable RH';
+            document.getElementById('rhId').value = rh.id;
+            document.getElementById('rhNom').value = rh.nom;
+            document.getElementById('rhEmail').value = rh.email;
+            document.getElementById('rhTelephone').value = rh.telephone || '';
+            document.getElementById('rhRole').value = rh.role || 'admin';
+            document.getElementById('rhStatus').value = rh.statut || 'active';
+            
+            document.getElementById('passwordField').style.display = 'none';
+            document.getElementById('rhPassword').required = false;
+            
+            new bootstrap.Modal(document.getElementById('rhModal')).show();
+        }
+
+        function saveRH() {
+            const id = document.getElementById('rhId').value;
+            const data = {
+                nom: document.getElementById('rhNom').value,
+                email: document.getElementById('rhEmail').value,
+                telephone: document.getElementById('rhTelephone').value,
+                role: document.getElementById('rhRole').value,
+                statut: document.getElementById('rhStatus').value
+            };
+            
+            if (!id) {
+                data.password = document.getElementById('rhPassword').value;
+                if (!data.password) {
+                    showError('Le mot de passe est requis');
+                    return;
+                }
+            }
+            
+            const token = localStorage.getItem('jwt');
+            const url = id ? 'api/update_rh.php' : 'api/add_rh.php';
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(id ? { ...data, id } : data)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('rhModal')).hide();
+                    showSuccess(id ? 'RH modifié' : 'RH ajouté');
+                    loadRHList();
+                    logActivity(id ? 'modification' : 'ajout', `RH ${data.nom}`);
+                } else {
+                    showError(data.message);
+                }
+            })
+            .catch(err => showError('Erreur de connexion'));
+        }
+
+        function deleteRH(id) {
+            currentRHId = id;
+            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+        }
+
+        function confirmDelete() {
+            if (!currentRHId) return;
+            
+            const token = localStorage.getItem('jwt');
+            
+            fetch(`api/delete_rh.php?id=${currentRHId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+                    showSuccess('RH supprimé');
+                    loadRHList();
+                    logActivity('suppression', `RH ID: ${currentRHId}`);
+                } else {
+                    showError(data.message);
+                }
+            })
+            .catch(err => showError('Erreur de connexion'));
+        }
+
+        function viewRHActivity(id) {
+            // Filtrer les activités pour ce RH
+            const rhActivities = activityList.filter(a => a.user_id == id);
+            // Afficher dans une modal ou rediriger
+            console.log('Activités du RH:', rhActivities);
+        }
+
+        // ==================== ACTIVITY FUNCTIONS ====================
+        function loadActivityList() {
+            const token = localStorage.getItem('jwt');
+            
+            fetch('api/get_activities.php', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    activityList = data.activities || [];
+                    renderActivityList();
+                }
+            })
+            .catch(err => console.error('Erreur chargement activités:', err));
+        }
+
+        function renderActivityList() {
+            const tbody = document.getElementById('activityTableBody');
+            
+            if (!activityList.length) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center">Aucune activité</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = activityList.slice(0, 20).map(a => `
+                <tr>
+                    <td>${formatDateTime(a.created_at)}</td>
+                    <td><span class="badge bg-${getActionColor(a.action)}">${a.action}</span></td>
+                    <td>${a.user_name || 'Système'}</td>
+                    <td>${a.details || '-'}</td>
+                    <td>${a.ip_address || '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function getActionColor(action) {
+            const colors = {
+                'ajout': 'success',
+                'modification': 'warning',
+                'suppression': 'danger',
+                'connexion': 'info'
+            };
+            return colors[action] || 'secondary';
+        }
+
+        function filterActivity() {
+            const filter = document.getElementById('activityFilter').value;
+            const filtered = filter ? activityList.filter(a => a.action === filter) : activityList;
+            
+            const tbody = document.getElementById('activityTableBody');
+            tbody.innerHTML = filtered.slice(0, 20).map(a => `
+                <tr>
+                    <td>${formatDateTime(a.created_at)}</td>
+                    <td><span class="badge bg-${getActionColor(a.action)}">${a.action}</span></td>
+                    <td>${a.user_name || 'Système'}</td>
+                    <td>${a.details || '-'}</td>
+                    <td>${a.ip_address || '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function logActivity(action, details) {
+            const token = localStorage.getItem('jwt');
+            
+            fetch('api/log_activity.php', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ action, details })
+            })
+            .catch(err => console.error('Erreur logging:', err));
+        }
+
+        // ==================== STATISTICS FUNCTIONS ====================
+        function updateDashboardStats() {
+            const total = rhList.length;
+            const active = rhList.filter(r => r.statut === 'active').length;
+            
+            document.getElementById('totalRH').textContent = total;
+            document.getElementById('activeRH').textContent = active;
+            document.getElementById('pendingActions').textContent = Math.floor(Math.random() * 10);
+            document.getElementById('monthlyActivity').textContent = activityList.length;
+        }
+
+        function updateStatistics() {
+            document.getElementById('totalEmployees').textContent = Math.floor(Math.random() * 500) + 100;
+            document.getElementById('totalConges').textContent = Math.floor(Math.random() * 50) + 20;
+            document.getElementById('totalRetards').textContent = Math.floor(Math.random() * 30) + 10;
+            document.getElementById('activityRate').textContent = Math.floor(Math.random() * 30) + 70 + '%';
+        }
+
+        // ==================== CHARTS FUNCTIONS ====================
+        function initCharts() {
+            // RH Chart
+            const ctx1 = document.getElementById('rhChart').getContext('2d');
+            charts.rhChart = new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Actifs', 'Inactifs'],
+                    datasets: [{
+                        data: [0, 0],
+                        backgroundColor: ['#27ae60', '#95a5a6'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    },
+                    cutout: '60%'
+                }
+            });
+
+            // Activity Chart
+            const ctx2 = document.getElementById('activityChart').getContext('2d');
+            charts.activityChart = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+                    datasets: [{
+                        label: 'Activités',
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            // Detailed RH Chart
+            const ctx3 = document.getElementById('detailedRhChart').getContext('2d');
+            charts.detailedRhChart = new Chart(ctx3, {
+                type: 'bar',
+                data: {
+                    labels: ['Admins', 'Super Admins'],
+                    datasets: [{
+                        label: 'Nombre de RH',
+                        data: [0, 0],
+                        backgroundColor: ['#3498db', '#e74c3c']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, stepSize: 1 }
+                    }
+                }
+            });
+
+            // Detailed Activity Chart
+            const ctx4 = document.getElementById('detailedActivityChart').getContext('2d');
+            charts.detailedActivityChart = new Chart(ctx4, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Ajouts', 'Modifications', 'Suppressions'],
+                    datasets: [{
+                        data: [0, 0, 0],
+                        backgroundColor: ['#27ae60', '#f39c12', '#e74c3c']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    },
+                    cutout: '60%'
+                }
+            });
+        }
+
+        function updateCharts() {
+            if (!rhList.length) return;
+            
+            const active = rhList.filter(r => r.statut === 'active').length;
+            const inactive = rhList.filter(r => r.statut === 'inactive').length;
+            const admins = rhList.filter(r => r.role === 'admin').length;
+            const superAdmins = rhList.filter(r => r.role === 'super_admin').length;
+            
+            // Mettre à jour les graphiques
+            charts.rhChart.data.datasets[0].data = [active, inactive];
+            charts.rhChart.update();
+            
+            charts.detailedRhChart.data.datasets[0].data = [admins, superAdmins];
+            charts.detailedRhChart.update();
+            
+            // Simuler des données d'activité
+            if (activityList.length) {
+                const ajouts = activityList.filter(a => a.action === 'ajout').length;
+                const modifs = activityList.filter(a => a.action === 'modification').length;
+                const supps = activityList.filter(a => a.action === 'suppression').length;
+                
+                charts.detailedActivityChart.data.datasets[0].data = [ajouts, modifs, supps];
+                charts.detailedActivityChart.update();
+            }
+        }
+
+        // ==================== UTILITY FUNCTIONS ====================
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            try {
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('fr-FR');
+            } catch {
+                return '-';
+            }
+        }
+
+        function formatDateTime(dateStr) {
+            if (!dateStr) return '-';
+            try {
+                const date = new Date(dateStr);
+                return date.toLocaleString('fr-FR');
+            } catch {
+                return '-';
+            }
+        }
+
+        function exportData() {
+            const data = {
+                rh: rhList,
+                activities: activityList,
+                exportDate: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `export_rh_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function logout() {
+            if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
+                localStorage.removeItem('jwt');
+                localStorage.removeItem('nom');
+                localStorage.removeItem('email');
+                localStorage.removeItem('role');
+                window.location.href = 'connexion.html';
+            }
+        }
+    </script>
+</body>
+</html>

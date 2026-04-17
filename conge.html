@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Système de gestion des congés">
+    <title>Demande de Congé - EmployeeSpace Pro</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4a6fa5;        /* Changé de mauve à bleu primaire */
+            --primary-light: #5a7bb5;   /* Changé de mauve clair à bleu clair */
+            --secondary: #4dabf7;        /* Changé de mauve secondaire à bleu accent */
+            --accent: #90caf9;           /* Changé de rose à bleu très clair */
+            --success: #2E8B57;
+            --success-soft: #4CAF50;
+            --warning-soft: #F9B572;
+            --danger-soft: #E57373;
+            --info-soft: #4a6fa5;         /* Changé de bleu pastel à bleu primaire */
+            --dark: #1A1A2E;
+            --light: #F8F9FA;
+            --gradient-1: linear-gradient(135deg, #4a6fa5 0%, #4dabf7 100%); /* Changé de violet à bleu */
+            --gradient-soft-1: linear-gradient(135deg, #90caf9 0%, #bbdefb 100%); /* Changé de violet doux à bleu doux */
+            --gradient-soft-2: linear-gradient(135deg, #fbc2c2 0%, #f8b0b0 100%);
+            --gradient-soft-3: linear-gradient(135deg, #a7c0e0 0%, #b8d0e8 100%);
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.2);
+            --sidebar-width: 300px;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            margin-left: var(--sidebar-width);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            bottom: 20px;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%); /* Changé pour correspondre au tableau de bord */
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            box-shadow: var(--shadow-xl), 0 0 0 1px rgba(255, 255, 255, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--secondary);
+            border-radius: 10px;
+        }
+
+        .sidebar-header {
+            padding: 30px 25px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .sidebar-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 15%;
+            width: 70%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--secondary), transparent);
+        }
+
+        .user-avatar-wrapper {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 15px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: var(--shadow-lg), 0 0 0 3px rgba(255, 255, 255, 0.5);
+            transition: all 0.5s ease;
+            animation: morphing 8s ease-in-out infinite;
+        }
+
+        @keyframes morphing {
+            0% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+            25% { border-radius: 58% 42% 75% 25% / 76% 46% 54% 24%; }
+            50% { border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%; }
+            75% { border-radius: 33% 67% 58% 42% / 63% 68% 32% 37%; }
+            100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05) rotate(5deg);
+        }
+
+        .online-indicator {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 15px;
+            height: 15px;
+            background: var(--success);
+            border-radius: 50%;
+            border: 2px solid white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+        }
+
+        .user-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .user-title {
+            display: inline-block;
+            padding: 5px 15px;
+            background: linear-gradient(135deg, rgba(74, 111, 165, 0.1), rgba(77, 171, 247, 0.1)); /* Changé de violet à bleu */
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-top: 5px;
+        }
+
+        .time-display {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 1rem;
+            margin: 20px auto 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Navigation */
+        .sidebar-nav {
+            padding: 20px 15px;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            padding: 14px 20px;
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(77, 171, 247, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.4s ease;
+        }
+
+        .nav-link:hover::before {
+            transform: translateX(0);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(90deg, rgba(77, 171, 247, 0.15), transparent);
+            color: white;
+            border-left: 4px solid var(--secondary);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-link.active i {
+            color: var(--secondary);
+        }
+
+        .nav-link i {
+            width: 24px;
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.6);
+            transition: all 0.3s ease;
+        }
+
+        .badge-notification {
+            margin-left: auto;
+            background: var(--danger-soft);
+            color: white;
+            border-radius: 50px;
+            padding: 4px 8px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Main Content - Layout 2 colonnes */
+        .main-content {
+            padding: 20px 30px;
+            min-height: 100vh;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 25px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Column Styles */
+        .left-column, .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* Container Formulaire */
+        .form-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: var(--shadow-xl), 0 0 0 1px rgba(255, 255, 255, 0.5);
+            border: var(--glass-border);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px dashed rgba(74, 111, 165, 0.2); /* Changé de violet à bleu */
+        }
+
+        .section-title i {
+            width: 35px;
+            height: 35px;
+            border-radius: 10px;
+            background: var(--gradient-1);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .section-title h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Form Styles */
+        .conge-form {
+            margin: 0;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+
+        .form-label i {
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+
+        .required-star {
+            color: #DC143C;
+            margin-left: 4px;
+            font-size: 1rem;
+        }
+
+        .form-control, .form-select {
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 2px solid rgba(74, 111, 165, 0.1); /* Changé de violet à bleu */
+            background: white;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.1); /* Changé de violet à bleu */
+            outline: none;
+        }
+
+        /* File Upload */
+        .file-upload-area {
+            border: 2px dashed var(--secondary);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            background: rgba(77, 171, 247, 0.05); /* Changé de violet à bleu */
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-area:hover {
+            background: rgba(77, 171, 247, 0.1); /* Changé de violet à bleu */
+            border-color: var(--primary);
+        }
+
+        .file-upload-area i {
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 5px;
+        }
+
+        .file-upload-area h6 {
+            font-size: 0.9rem;
+            margin-bottom: 3px;
+        }
+
+        .file-upload-area p, .file-upload-area small {
+            font-size: 0.75rem;
+        }
+
+        /* Info Cards */
+        .info-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: var(--shadow-xl), 0 0 0 1px rgba(255, 255, 255, 0.5);
+            border: var(--glass-border);
+        }
+
+        .solde-table {
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .solde-table th {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 8px 5px;
+            border-bottom: 2px solid rgba(74, 111, 165, 0.1); /* Changé de violet à bleu */
+        }
+
+        .solde-table td {
+            padding: 8px 5px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(74, 111, 165, 0.05); /* Changé de violet à bleu */
+        }
+
+        .solde-table td:last-child {
+            font-weight: 700;
+            color: var(--success-soft);
+        }
+
+        .regle-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            background: rgba(74, 111, 165, 0.03); /* Changé de violet à bleu */
+            border-left: 3px solid var(--secondary);
+        }
+
+        .regle-item p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .regle-item strong {
+            color: var(--primary);
+        }
+
+        .sous-liste {
+            list-style: none;
+            padding-left: 20px;
+            margin-top: 8px;
+        }
+
+        .sous-liste li {
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sous-liste li i {
+            color: var(--success-soft);
+            font-size: 0.8rem;
+        }
+
+        .sous-liste li.text-warning i {
+            color: var(--warning-soft);
+        }
+
+        .regulation-note {
+            padding: 12px;
+            background: rgba(249, 181, 114, 0.1);
+            border-radius: 10px;
+            color: var(--warning-soft);
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .regulation-note i {
+            color: var(--warning-soft);
+        }
+
+        /* Historique mini */
+        .historique-mini {
+            margin-top: 15px;
+        }
+
+        .historique-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 10px;
+            background: rgba(74, 111, 165, 0.03); /* Changé de violet à bleu */
+            border-radius: 10px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .historique-item:hover {
+            background: rgba(74, 111, 165, 0.08); /* Changé de violet à bleu */
+            border-color: var(--secondary);
+            transform: translateX(3px);
+        }
+
+        .historique-date {
+            font-size: 0.7rem;
+            color: #888;
+            min-width: 45px;
+            font-weight: 500;
+        }
+
+        .historique-type {
+            flex: 1;
+            font-size: 0.8rem;
+            color: var(--primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 500;
+        }
+
+        .historique-statut {
+            font-size: 0.65rem;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .statut-ok {
+            background: rgba(76, 175, 80, 0.15);
+            color: #2E7D32;
+        }
+
+        .statut-attente {
+            background: rgba(249, 181, 114, 0.15);
+            color: #B85C00;
+        }
+
+        .statut-refuse {
+            background: rgba(229, 115, 115, 0.15);
+            color: #B71C1C;
+        }
+
+        /* Info Badge */
+        .info-badge {
+            background: linear-gradient(135deg, rgba(249, 181, 114, 0.1), rgba(233, 157, 94, 0.1));
+            border-left: 4px solid var(--warning-soft);
+            padding: 12px 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .info-badge i {
+            font-size: 1.5rem;
+            color: var(--warning-soft);
+        }
+
+        .info-badge-content h5 {
+            color: var(--warning-soft);
+            font-weight: 700;
+            margin-bottom: 3px;
+            font-size: 0.95rem;
+        }
+
+        .info-badge-content p {
+            color: #666;
+            margin: 0;
+            font-size: 0.8rem;
+        }
+
+        /* Bouton */
+        .btn-custom {
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            border: none;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 12px rgba(74, 111, 165, 0.3); /* Changé de violet à bleu */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(74, 111, 165, 0.4); /* Changé de violet à bleu */
+        }
+
+        .btn-custom:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-outline-secondary {
+            color: var(--secondary);
+            border-color: var(--secondary);
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-secondary:hover {
+            background: rgba(77, 171, 247, 0.1);
+            color: var(--secondary);
+            border-color: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .btn-link {
+            color: var(--secondary) !important;
+            transition: all 0.3s ease;
+        }
+
+        .btn-link:hover {
+            color: var(--primary) !important;
+            transform: translateX(5px);
+        }
+
+        /* Message */
+        .message-container {
+            margin-top: 15px;
+        }
+
+        .alert {
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 0.9rem;
+            border-left-width: 4px;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: var(--gradient-1);
+            color: white;
+            border: none;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-lg);
+            z-index: 1001;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .two-columns {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 992px) {
+            body {
+                margin-left: 0;
+                padding-top: 20px;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                left: 10px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .two-columns {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
+            }
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-container, .info-card {
+            animation: slideIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="user-avatar-wrapper" onclick="openAvatarModal()">
+                <img src="https://ui-avatars.com/api/?name=Jean+Dupont&size=100&background=4a6fa5&color=fff&bold=true" 
+                     class="user-avatar" 
+                     alt="Photo de profil"
+                     id="sidebarAvatar">
+                <span class="online-indicator"></span>
+            </div>
+            <h3 class="user-name" id="sidebarName">Chargement...</h3>
+            <span class="user-title" id="sidebarPoste">-</span>
+            <div class="time-display">
+                <i class="fas fa-clock"></i>
+                <span id="currentTime">--:--</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-item">
+                <a href="profile1.html" class="nav-link">
+                <i class="fas fa-chart-pie"></i>
+                <span>Tableau de bord</span>
+            </a>
+        </div>
+        
+        <div class="nav-item">
+            <a href="justificatif.html" class="nav-link">
+                <i class="fas fa-file-alt"></i>
+                <span>Justificatif de retard</span>
+            </a>
+        </div>
+        
+        <div class="nav-item">
+            <a href="conge.html" class="nav-link active">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Demande de congé</span>
+            </a>
+        </div>
+            
+        <div class="nav-item">
+            <a href="statistiques.html" class="nav-link">
+                <i class="fas fa-chart-line"></i>
+                <span>Statistiques</span>
+            </a>
+        </div>
+            
+            <div class="nav-item mt-4">
+                <hr style="border-color: rgba(255, 255, 255, 0.1);">
+            </div>
+            
+            <div class="nav-item">
+                <a href="#" class="nav-link" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Déconnexion</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Main Content - 2 colonnes -->
+    <div class="main-content">
+        <div id="message" class="message-container"></div>
+        
+        <div class="two-columns">
+            <!-- COLONNE GAUCHE : Formulaire -->
+            <div class="left-column">
+                <div class="form-container">
+                    <div class="section-title">
+                        <i class="fas fa-calendar-plus"></i>
+                        <h4>Nouvelle demande de congé</h4>
+                    </div>
+
+                    <!-- Info badge -->
+                    <div class="info-badge">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <div class="info-badge-content">
+                            <h5>Vérifiez votre solde avant de faire une demande</h5>
+                            <p>Les demandes sont traitées dans un délai de 48h</p>
+                        </div>
+                    </div>
+
+                    <!-- Formulaire de demande de congé -->
+                    <form id="demandeForm" novalidate>
+                        <input type="hidden" id="userId" name="userId">
+                        <input type="hidden" id="userNom" name="userNom">
+
+                        <!-- Type de congé -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-tag"></i>
+                                Type de congé
+                                <span class="required-star">*</span>
+                            </label>
+                            <select class="form-select" id="typeConge" name="type_conge" required>
+                                <option value="" disabled selected>Sélectionnez un type</option>
+                                <option value="annuel">Congé annuel</option>
+                                <option value="maladie">Congé maladie</option>
+                                <option value="exceptionnel">Congé exceptionnel</option>
+                                <option value="maternite">Congé maternité</option>
+                            </select>
+                        </div>
+
+                        <!-- Certificat médical (visible seulement pour maladie) -->
+                        <div class="form-group" id="certificatContainer" style="display: none;">
+                            <label class="form-label">
+                                <i class="fas fa-file-medical"></i>
+                                Certificat médical
+                                <span class="required-star">*</span>
+                            </label>
+                            <div class="file-upload-area" onclick="document.getElementById('certificat').click()">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <h6>Cliquez pour télécharger</h6>
+                                <p>PDF, JPG, PNG (max 5 Mo)</p>
+                                <small id="selectedFileName">Aucun fichier sélectionné</small>
+                                <input type="file" 
+                                       id="certificat" 
+                                       name="certificat" 
+                                       accept=".pdf,.jpg,.jpeg,.png" 
+                                       style="display: none;"
+                                       onchange="updateFileName(this)">
+                            </div>
+                            <button class="btn btn-sm btn-outline-secondary mt-2" type="button" id="clearFile" style="display: none;">
+                                <i class="fas fa-times"></i> Effacer
+                            </button>
+                        </div>
+
+                        <!-- Date de début -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-calendar-alt"></i>
+                                Date de début
+                                <span class="required-star">*</span>
+                            </label>
+                            <input type="date" class="form-control" id="dateDebut" name="date_debut" required>
+                        </div>
+
+                        <!-- Date de fin -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-calendar-alt"></i>
+                                Date de fin
+                                <span class="required-star">*</span>
+                            </label>
+                            <input type="date" class="form-control" id="dateFin" name="date_fin" required>
+                        </div>
+
+                        <!-- Durée calculée -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-clock"></i>
+                                Durée
+                            </label>
+                            <div class="form-control" style="background-color: #f8f9fa; color: #666;" readonly>
+                                <span id="joursDemandes">0 jour(s)</span>
+                            </div>
+                        </div>
+
+                        <!-- Commentaire -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-comment"></i>
+                                Commentaire
+                            </label>
+                            <textarea class="form-control" id="commentaire" name="commentaire" rows="3" placeholder="Détails supplémentaires..."></textarea>
+                        </div>
+
+                        <!-- Boutons -->
+                        <div class="d-flex gap-2">
+                            <button type="reset" class="btn btn-outline-secondary flex-grow-1">
+                                <i class="fas fa-times"></i> Annuler
+                            </button>
+                            <button type="submit" class="btn-custom flex-grow-1" id="submitBtn">
+                                <i class="fas fa-paper-plane"></i> Envoyer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- COLONNE DROITE : Solde + Règlementation + Historique -->
+            <div class="right-column">
+                <!-- Carte Solde des congés -->
+                <div class="info-card">
+                    <div class="section-title">
+                        <i class="fas fa-calendar-check"></i>
+                        <h4>Solde des congés</h4>
+                    </div>
+                    
+                    <table class="solde-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Total</th>
+                                <th>Utilisés</th>
+                                <th>Restants</th>
+                            </tr>
+                        </thead>
+                        <tbody id="soldeTableBody">
+                            <tr><td colspan="4" class="text-center">Chargement...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Carte Règlementation -->
+                <div class="info-card">
+                    <div class="section-title">
+                        <i class="fas fa-gavel"></i>
+                        <h4>Règlementation</h4>
+                    </div>
+                    
+                    <!-- Règles importantes -->
+                    <div class="regle-item">
+                        <p><strong>Règles importantes</strong></p>
+                        <ul class="sous-liste">
+                            <li><i class="fas fa-check-circle"></i> Les demandes sont traitées dans 48 heures</li>
+                            <li><i class="fas fa-check-circle"></i> Joindre un certificat médical pour les congés maladie</li>
+                            <li><i class="fas fa-check-circle"></i> Vérifier votre solde avant de faire une demande</li>
+                        </ul>
+                    </div>
+
+                    <!-- Congés annuels -->
+                    <div class="regle-item">
+                        <p><strong>Congés annuels</strong></p>
+                        <ul class="sous-liste">
+                            <li><i class="fas fa-check-circle"></i> 25 jours ouvrés par an</li>
+                            <li><i class="fas fa-check-circle"></i> Validation requise par le manager</li>
+                        </ul>
+                    </div>
+
+                    <!-- Congés maladie -->
+                    <div class="regle-item">
+                        <p><strong>Congés maladie</strong></p>
+                        <ul class="sous-liste">
+                            <li><i class="fas fa-check-circle"></i> Certificat médical obligatoire dès le 1er jour</li>
+                            <li><i class="fas fa-check-circle"></i> 15 jours maximum pris en charge par an</li>
+                            <li class="text-warning"><i class="fas fa-exclamation-triangle"></i> Au-delà, déduction sur salaire</li>
+                        </ul>
+                    </div>
+
+                    <!-- Congés exceptionnels -->
+                    <div class="regle-item">
+                        <p><strong>Congés exceptionnels</strong></p>
+                        <ul class="sous-liste">
+                            <li><i class="fas fa-check-circle"></i> 7 jours par an (mariage, décès, etc.)</li>
+                            <li><i class="fas fa-check-circle"></i> Justificatif obligatoire</li>
+                        </ul>
+                    </div>
+
+                    <div class="regulation-note">
+                        <i class="fas fa-info-circle"></i>
+                        Pour toute question concernant vos congés, contactez le service RH.
+                    </div>
+                </div>
+
+                <!-- Carte Dernières demandes -->
+                <div class="info-card">
+                    <div class="section-title">
+                        <i class="fas fa-history"></i>
+                        <h4>Dernières demandes</h4>
+                    </div>
+                    
+                    <div class="historique-mini" id="historiqueConges">
+                        <div class="text-center py-3 text-muted">
+                            <i class="fas fa-spinner fa-spin"></i> Chargement...
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-3">
+                        <a href="historique.html" class="btn-link" style="color: var(--secondary); text-decoration: none;">
+                            <i class="fas fa-chart-line"></i> Voir tout l'historique
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ==================== VARIABLES GLOBALES ====================
+        let token = localStorage.getItem("jwt");
+
+        // Redirection si non connecté
+        if (!token) {
+            window.location.href = "connexion.html";
+        }
+
+        // ==================== FONCTIONS PRINCIPALES ====================
+        function showNotification(message, type) {
+            const colors = {
+                success: '#4CAF50',
+                danger: '#E57373',
+                warning: '#F9B572',
+                info: '#4a6fa5'
+            };
+            
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: var(--glass-bg);
+                backdrop-filter: blur(10px);
+                color: ${colors[type]};
+                padding: 12px 20px;
+                border-radius: 10px;
+                box-shadow: var(--shadow-xl);
+                border-left: 4px solid ${colors[type]};
+                font-weight: 500;
+                z-index: 9999;
+                animation: slideIn 0.3s ease-out;
+                font-size: 0.9rem;
+            `;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 
+                                 type === 'danger' ? 'exclamation-circle' : 
+                                 type === 'warning' ? 'exclamation-triangle' : 'info-circle'} me-2" 
+                   style="color: ${colors[type]};"></i>
+                ${message}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        function logout() {
+            localStorage.removeItem("jwt");
+            localStorage.removeItem("nom");
+            localStorage.removeItem("prenom");
+            localStorage.removeItem("user_id");
+            localStorage.removeItem("poste");
+            localStorage.removeItem("photo_profil");
+            window.location.href = "connexion.html";
+        }
+
+        // ==================== GESTION DU PROFIL ====================
+        async function loadEmployeeData() {
+            try {
+                const response = await fetch("profile1.php", {
+                    method: "GET",
+                    headers: {
+                        "Authorization": "Bearer " + token
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.user) {
+                    const user = data.user;
+
+                    // Sauvegarder dans localStorage
+                    localStorage.setItem('nom', user.nom || '');
+                    localStorage.setItem('prenom', user.prenom || '');
+                    localStorage.setItem('poste', user.poste || 'Employé');
+                    if (user.photo_profil) {
+                        localStorage.setItem('photo_profil', user.photo_profil);
+                    }
+
+                    // Mettre à jour l'affichage
+                    updateUserDisplay();
+                }
+            } catch (error) {
+                console.error("Erreur chargement profil:", error);
+                // Utiliser les données du localStorage en cas d'erreur
+                updateUserDisplay();
+            }
+        }
+
+        function updateUserDisplay() {
+            const nom = localStorage.getItem('nom') || '';
+            const prenom = localStorage.getItem('prenom') || '';
+            const poste = localStorage.getItem('poste') || 'Employé';
+            const photo = localStorage.getItem('photo_profil');
+
+            document.getElementById('sidebarName').textContent = 
+                `${prenom} ${nom}`.trim() || 'Employé';
+            document.getElementById('sidebarPoste').textContent = poste;
+
+            // Mettre à jour la photo
+            updateAvatar(photo, prenom, nom);
+        }
+
+        function updateAvatar(photo, prenom, nom) {
+            const avatarImg = document.getElementById('sidebarAvatar');
+            
+            if (photo && photo !== 'null' && photo !== 'undefined' && photo !== '') {
+                avatarImg.src = photo;
+            } else {
+                const initial1 = prenom ? prenom.charAt(0) : '';
+                const initial2 = nom ? nom.charAt(0) : '';
+                const initials = (initial1 + initial2).toUpperCase() || 'U';
+                avatarImg.src = `https://ui-avatars.com/api/?name=${initials}&size=100&background=4a6fa5&color=fff&bold=true`;
+            }
+        }
+
+        function openAvatarModal() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    if (file.size > 2 * 1024 * 1024) {
+                        showNotification("L'image ne doit pas dépasser 2 Mo", "warning");
+                        return;
+                    }
+                    
+                    if (!file.type.startsWith('image/')) {
+                        showNotification("Veuillez sélectionner une image valide", "warning");
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const photoData = event.target.result;
+                        localStorage.setItem('photo_profil', photoData);
+                        document.getElementById('sidebarAvatar').src = photoData;
+                        showNotification("Photo de profil mise à jour avec succès", "success");
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            
+            input.click();
+        }
+
+        // ==================== GESTION DES CONGÉS ====================
+        function calculateDuration() {
+            const start = document.getElementById("dateDebut").value;
+            const end = document.getElementById("dateFin").value;
+
+            if (!start || !end) {
+                document.getElementById("joursDemandes").textContent = "0 jour(s)";
+                return;
+            }
+
+            const startParts = start.split("-");
+            const endParts = end.split("-");
+
+            const startDate = new Date(startParts[0], startParts[1] - 1, startParts[2]);
+            const endDate = new Date(endParts[0], endParts[1] - 1, endParts[2]);
+
+            if (endDate < startDate) {
+                showNotification("La date de fin doit être après la date de début", "danger");
+                document.getElementById("joursDemandes").textContent = "0 jour(s)";
+                return;
+            }
+
+            const diffTime = endDate - startDate;
+            const diffDays = diffTime / (1000 * 60 * 60 * 24) + 1; // +1 pour inclure le dernier jour
+
+            document.getElementById("joursDemandes").textContent = diffDays + " jour(s)";
+        }
+
+        async function loadSoldeConges() {
+            try {
+                const response = await fetch("conge.php?action=solde", {
+                    headers: { "Authorization": "Bearer " + token }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    renderSoldeConges(data.solde);
+                } else {
+                    // Données par défaut
+                    renderSoldeConges([
+                        { type: 'Annuel', total: 25, utilises: 5, restants: 20 },
+                        { type: 'Maladie', total: 15, utilises: 3, restants: 12 },
+                        { type: 'Exceptionnel', total: 5, utilises: 1, restants: 4 }
+                    ]);
+                }
+            } catch (error) {
+                console.error("Erreur chargement solde:", error);
+                renderSoldeConges([
+                    { type: 'Annuel', total: 25, utilises: 5, restants: 20 },
+                    { type: 'Maladie', total: 15, utilises: 3, restants: 12 },
+                    { type: 'Exceptionnel', total: 5, utilises: 1, restants: 4 }
+                ]);
+            }
+        }
+
+        function renderSoldeConges(soldeData) {
+            const tbody = document.getElementById('soldeTableBody');
+            tbody.innerHTML = soldeData.map(solde => `
+                <tr>
+                    <td>${solde.type}</td>
+                    <td>${solde.total}</td>
+                    <td>${solde.utilises}</td>
+                    <td class="fw-bold" style="color: var(--success-soft);">${solde.restants}</td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadHistorique() {
+            try {
+                const response = await fetch("conge.php?action=historique", {
+                    headers: { "Authorization": "Bearer " + token }
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    displayHistorique(data.conges || []);
+                } else {
+                    document.getElementById('historiqueConges').innerHTML = `
+                        <div class="text-center py-3 text-muted">
+                            <i class="fas fa-calendar"></i> Aucune demande récente
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error("Erreur chargement historique:", error);
+                document.getElementById('historiqueConges').innerHTML = `
+                    <div class="text-center py-3 text-muted">
+                        <i class="fas fa-calendar"></i> Aucune demande récente
+                    </div>
+                `;
+            }
+        }
+
+        function displayHistorique(conges) {
+            const container = document.getElementById('historiqueConges');
+            
+            if (!conges || conges.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-3 text-muted">
+                        <i class="fas fa-calendar"></i> Aucune demande récente
+                    </div>
+                `;
+                return;
+            }
+
+            const recents = conges.slice(0, 3);
+            
+            container.innerHTML = recents.map(c => {
+                let statutClass = 'statut-attente';
+                let statutText = 'En attente';
+                
+                if (c.statut === 'accepte') {
+                    statutClass = 'statut-ok';
+                    statutText = 'Approuvé';
+                } else if (c.statut === 'refuse') {
+                    statutClass = 'statut-refuse';
+                    statutText = 'Refusé';
+                }
+                
+                const date = new Date(c.date_debut);
+                const formattedDate = date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+                
+                return `
+                    <div class="historique-item" onclick="voirDetail(${c.id})">
+                        <span class="historique-date">${formattedDate}</span>
+                        <span class="historique-type">${c.type_conge}</span>
+                        <span class="historique-statut ${statutClass}">${statutText}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function voirDetail(id) {
+            showNotification(`Détails de la demande #${id} (à venir)`, 'info');
+        }
+
+        // ==================== SOUMISSION DU FORMULAIRE ====================
+        document.getElementById("demandeForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            
+            const typeConge = document.getElementById("typeConge").value;
+            const dateDebut = document.getElementById("dateDebut").value;
+            const dateFin = document.getElementById("dateFin").value;
+            const commentaire = document.getElementById("commentaire").value;
+            const certificatInput = document.getElementById("certificat");
+
+            if (!typeConge || !dateDebut || !dateFin) {
+                showNotification("Veuillez remplir tous les champs obligatoires", "danger");
+                return;
+            }
+
+            if (typeConge === 'maladie' && certificatInput.files.length === 0) {
+                showNotification("Un certificat médical est requis pour les congés maladie", "danger");
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi...';
+
+            const formData = {
+                type_conge: typeConge,
+                date_debut: dateDebut,
+                date_fin: dateFin,
+                commentaire: commentaire
+            };
+
+            try {
+                if (typeConge === 'maladie' && certificatInput.files.length > 0) {
+                    const file = certificatInput.files[0];
+                    const reader = new FileReader();
+                    
+                    reader.onload = async function(e) {
+                        formData.certificat = e.target.result;
+                        await submitDemande(formData, submitBtn);
+                    };
+                    
+                    reader.readAsDataURL(file);
+                } else {
+                    await submitDemande(formData, submitBtn);
+                }
+            } catch (error) {
+                showNotification("Erreur lors de l'envoi de la demande", "danger");
+                console.error("Erreur:", error);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Envoyer';
+            }
+        });
+
+        async function submitDemande(formData, submitBtn) {
+            try {
+                const response = await fetch("conge.php", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Bearer " + token,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification("Demande envoyée avec succès", "success");
+                    document.getElementById("demandeForm").reset();
+                    document.getElementById("certificatContainer").style.display = 'none';
+                    document.getElementById("joursDemandes").textContent = "0 jour(s)";
+                    document.getElementById('selectedFileName').textContent = 'Aucun fichier sélectionné';
+                    
+                    // Recharger l'historique
+                    loadHistorique();
+                } else {
+                    showNotification(data.error || "Erreur lors de l'envoi", "danger");
+                }
+            } catch (error) {
+                showNotification("Erreur de communication avec le serveur", "danger");
+                console.error("Erreur:", error);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Envoyer';
+            }
+        }
+
+        // ==================== FONCTIONS UTILITAIRES ====================
+        function updateFileName(input) {
+            const fileName = input.files[0] ? input.files[0].name : 'Aucun fichier sélectionné';
+            document.getElementById('selectedFileName').textContent = fileName;
+            
+            if (input.files[0] && input.files[0].size > 5 * 1024 * 1024) {
+                showNotification('Le fichier ne doit pas dépasser 5 Mo', 'warning');
+                input.value = '';
+                document.getElementById('selectedFileName').textContent = 'Aucun fichier sélectionné';
+            }
+        }
+
+        function updateCurrentTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = 
+                now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        function showSection(section) {
+            showNotification(`Section ${section} en développement`, 'info');
+        }
+
+        // ==================== INITIALISATION ====================
+        document.addEventListener("DOMContentLoaded", function() {
+            // Charger les données
+            loadEmployeeData();
+            loadSoldeConges();
+            loadHistorique();
+
+            // Initialiser les dates
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById("dateDebut").min = today;
+            document.getElementById("dateFin").min = today;
+
+            // Écouteurs d'événements
+            document.getElementById("typeConge").addEventListener("change", function() {
+                const certificatContainer = document.getElementById("certificatContainer");
+                const clearFileBtn = document.getElementById("clearFile");
+                
+                if (this.value === "maladie") {
+                    certificatContainer.style.display = "block";
+                    clearFileBtn.style.display = "block";
+                    document.getElementById("certificat").required = true;
+                } else {
+                    certificatContainer.style.display = "none";
+                    clearFileBtn.style.display = "none";
+                    document.getElementById("certificat").required = false;
+                    document.getElementById("certificat").value = "";
+                    document.getElementById('selectedFileName').textContent = 'Aucun fichier sélectionné';
+                }
+            });
+
+            document.getElementById("dateDebut").addEventListener("change", function() {
+                document.getElementById("dateFin").min = this.value;
+                calculateDuration();
+            });
+            
+            document.getElementById("dateFin").addEventListener("change", calculateDuration);
+
+            document.getElementById("clearFile").addEventListener("click", function() {
+                document.getElementById("certificat").value = "";
+                document.getElementById('selectedFileName').textContent = 'Aucun fichier sélectionné';
+            });
+
+            // Mettre à jour l'heure
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 60000);
+        });
+
+        // Animation keyframes pour les notifications
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideOut {
+                from { opacity: 1; transform: translateX(0); }
+                to { opacity: 0; transform: translateX(100%); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

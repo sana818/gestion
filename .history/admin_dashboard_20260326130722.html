@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tableau de bord RH - Interface relaxante</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+<style>
+  :root {
+    /* Palette relaxante - tons pastel et apaisants */
+    --primary-color: #5c9c8e;
+    --primary-light: #8bb5aa;
+    --primary-dark: #3f7a6b;
+    --secondary-color: #9aaebf;
+    --success-color: #7cae7a;
+    --success-light: #a8c9a6;
+    --warning-color: #e6b87e;
+    --warning-light: #f0d0a8;
+    --danger-color: #c98c8c;
+    --danger-light: #deb0b0;
+    --info-color: #7fa5b8;
+    --info-light: #b2c9d8;
+    --light-color: #f5f3ef;
+    --dark-color: #5b6e6a;
+    --gray-color: #9fb0aa;
+    --gray-light: #e2e6e3;
+    --bg-gradient-start: #f0f2f0;
+    --bg-gradient-end: #e3e6e4;
+    --sidebar-bg-start: #2c3e3a;
+    --sidebar-bg-end: #1e2b28;
+    --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    --sidebar-width: 320px;
+    --transition-speed: 0.4s;
+    --accent-color: #7fa5b8;
+  }
+  body {
+    font-family: 'Inter', 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif;
+    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+    min-height: 100vh;
+    padding-bottom: 20px;
+    margin-left: var(--sidebar-width);
+    transition: margin-left var(--transition-speed) ease;
+    color: #2d3a36;
+  }
+  #sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    position: fixed;
+    left: 0; top: 0;
+    z-index: 1050;
+    background: linear-gradient(180deg, var(--sidebar-bg-start) 0%, var(--sidebar-bg-end) 100%);
+    color: #e8eae6;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+    transition: all var(--transition-speed) cubic-bezier(0.4,0,0.2,1);
+    overflow-y: auto; overflow-x: hidden;
+    border-right: 1px solid rgba(255,255,255,0.08);
+  }
+  .sidebar-header {
+    padding: 30px 25px;
+    background: rgba(30, 43, 40, 0.6);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .sidebar-brand {
+    display: flex; align-items: center; gap: 15px;
+    font-size: 1.4rem; font-weight: 600; color: #e8eae6;
+    text-decoration: none; transition: transform 0.3s ease;
+    letter-spacing: -0.3px;
+  }
+  .sidebar-brand:hover { transform: translateX(5px); color: #cbdcd7; }
+  .sidebar-brand i { color: var(--accent-color); font-size: 2rem; }
+  .sidebar-user {
+    padding: 30px 25px; text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    background: rgba(44, 62, 58, 0.4);
+  }
+  .user-avatar-wrapper { position: relative; width: fit-content; margin: 0 auto 20px; cursor: pointer; }
+  .user-avatar {
+    width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+    border: 3px solid rgba(200, 220, 210, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+  }
+  .user-avatar:hover { transform: scale(1.02); filter: brightness(1.05); }
+  .online-indicator {
+    position: absolute; bottom: 5px; right: 5px;
+    width: 12px; height: 12px;
+    background: var(--success-light); border-radius: 50%;
+    border: 2px solid var(--sidebar-bg-start);
+    animation: gentlePulse 2s infinite;
+  }
+  #welcomeText {
+    font-size: 1.2rem; font-weight: 500; margin-bottom: 5px;
+    color: #e8eae6;
+    letter-spacing: -0.2px;
+  }
+  .user-email { font-size: 0.85rem; opacity: 0.7; color: #cbdcd7; }
+  .sidebar-nav { padding: 25px 0; }
+  .sidebar-nav .nav-link {
+    color: rgba(232, 234, 230, 0.8); padding: 14px 28px;
+    display: flex; align-items: center; gap: 16px;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+    margin: 4px 12px; border-radius: 12px;
+    text-decoration: none;
+    font-weight: 450;
+  }
+  .sidebar-nav .nav-link:hover {
+    color: white; background: rgba(127, 165, 184, 0.15);
+    border-left-color: var(--accent-color); transform: translateX(6px);
+  }
+  .sidebar-nav .nav-link.active {
+    color: white;
+    background: rgba(127, 165, 184, 0.2);
+    border-left-color: var(--accent-color);
+  }
+  .sidebar-nav .nav-link i { width: 24px; text-align: center; font-size: 1.2rem; transition: transform 0.3s ease; }
+  .sidebar-nav .nav-link:hover i { transform: scale(1.1); color: var(--accent-color); }
+  .stats-section { padding: 20px 20px; border-top: 1px solid rgba(255,255,255,0.05); }
+  .stats-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; color: rgba(232,234,230,0.9); font-size: 0.9rem; }
+  .stats-header i { color: var(--accent-color); }
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .stat-item {
+    background: rgba(255,255,255,0.05); border-radius: 14px; padding: 14px;
+    text-align: center; transition: all 0.3s ease; border: 1px solid rgba(255,255,255,0.03);
+    backdrop-filter: blur(4px);
+  }
+  .stat-item:hover { background: rgba(255,255,255,0.08); transform: translateY(-2px); }
+  .stat-value { font-size: 1.5rem; font-weight: 500; color: #e8eae6; margin-bottom: 4px; }
+  .stat-label { font-size: 0.75rem; color: rgba(232,234,230,0.65); text-transform: uppercase; letter-spacing: 0.5px; }
+  .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(30, 43, 40, 0.5); }
+  .notification-btn {
+    width: 100%;
+    background: rgba(127, 165, 184, 0.15);
+    border: 1px solid rgba(127, 165, 184, 0.2);
+    color: #e8eae6;
+    padding: 12px 18px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.3s ease;
+  }
+  .notification-btn:hover { background: rgba(127, 165, 184, 0.25); transform: translateY(-2px); }
+  .notification-content { display: flex; align-items: center; gap: 12px; }
+  .notification-content i { color: var(--accent-color); }
+  .notification-badge {
+    background: linear-gradient(135deg, #b98c6e, #9d7b62);
+    color: white;
+    font-weight: 500;
+    font-size: 0.75rem;
+    min-width: 22px;
+    height: 22px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .logout-btn {
+    width: 100%;
+    margin-top: 15px;
+    background: rgba(160, 120, 100, 0.2);
+    border: 1px solid rgba(160, 120, 100, 0.25);
+    color: #f0ddd0;
+    padding: 12px 18px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  .logout-btn:hover { background: rgba(160, 120, 100, 0.35); color: white; transform: translateY(-2px); }
+  .container {
+    margin-top: 30px; margin-bottom: 30px;
+    margin-left: 40px; margin-right: 40px;
+    max-width: calc(100% - 80px);
+  }
+  .section-container { display: none; opacity: 0; transform: translateY(15px); transition: all 0.5s ease; }
+  .section-container.active { display: block; opacity: 1; transform: translateY(0); }
+  .card {
+    border: none;
+    border-radius: 20px;
+    background: white;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+  .card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08); }
+  .btn {
+    border-radius: 12px;
+    font-weight: 500;
+    padding: 10px 22px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+  }
+  .btn-primary { background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); color: white; }
+  .btn-primary:hover { background: linear-gradient(135deg, var(--primary-dark), var(--primary-color)); transform: translateY(-2px); filter: brightness(1.02); }
+  .btn-success { background: linear-gradient(135deg, var(--success-color), #659b62); color: white; }
+  .btn-success:hover { transform: translateY(-2px); filter: brightness(1.02); }
+  .btn-warning { background: linear-gradient(135deg, var(--warning-color), #d6a066); color: #3a2a1e; }
+  .btn-info { background: linear-gradient(135deg, var(--info-color), #6d8f9f); color: white; }
+  .btn-secondary { background: linear-gradient(135deg, var(--secondary-color), #889eac); color: white; }
+  .table-responsive { border-radius: 20px; overflow: hidden; box-shadow: var(--card-shadow); }
+  .table { margin-bottom: 0; background: white; }
+  .table thead { background: linear-gradient(135deg, var(--primary-light), var(--primary-color)); color: white; }
+  .table thead th { border: none; padding: 16px 16px; font-weight: 500; font-size: 0.85rem; letter-spacing: 0.3px; }
+  .table tbody tr { transition: all 0.2s ease; border-bottom: 1px solid #f0ede8; }
+  .table tbody tr:hover { background-color: #faf8f4; }
+  .table td { padding: 14px 16px; vertical-align: middle; color: #4a5a55; }
+  .badge {
+    font-size: 0.75rem;
+    padding: 5px 12px;
+    border-radius: 30px;
+    font-weight: 500;
+  }
+  .badge-success { background: linear-gradient(135deg, var(--success-light), var(--success-color)); color: #2a4a28; }
+  .badge-warning { background: linear-gradient(135deg, var(--warning-light), var(--warning-color)); color: #5a3e28; }
+  .badge-info { background: linear-gradient(135deg, var(--info-light), var(--info-color)); color: #2a4a5a; }
+  .modal-content { border-radius: 24px; border: none; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1); overflow: hidden; }
+  .modal-header { background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); color: white; border: none; padding: 20px 28px; }
+  .modal-body { padding: 28px 30px; background: #fffdf9; }
+  .form-control, .form-select {
+    border-radius: 12px;
+    border: 1px solid #e0ddd8;
+    padding: 10px 16px;
+    background: white;
+    transition: all 0.2s ease;
+  }
+  .form-control:focus, .form-select:focus {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(92, 156, 142, 0.1);
+    outline: none;
+  }
+  .alert { border-radius: 16px; border: none; padding: 14px 20px; background: #fef9ef; color: #7a684e; border-left: 4px solid var(--warning-color); }
+  .alert-info { background: #eef3f0; color: #4a6b62; border-left-color: var(--info-color); }
+  .day-checkbox-group { display: flex; gap: 12px; flex-wrap: wrap; margin: 15px 0; }
+  .day-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f5f3ef;
+    padding: 8px 18px;
+    border-radius: 40px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid #e5e0d8;
+  }
+  .day-checkbox:hover { background: #e8e4dc; transform: translateY(-1px); }
+  .day-checkbox input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--primary-color); }
+  .day-checkbox label { margin: 0; cursor: pointer; font-weight: 450; color: #5b6e68; }
+  .day-checkbox.checked { background: linear-gradient(135deg, var(--primary-light), var(--primary-color)); border-color: var(--primary-color); }
+  .day-checkbox.checked label { color: white; }
+  .badge-jour {
+    background: #f0ede8;
+    color: #6b7b75;
+    padding: 5px 12px;
+    border-radius: 30px;
+    font-size: 0.7rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 2px;
+  }
+  .badge-jour.actif {
+    background: linear-gradient(135deg, var(--success-light), var(--success-color));
+    color: white;
+  }
+  .heure-badge {
+    background: #f0ede8;
+    padding: 5px 12px;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    color: #6b7b75;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .salle-badge {
+    background: linear-gradient(135deg, var(--info-light), var(--info-color));
+    color: white;
+    padding: 5px 14px;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .filter-container {
+    background: white;
+    padding: 20px 24px;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-end;
+  }
+  @keyframes gentlePulse {
+    0% { box-shadow: 0 0 0 0 rgba(124, 174, 122, 0.4); }
+    70% { box-shadow: 0 0 0 8px rgba(124, 174, 122, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(124, 174, 122, 0); }
+  }
+  @media (max-width: 992px) {
+    body { margin-left: 0; }
+    #sidebar { width: 100%; height: auto; position: relative; }
+    .container { margin-left: 20px; margin-right: 20px; max-width: 100%; }
+  }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #e8e4dc; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb { background: var(--primary-light); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div class="sidebar-header">
+    <a class="sidebar-brand" href="#"><i class="fas fa-leaf"></i><span>Espace RH</span></a>
+  </div>
+  <div class="sidebar-user">
+    <img src="https://ui-avatars.com/api/?name=RH&size=80&background=5c9c8e&color=fff&bold=true&fontsize=0.5" class="user-avatar" alt="Photo">
+    <div id="welcomeText" class="mt-2">Bienvenue</div>
+    <div class="user-email" id="userEmail"></div>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="#" class="nav-link" onclick="showSection('dashboard')"><i class="fas fa-chart-line"></i><span>Tableau de bord</span></a>
+    <a href="#" class="nav-link active" onclick="showSection('gestionTemps')"><i class="fas fa-calendar-alt"></i><span>Gestion des temps</span></a>
+    <a href="#" class="nav-link" onclick="showSection('planningHebdo')"><i class="fas fa-calendar-week"></i><span>Planning hebdomadaire</span></a>
+    <a href="#" class="nav-link" onclick="showSection('statistics')"><i class="fas fa-chart-pie"></i><span>Statistiques</span></a>
+    <a href="#" class="nav-link" onclick="showSection('conges')"><i class="fas fa-umbrella-beach"></i><span>Congés</span></a>
+  </nav>
+  <div class="stats-section">
+    <div class="stats-header"><i class="fas fa-chart-simple"></i><span>Aperçu</span></div>
+    <div class="stats-grid">
+      <div class="stat-item"><div class="stat-value" id="statEmployees">0</div><div class="stat-label">Employés</div></div>
+      <div class="stat-item"><div class="stat-value" id="statJoursMoyen">0</div><div class="stat-label">Jours/semaine</div></div>
+    </div>
+  </div>
+  <div class="sidebar-footer">
+    <button class="notification-btn" id="notificationBtn">
+      <div class="notification-content"><i class="fas fa-bell"></i><span>Notifications</span></div>
+      <span id="notificationCount" class="notification-badge" style="display:none;">0</span>
+    </button>
+    <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i><span>Déconnexion</span></button>
+  </div>
+</div>
+
+<div class="container">
+  <div id="errorContent" class="alert alert-danger d-none"></div>
+  <div id="successContent" class="alert alert-success d-none"></div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="section-container">
+    <h2 class="mb-4" style="color: #4a6b62;"><i class="fas fa-chart-line me-2" style="color: var(--primary-color);"></i>Tableau de bord</h2>
+    <div class="row">
+      <div class="col-md-4 mb-4"><div class="card text-center p-3"><div class="card-body"><i class="fas fa-users fa-3x mb-3" style="color: var(--primary-color);"></i><h3 id="totalEmployes">0</h3><p class="text-muted">Employés actifs</p></div></div></div>
+      <div class="col-md-4 mb-4"><div class="card text-center p-3"><div class="card-body"><i class="fas fa-clock fa-3x mb-3" style="color: var(--success-color);"></i><h3 id="moyenneJours">0</h3><p class="text-muted">Jours travaillés/semaine (moy.)</p></div></div></div>
+    </div>
+    <div class="card"><div class="card-body"><h5 class="mb-3">Liste des employés</h5><div class="table-responsive"><table class="table"><thead><tr><th>ID</th><th>Nom</th><th>Email</th><th>Poste</th></tr></thead><tbody id="usersTableBody"></tbody></table></div></div></div>
+  </div>
+
+  <!-- GESTION DES TEMPS -->
+  <div id="gestionTemps" class="section-container active">
+    <h2 class="mb-4" style="color: #4a6b62;"><i class="fas fa-calendar-alt me-2" style="color: var(--primary-color);"></i>Gestion des horaires et jours de travail</h2>
+    <div class="alert alert-info mb-4"><i class="fas fa-info-circle me-2"></i>Définissez pour chaque employé ses jours de travail, ses horaires et sa salle assignée.</div>
+    <div class="filter-container">
+      <div><label class="form-label">Rechercher</label><input type="text" id="searchEmployeTemps" class="form-control" placeholder="Nom..." style="width: 220px;" onkeyup="filterEmployesTemps()"></div>
+      <div><label class="form-label">Salle</label><select id="filterSalleTemps" class="form-select" style="width: 180px;" onchange="filterEmployesTemps()"><option value="">Toutes</option></select></div>
+      <div><label class="form-label">Jour de travail</label><select id="filterJourTemps" class="form-select" style="width: 200px;" onchange="filterEmployesTemps()"><option value="">Tous</option><option value="Lundi">Travaille le Lundi</option><option value="Mardi">Travaille le Mardi</option><option value="Mercredi">Travaille le Mercredi</option><option value="Jeudi">Travaille le Jeudi</option><option value="Vendredi">Travaille le Vendredi</option></select></div>
+      <div><button class="btn btn-primary" onclick="ouvrirModalTempsGlobal()"><i class="fas fa-edit me-2"></i>Modification en masse</button></div>
+    </div>
+    <div class="table-responsive"><table class="table"><thead><tr><th>Employé</th><th>Poste</th><th>Jours de travail</th><th>Salle</th><th>Horaires</th><th>Actions</th></tr></thead><tbody id="employesTempsTableBody"></tbody></table></div>
+  </div>
+
+  <!-- PLANNING HEBDOMADAIRE -->
+  <div id="planningHebdo" class="section-container">
+    <h2 class="mb-4" style="color: #4a6b62;"><i class="fas fa-calendar-week me-2" style="color: var(--primary-color);"></i>Planning hebdomadaire</h2>
+    <div class="row mb-4">
+      <div class="col-md-5"><label class="form-label">Employé</label><select id="selectEmployePlanning" class="form-select" onchange="afficherPlanningHebdo()"><option value="">Choisir...</option></select></div>
+      <div class="col-md-4"><label class="form-label">Semaine du</label><input type="date" id="semaineDate" class="form-control" onchange="afficherPlanningHebdo()"></div>
+    </div>
+    <div id="planningHebdoContent" class="card"><div class="card-body text-center text-muted py-5"><i class="fas fa-calendar fa-3x mb-3 opacity-50"></i><p>Sélectionnez un employé pour voir son planning</p></div></div>
+  </div>
+
+  <!-- STATISTIQUES -->
+  <div id="statistics" class="section-container">
+    <h2 class="mb-4" style="color: #4a6b62;"><i class="fas fa-chart-pie me-2" style="color: var(--primary-color);"></i>Statistiques</h2>
+    <div class="row"><div class="col-md-8 mx-auto"><div class="card"><div class="card-body"><h5 class="card-title mb-3">Répartition par poste</h5><canvas id="posteChart" height="250"></canvas></div></div></div></div>
+  </div>
+
+  <!-- CONGÉS -->
+  <div id="conges" class="section-container">
+    <h2 class="mb-4" style="color: #4a6b62;"><i class="fas fa-umbrella-beach me-2" style="color: var(--primary-color);"></i>Demandes de congé</h2>
+    <div class="table-responsive"><table class="table"><thead><tr><th>ID</th><th>Employé</th><th>Type</th><th>Date début</th><th>Date fin</th><th>Jours</th><th>Statut</th></tr></thead><tbody id="congesTableBody"></tbody></table></div>
+  </div>
+</div>
+
+<!-- MODAL MODIFICATION INDIVIDUELLE -->
+<div class="modal fade" id="modalModifierHoraire" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title"><i class="fas fa-user-clock me-2"></i>Modifier le planning</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <input type="hidden" id="editEmployeId">
+        <div class="mb-3"><label class="fw-bold">Employé</label><p class="form-control-static" id="editEmployeNom"></p></div>
+        <div class="mb-3"><label class="fw-bold">Jours de travail</label><div class="day-checkbox-group" id="joursTravailGroup"></div></div>
+        <div class="mb-3"><label class="fw-bold">Salle de travail</label><select id="editSalle" class="form-select"></select></div>
+        <div class="row"><div class="col-md-6"><label class="fw-bold">Heure d'arrivée</label><input type="time" id="editHeureArrivee" class="form-control"></div><div class="col-md-6"><label class="fw-bold">Heure de sortie</label><input type="time" id="editHeureSortie" class="form-control"></div></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button><button class="btn btn-primary" onclick="enregistrerHoraireEmploye()">Enregistrer</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MODIFICATION EN MASSE -->
+<div class="modal fade" id="modalModifierHoraireGlobal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title"><i class="fas fa-users me-2"></i>Modification en masse</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="alert alert-warning mb-3"><i class="fas fa-info-circle me-2"></i>Sélectionnez les employés à modifier</div>
+        <div class="mb-3"><label class="fw-bold">Employés concernés</label><select id="globalEmployesSelect" class="form-select" multiple size="6"></select><small class="text-muted">Ctrl + clic pour sélection multiple</small></div>
+        <div class="mb-3"><label class="fw-bold">Jours de travail</label><div class="day-checkbox-group" id="globalJoursGroup"></div></div>
+        <div class="row"><div class="col-md-6"><label>Heure d'arrivée</label><input type="time" id="globalHeureArrivee" class="form-control"></div><div class="col-md-6"><label>Heure de sortie</label><input type="time" id="globalHeureSortie" class="form-control"></div></div>
+        <div class="mt-3"><label>Salle</label><select id="globalSalle" class="form-select"><option value="">Ne pas changer</option></select></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button><button class="btn btn-primary" onclick="enregistrerHorairesGlobal()">Appliquer</button></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// DONNÉES
+let usersList = [], congesList = [];
+let horairesEmployes = {};
+const joursSemaine = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
+const sallesDisponibles = ["Salle de réunion A", "Salle de réunion B", "Bureau open space", "Bureau RH", "Salle serveur", "Cafétéria", "Salle de formation", "Espace créatif"];
+
+// CHARGEMENT
+function chargerHoraires() {
+  const stock = localStorage.getItem('horairesRelax');
+  if (stock) horairesEmployes = JSON.parse(stock);
+  else if (usersList.length) {
+    usersList.forEach(u => { horairesEmployes[u.id] = { jours: ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"], salle: sallesDisponibles[0], heureArrivee: "09:00", heureSortie: "17:00" }; });
+    sauvegarder();
+  }
+}
+function sauvegarder() { localStorage.setItem('horairesRelax', JSON.stringify(horairesEmployes)); }
+function getHoraire(id) {
+  if (!horairesEmployes[id]) horairesEmployes[id] = { jours: ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"], salle: sallesDisponibles[0], heureArrivee: "09:00", heureSortie: "17:00" };
+  return horairesEmployes[id];
+}
+function setHoraire(id, jours, salle, arrivee, sortie) { horairesEmployes[id] = { jours, salle, heureArrivee: arrivee, heureSortie: sortie }; sauvegarder(); }
+
+// AFFICHAGE
+function afficherEmployes() {
+  const tbody = document.getElementById('employesTempsTableBody');
+  if (!tbody) return;
+  const search = (document.getElementById('searchEmployeTemps')?.value || '').toLowerCase();
+  const salleFilter = document.getElementById('filterSalleTemps')?.value || '';
+  const jourFilter = document.getElementById('filterJourTemps')?.value || '';
+  let filtered = usersList.filter(u => {
+    const nom = `${u.prenom || ''} ${u.nom || ''}`.toLowerCase();
+    const h = getHoraire(u.id);
+    if (search && !nom.includes(search)) return false;
+    if (salleFilter && h.salle !== salleFilter) return false;
+    if (jourFilter && !h.jours.includes(jourFilter.replace('Travaille le ', ''))) return false;
+    return true;
+  });
+  if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">Aucun employé</td></tr>'; return; }
+  tbody.innerHTML = filtered.map(u => {
+    const h = getHoraire(u.id);
+    const joursHtml = h.jours.map(j => `<span class="badge-jour actif"><i class="fas fa-check-circle"></i> ${j.substring(0,3)}</span>`).join('');
+    const nonTravail = joursSemaine.filter(j => !h.jours.includes(j)).slice(0,3).map(j => `<span class="badge-jour">${j.substring(0,3)}</span>`).join('');
+    return `<tr><td><strong>${u.prenom || ''} ${u.nom || ''}</strong><br><small class="text-muted">${u.email || ''}</small></td><td>${u.poste || '—'}</td><td>${joursHtml} ${nonTravail}</td><td><span class="salle-badge"><i class="fas fa-building"></i> ${h.salle}</span></td><td><span class="heure-badge"><i class="fas fa-clock"></i> ${h.heureArrivee} - ${h.heureSortie}</span></td><td><button class="btn btn-sm btn-primary" onclick="ouvrirModal(${u.id}, '${u.prenom || ''} ${u.nom || ''}')"><i class="fas fa-edit"></i> Modifier</button></td></tr>`;
+  }).join('');
+  const totalJours = filtered.reduce((s,u) => s + getHoraire(u.id).jours.length, 0);
+  const moy = filtered.length ? (totalJours / filtered.length).toFixed(1) : 0;
+  document.getElementById('moyenneJours')?.setAttribute('data-value', moy);
+  document.getElementById('moyenneJours')?.setAttribute('data-value', moy);
+  document.getElementById('statJoursMoyen')?.setAttribute('data-value', moy);
+}
+function filterEmployesTemps() { afficherEmployes(); }
+
+// MODAL INDIVIDUEL
+function ouvrirModal(id, nom) {
+  const h = getHoraire(id);
+  document.getElementById('editEmployeId').value = id;
+  document.getElementById('editEmployeNom').innerHTML = `<i class="fas fa-user"></i> ${nom}`;
+  document.getElementById('editHeureArrivee').value = h.heureArrivee;
+  document.getElementById('editHeureSortie').value = h.heureSortie;
+  const div = document.getElementById('joursTravailGroup');
+  div.innerHTML = joursSemaine.map(j => `<div class="day-checkbox ${h.jours.includes(j) ? 'checked' : ''}" onclick="toggleDay(this, '${j}')"><input type="checkbox" value="${j}" ${h.jours.includes(j) ? 'checked' : ''} onclick="event.stopPropagation()"><label>${j}</label></div>`).join('');
+  const salle = document.getElementById('editSalle');
+  salle.innerHTML = sallesDisponibles.map(s => `<option value="${s}" ${h.salle === s ? 'selected' : ''}>${s}</option>`).join('');
+  new bootstrap.Modal(document.getElementById('modalModifierHoraire')).show();
+}
+function toggleDay(div, jour) { const cb = div.querySelector('input'); cb.checked = !cb.checked; if (cb.checked) div.classList.add('checked'); else div.classList.remove('checked'); }
+function enregistrerHoraireEmploye() {
+  const id = document.getElementById('editEmployeId').value;
+  const jours = Array.from(document.querySelectorAll('#joursTravailGroup input')).filter(cb => cb.checked).map(cb => cb.value);
+  const salle = document.getElementById('editSalle').value;
+  const arrivee = document.getElementById('editHeureArrivee').value;
+  const sortie = document.getElementById('editHeureSortie').value;
+  if (!jours.length) { showError("Sélectionnez au moins un jour"); return; }
+  setHoraire(id, jours, salle, arrivee, sortie);
+  afficherEmployes();
+  bootstrap.Modal.getInstance(document.getElementById('modalModifierHoraire')).hide();
+  showSuccess("Planning modifié");
+}
+
+// MODAL EN MASSE
+function ouvrirModalTempsGlobal() {
+  const select = document.getElementById('globalEmployesSelect');
+  select.innerHTML = usersList.map(u => `<option value="${u.id}">${u.prenom || ''} ${u.nom || ''}</option>`).join('');
+  const div = document.getElementById('globalJoursGroup');
+  div.innerHTML = joursSemaine.map(j => `<div class="day-checkbox" onclick="toggleGlobalDay(this, '${j}')"><input type="checkbox" value="${j}" onclick="event.stopPropagation()"><label>${j}</label></div>`).join('');
+  const salle = document.getElementById('globalSalle');
+  salle.innerHTML = '<option value="">Ne pas changer</option>' + sallesDisponibles.map(s => `<option value="${s}">${s}</option>`).join('');
+  new bootstrap.Modal(document.getElementById('modalModifierHoraireGlobal')).show();
+}
+function toggleGlobalDay(div, jour) { const cb = div.querySelector('input'); cb.checked = !cb.checked; if (cb.checked) div.classList.add('checked'); else div.classList.remove('checked'); }
+function enregistrerHorairesGlobal() {
+  const ids = Array.from(document.getElementById('globalEmployesSelect').selectedOptions).map(opt => opt.value);
+  const jours = Array.from(document.querySelectorAll('#globalJoursGroup input')).filter(cb => cb.checked).map(cb => cb.value);
+  const arrivee = document.getElementById('globalHeureArrivee').value;
+  const sortie = document.getElementById('globalHeureSortie').value;
+  const salle = document.getElementById('globalSalle').value;
+  if (!ids.length) { showError("Sélectionnez des employés"); return; }
+  let cpt = 0;
+  ids.forEach(id => {
+    const h = getHoraire(id);
+    const nvJours = jours.length ? jours : h.jours;
+    const nvArrivee = arrivee || h.heureArrivee;
+    const nvSortie = sortie || h.heureSortie;
+    const nvSalle = salle || h.salle;
+    if (nvJours.length) { setHoraire(id, nvJours, nvSalle, nvArrivee, nvSortie); cpt++; }
+  });
+  afficherEmployes();
+  bootstrap.Modal.getInstance(document.getElementById('modalModifierHoraireGlobal')).hide();
+  showSuccess(`${cpt} employé(s) modifié(s)`);
+}
+
+// PLANNING HEBDOMADAIRE
+function afficherPlanningHebdo() {
+  const id = document.getElementById('selectEmployePlanning').value;
+  const dateInput = document.getElementById('semaineDate').value;
+  if (!id) return;
+  const emp = usersList.find(u => u.id == id);
+  const h = getHoraire(id);
+  const ref = dateInput ? new Date(dateInput) : new Date();
+  const debut = new Date(ref); debut.setDate(ref.getDate() - ref.getDay() + (ref.getDay() === 0 ? -6 : 1));
+  const html = `<div class="card-body"><h5 class="mb-3">${emp?.prenom || ''} ${emp?.nom || ''} - Semaine du ${debut.toLocaleDateString('fr-FR')}</h5><div class="table-responsive"><table class="table"><thead><tr><th>Jour</th><th>Date</th><th>Statut</th><th>Salle</th><th>Horaires</th></tr></thead><tbody>${joursSemaine.map((j, i) => {
+    const date = new Date(debut); date.setDate(debut.getDate() + i);
+    const travail = h.jours.includes(j);
+    return `<tr class="${travail ? 'table-success' : 'table-light'}"><td><strong>${j}</strong></td><td>${date.toLocaleDateString('fr-FR')}</td><td>${travail ? '<span class="badge bg-success" style="background:#7cae7a!important">Présent</span>' : '<span class="badge bg-secondary">Repos</span>'}</td><td>${travail ? `<span class="salle-badge">${h.salle}</span>` : '—'}</td><td>${travail ? `<span class="heure-badge">${h.heureArrivee} → ${h.heureSortie}</span>` : '—'}</td></tr>`;
+  }).join('')}</tbody></table></div><div class="alert alert-info mt-3"><i class="fas fa-info-circle"></i> Jours travaillés : ${h.jours.join(', ')} | Horaires : ${h.heureArrivee} - ${h.heureSortie}</div></div>`;
+  document.getElementById('planningHebdoContent').innerHTML = html;
+}
+
+// FONCTIONS EXISTANTES
+function fetchUsers() {
+  const token = localStorage.getItem('jwt');
+  if (!token) { logout(); return; }
+  fetch('admin_api.php', { headers: { 'Authorization': `Bearer ${token}` } })
+    .then(res => res.json())
+    .then(data => {
+      if (!data.error) { usersList = Array.isArray(data) ? data : []; chargerHoraires(); afficherEmployes(); miseAJourSelects(); document.getElementById('totalEmployes').innerText = usersList.length; renderUsers(); }
+    }).catch(console.error);
+}
+function renderUsers() {
+  const tbody = document.getElementById('usersTableBody');
+  if (tbody) tbody.innerHTML = usersList.slice(0,5).map(u => `<tr><td>${u.id}</td><td>${u.prenom || ''} ${u.nom || ''}</td><td>${u.email}</td><td>${u.poste || '—'}</td></tr>`).join('') + (usersList.length > 5 ? '<tr><td colspan="4" class="text-center text-muted">...</td></tr>' : '');
+}
+function fetchConges() {
+  const token = localStorage.getItem('jwt');
+  if (!token) return;
+  fetch('admin_conges.php?action=get_conges', { headers: { 'Authorization': `Bearer ${token}` } })
+    .then(res => res.json())
+    .then(data => { congesList = data.data || data || []; renderConges(); }).catch(console.error);
+}
+function renderConges() {
+  const tbody = document.getElementById('congesTableBody');
+  if (tbody) tbody.innerHTML = congesList.slice(0,5).map(c => `<tr><td>${c.id}</td><td>${c.employe || '—'}</td><td>${c.type || '—'}</td><td>${c.date_debut || '—'}</td><td>${c.date_fin || '—'}</td><td>${c.nb_jours || '—'}</td><td><span class="badge badge-warning">En attente</span></td></tr>`).join('');
+}
+function miseAJourSelects() {
+  const sel = document.getElementById('selectEmployePlanning');
+  if (sel) sel.innerHTML = '<option value="">Choisir...</option>' + usersList.map(u => `<option value="${u.id}">${u.prenom || ''} ${u.nom || ''}</option>`).join('');
+  const filterSalle = document.getElementById('filterSalleTemps');
+  if (filterSalle) filterSalle.innerHTML = '<option value="">Toutes</option>' + sallesDisponibles.map(s => `<option value="${s}">${s}</option>`).join('');
+}
+function createCharts() {
+  const posteData = {}; usersList.forEach(u => { const p = u.poste || 'Non défini'; posteData[p] = (posteData[p] || 0) + 1; });
+  const canvas = document.getElementById('posteChart');
+  if (canvas && Object.keys(posteData).length) {
+    const parent = canvas.parentElement; parent.innerHTML = '<canvas id="posteChart" height="250"></canvas>';
+    new Chart(document.getElementById('posteChart'), { type: 'doughnut', data: { labels: Object.keys(posteData), datasets: [{ data: Object.values(posteData), backgroundColor: ['#8bb5aa', '#7cae7a', '#e6b87e', '#7fa5b8', '#c98c8c', '#9aaebf'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } } });
+  }
+}
+function showSection(id) {
+  document.querySelectorAll('.section-container').forEach(s => s.classList.remove('active'));
+  document.getElementById(id)?.classList.add('active');
+  if (id === 'planningHebdo') miseAJourSelects();
+  if (id === 'statistics') createCharts();
+}
+function showError(msg) { const e = document.getElementById('errorContent'); if (e) { e.textContent = msg; e.classList.remove('d-none'); setTimeout(() => e.classList.add('d-none'), 4000); } }
+function showSuccess(msg) { const s = document.getElementById('successContent'); if (s) { s.textContent = msg; s.classList.remove('d-none'); setTimeout(() => s.classList.add('d-none'), 3000); } }
+function logout() { if (confirm('Déconnexion ?')) { localStorage.clear(); window.location.href = 'connexion.html'; } }
+
+// INIT
+document.addEventListener('DOMContentLoaded', () => {
+  const token = localStorage.getItem('jwt'), role = localStorage.getItem('role');
+  if (!token || role !== 'responsable_rh') { alert("Accès refusé"); window.location.href = "connexion.html"; return; }
+  const nom = localStorage.getItem('nom') || 'RH', email = localStorage.getItem('email') || '';
+  document.getElementById('welcomeText').innerHTML = `Bienvenue, ${nom} !`;
+  document.getElementById('userEmail').innerText = email;
+  fetchUsers(); fetchConges(); setInterval(() => fetchUsers(), 30000);
+});
+</script>
+</body>
+</html>

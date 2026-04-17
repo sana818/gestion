@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tableau de bord Directeur RH</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+<style>
+  :root {
+    --primary-color: #4a6fa5;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --sidebar-width: 320px;
+    --transition-speed: 0.4s;
+    --accent-color: #4dabf7;
+  }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    min-height: 100vh;
+    margin-left: var(--sidebar-width);
+    transition: margin-left var(--transition-speed) ease;
+  }
+
+  /* SIDEBAR STYLES */
+  #sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    position: fixed;
+    left: 0; top: 0;
+    z-index: 1050;
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    color: white;
+    box-shadow: 8px 0 30px rgba(0,0,0,0.2);
+    overflow-y: auto;
+  }
+  .sidebar-header { padding: 30px 25px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .sidebar-brand { display: flex; align-items: center; gap: 15px; font-size: 1.4rem; font-weight: 700; color: white; text-decoration: none; }
+  .sidebar-brand i { color: var(--accent-color); font-size: 2rem; }
+  
+  .sidebar-nav { padding: 20px 0; }
+  .nav-link {
+    color: rgba(255,255,255,0.8); padding: 14px 25px;
+    display: flex; align-items: center; gap: 15px;
+    text-decoration: none; transition: 0.3s;
+  }
+  .nav-link:hover, .nav-link.active {
+    background: rgba(255,255,255,0.1); color: white; border-left: 4px solid var(--accent-color);
+  }
+
+  /* MAIN CONTENT */
+  .container-fluid { padding: 40px; }
+  .section-container { display: none; }
+  .section-container.active { display: block; animation: fadeIn 0.5s ease; }
+  
+  /* TABLE CUSTOMIZATION */
+  .table-container {
+    background: white; border-radius: 15px; overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  }
+  .table thead { background: var(--primary-color); color: white; }
+  .table th { padding: 15px; font-weight: 600; font-size: 0.9rem; }
+  .table td { padding: 15px; vertical-align: middle; }
+
+  /* TIME & ROOM BADGES */
+  .time-slot {
+    background: #f1f5f9; padding: 6px 12px; border-radius: 8px;
+    font-weight: 700; color: #1e293b; border: 1px solid #e2e8f0;
+    display: inline-block; min-width: 130px; text-align: center;
+  }
+  .room-tag {
+    background: linear-gradient(135deg, #4dabf7, #3b82f6);
+    color: white; padding: 5px 12px; border-radius: 20px;
+    font-size: 0.85rem; font-weight: 500;
+  }
+  .date-info { font-size: 0.85rem; color: #64748b; font-weight: 500; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 992px) {
+    body { margin-left: 0; }
+    #sidebar { width: 100%; height: auto; position: relative; }
+  }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <div class="sidebar-header">
+    <a class="sidebar-brand" href="#"><i class="fas fa-user-shield"></i><span>Espace RH</span></a>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="#" class="nav-link active" onclick="showSection('dashboard')"><i class="fas fa-users"></i><span>Gestion Employés</span></a>
+    <a href="#" class="nav-link" onclick="showSection('statistics')"><i class="fas fa-chart-line"></i><span>Statistiques</span></a>
+    <a href="#" class="nav-link" onclick="showSection('historique')"><i class="fas fa-history"></i><span>Accès Salles</span></a>
+  </nav>
+</div>
+
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold text-dark">Tableau de Bord RH</h2>
+      <p class="text-muted">Suivi en temps réel des horaires et localisations.</p>
+    </div>
+    <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#addUserModal">
+      <i class="fas fa-user-plus me-2"></i>Nouvel Employé
+    </button>
+  </div>
+
+  <div id="dashboard" class="section-container active">
+    <div class="table-container">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Employé</th>
+            <th>Poste</th>
+            <th>Aujourd'hui</th>
+            <th>Horaires (Entrée - Sortie)</th>
+            <th>Localisation</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="usersTableBody">
+          </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="statistics" class="section-container"><h3>Statistiques</h3></div>
+  <div id="historique" class="section-container"><h3>Historique</h3></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Données de test
+  const employees = [
+    { id: 1, nom: "Jean Dupont", email: "j.dupont@entreprise.com", poste: "AI Developer", hEntree: "08:30", hSortie: "17:30", salle: "Lab IA 01" },
+    { id: 2, nom: "Alice Martin", email: "a.martin@entreprise.com", poste: "Cloud Arch.", hEntree: "09:00", hSortie: "18:00", salle: "Salle Serveur" },
+    { id: 3, nom: "Marc Durand", email: "m.durand@entreprise.com", poste: "HR Manager", hEntree: "08:00", hSortie: "16:30", salle: "Bureau 102" },
+    { id: 4, nom: "Sophie Lefebvre", email: "s.lefe@entreprise.com", poste: "Full-stack Dev", hEntree: "09:30", hSortie: "18:30", salle: "Open Space A" }
+  ];
+
+  function renderTable() {
+    const tbody = document.getElementById('usersTableBody');
+    const today = new Date().toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
+    
+    tbody.innerHTML = employees.map(emp => `
+      <tr>
+        <td>
+          <div class="d-flex align-items-center">
+            <img src="https://ui-avatars.com/api/?name=${emp.nom}&background=random" class="rounded-circle me-3" width="40">
+            <div>
+              <div class="fw-bold text-primary">${emp.nom}</div>
+              <small class="text-muted">${emp.email}</small>
+            </div>
+          </div>
+        </td>
+        <td><span class="badge bg-light text-dark border">${emp.poste}</span></td>
+        <td><span class="date-info"><i class="far fa-calendar-alt me-1"></i>${today}</span></td>
+        <td>
+          <div class="time-slot">
+            <i class="far fa-clock text-primary me-1"></i> ${emp.hEntree} — ${emp.hSortie}
+          </div>
+        </td>
+        <td>
+          <span class="room-tag">
+            <i class="fas fa-map-marker-alt me-1"></i> ${emp.salle}
+          </span>
+        </td>
+        <td class="text-center">
+          <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function showSection(sectionId) {
+    document.querySelectorAll('.section-container').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    
+    document.getElementById(sectionId).classList.add('active');
+    event.currentTarget.classList.add('active');
+  }
+
+  // Initialisation
+  window.onload = renderTable;
+</script>
+
+</body>
+</html>

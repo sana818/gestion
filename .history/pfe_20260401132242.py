@@ -1,0 +1,80 @@
+import paho.mqtt.client as mqtt
+import mysql.connector
+from datetime import date, datetime
+
+db = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="",
+    database="gestion_utilisateurs"
+)
+
+cursor = db.cursor()
+
+def tester_rfid(rfid_code):
+    print("\nRFID reçu :", rfid_code)
+
+    query = "SELECT id, nom, prenom, statut FROM registre WHERE rfid_code = %s"
+    cursor.execute(query, (rfid_code,))
+    user = cursor.fetchone()
+
+    today = date.today()
+    now_time = datetime.now().strftime("%H:%M:%S")
+
+    if user:
+        user_id, nom, prenom, statut = user
+
+        if statut != "actif":
+            print("Accès refusé ❌")
+            return
+
+        check = """
+            SELECT id, heure_arrivee, heure_depart 
+            FROM presence 
+            WHERE employe_id = %s AND date = %s
+        """
+        cursor.execute(check, (user_id, today))
+        presence = cursor.fetchone()
+
+        if presence:
+            presence_id, heure_arrivee, heure_depart = presence
+
+            if heure_depart is None:
+                update = """
+                    UPDATE presence
+                    SET heure_depart = %s
+                    WHERE id = %s
+                """
+                cursor.execute(update, (now_time, presence_id))
+                db.commit()
+                print("Sortie enregistrée 🟢")
+            else:
+                print("Déjà pointé ✅")
+
+        else:
+            insert = """
+                INSERT INTO presence 
+                (employe, employe_id, date, heure_arrivee, statut)
+                VALUES (%s, %s, %s, %s, %s)
+            """
+            cursor.execute(insert, (nom, user_id, today, now_time, "présent"))
+            db.commit()
+            print("Entrée enregistrée 🟢")
+
+    else:
+        print("Carte inconnue ❌")
+
+
+# MQTT
+def on_message(client, userdata, msg):
+    uid = msg.payload.decode()
+    tester_rfid(uid)
+
+client = mqtt.Client()
+client.on_message = on_message
+
+client.connect("localhost", 1883, 60)
+client.subscribe("rfid/scan")
+
+print("En attente des cartes RFID...")
+client.loop_forever()

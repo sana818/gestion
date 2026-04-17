@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tableau de bord — Directeur</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --navy:   #0d1b2a;
+  --navy2:  #1a3a5c;
+  --navy3:  #2c5f8a;
+  --gold:   #e8b84b;
+  --gold2:  #f5d080;
+  --gold3:  #c9973a;
+  --accent: #4dabf7;
+  --success:#2ecc71;
+  --danger: #e74c3c;
+  --warn:   #f39c12;
+  --sidebar-w: 300px;
+  --speed: 0.35s;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #eef2f7;
+  min-height: 100vh;
+  margin-left: var(--sidebar-w);
+  transition: margin-left var(--speed) ease;
+  padding-bottom: 40px;
+}
+
+/* ══ SIDEBAR ══ */
+#sidebar {
+  width: var(--sidebar-w);
+  height: 100vh;
+  position: fixed;
+  left: 0; top: 0; z-index: 1050;
+  background: var(--navy);
+  display: flex; flex-direction: column;
+  box-shadow: 6px 0 40px rgba(0,0,0,0.35);
+  border-right: 1px solid rgba(232,184,75,0.12);
+  overflow-y: auto; overflow-x: hidden;
+}
+#sidebar::-webkit-scrollbar { width: 4px; }
+#sidebar::-webkit-scrollbar-thumb { background: rgba(232,184,75,0.25); border-radius: 4px; }
+
+.sb-header {
+  padding: 26px 22px 20px;
+  background: linear-gradient(160deg, rgba(232,184,75,0.08) 0%, transparent 100%);
+  border-bottom: 1px solid rgba(232,184,75,0.1);
+  flex-shrink: 0;
+}
+.sb-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+.sb-logo-icon {
+  width: 42px; height: 42px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--gold), var(--gold3));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.15rem; color: var(--navy); flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(232,184,75,0.35);
+}
+.sb-logo-name { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: #fff; font-weight: 700; line-height: 1.2; }
+.sb-logo-sub  { font-size: 0.62rem; color: rgba(232,184,75,0.6); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 500; }
+
+.sb-user {
+  padding: 22px; text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.02); flex-shrink: 0;
+}
+.sb-avatar-wrap { 
+  position: relative; 
+  width: fit-content; 
+  margin: 0 auto 14px;
+  cursor: pointer;
+}
+.sb-avatar {
+  width: 72px; height: 72px; border-radius: 50%; object-fit: cover;
+  border: 3px solid rgba(232,184,75,0.35);
+  box-shadow: 0 0 0 6px rgba(232,184,75,0.08); transition: all 0.3s;
+}
+.sb-avatar:hover {
+  transform: scale(1.05);
+  border-color: var(--gold);
+}
+.sb-online {
+  position: absolute; bottom: 4px; right: 4px;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--success); border: 2px solid var(--navy);
+  animation: pulseGreen 2s infinite;
+}
+.sb-role-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: linear-gradient(135deg, rgba(232,184,75,0.18), rgba(232,184,75,0.08));
+  border: 1px solid rgba(232,184,75,0.3);
+  color: var(--gold); font-size: 0.68rem; font-weight: 700;
+  padding: 3px 11px; border-radius: 20px;
+  letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;
+}
+.sb-username { font-size: 1rem; font-weight: 600; color: #fff; margin-bottom: 3px; }
+.sb-email    { font-size: 0.78rem; color: rgba(255,255,255,0.45); }
+
+.sb-nav { padding: 18px 0; flex: 1; }
+.sb-section-lbl {
+  padding: 6px 24px 4px;
+  font-size: 0.62rem; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: rgba(232,184,75,0.4);
+}
+.sb-link {
+  display: flex; align-items: center; gap: 13px;
+  padding: 12px 22px; margin: 2px 10px; border-radius: 10px;
+  color: rgba(255,255,255,0.65); text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all 0.28s cubic-bezier(.4,0,.2,1);
+  font-size: 0.88rem; font-weight: 500; cursor: pointer;
+}
+.sb-link i { width: 20px; text-align: center; font-size: 1rem; transition: all 0.25s; }
+.sb-link:hover { color: #fff; background: rgba(255,255,255,0.05); border-left-color: var(--gold); transform: translateX(5px); }
+.sb-link.active { color: #fff; background: linear-gradient(90deg, rgba(232,184,75,0.14), transparent); border-left-color: var(--gold); }
+.sb-link.active i, .sb-link:hover i { color: var(--gold); transform: scale(1.1); }
+.sb-badge { margin-left: auto; background: var(--gold); color: var(--navy); font-size: 0.68rem; font-weight: 800; padding: 2px 7px; border-radius: 10px; min-width: 20px; text-align: center; }
+
+.sb-mini { padding: 18px 18px 12px; border-top: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; }
+.sb-mini-lbl  { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(232,184,75,0.4); font-weight: 700; margin-bottom: 12px; }
+.sb-mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.sb-mini-item {
+  background: rgba(255,255,255,0.04); border-radius: 10px;
+  padding: 11px 10px; text-align: center;
+  border: 1px solid rgba(255,255,255,0.05); transition: all 0.25s;
+}
+.sb-mini-item:hover { background: rgba(232,184,75,0.07); border-color: rgba(232,184,75,0.18); transform: translateY(-2px); }
+.sb-mini-val { font-size: 1.4rem; font-weight: 700; color: #fff; line-height: 1; }
+.sb-mini-txt { font-size: 0.68rem; color: rgba(255,255,255,0.45); margin-top: 3px; }
+
+.sb-footer { padding: 16px 18px; border-top: 1px solid rgba(255,255,255,0.06); background: rgba(0,0,0,0.2); flex-shrink: 0; }
+.btn-logout {
+  width: 100%; background: rgba(231,76,60,0.12);
+  border: 1px solid rgba(231,76,60,0.22); color: #fca5a5;
+  padding: 11px; border-radius: 10px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  font-size: 0.85rem; font-weight: 600; transition: all 0.28s;
+}
+.btn-logout:hover { background: rgba(231,76,60,0.25); color: #fff; transform: translateY(-2px); }
+
+/* ══ MAIN ══ */
+.main { padding: 28px 32px; }
+
+.page-hero {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 60%, #1e4d7b 100%);
+  border-radius: 20px; padding: 28px 32px; color: #fff; margin-bottom: 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 8px 32px rgba(13,27,42,0.28);
+  position: relative; overflow: hidden;
+}
+.page-hero::before { content:''; position:absolute; width:220px; height:220px; border-radius:50%; background:radial-gradient(circle, rgba(232,184,75,0.12) 0%, transparent 70%); top:-60px; right:-40px; }
+.page-hero::after  { content:''; position:absolute; width:150px; height:150px; border-radius:50%; background:radial-gradient(circle, rgba(77,171,247,0.09) 0%, transparent 70%); bottom:-30px; left:180px; }
+.hero-title { font-family: 'Playfair Display', serif; font-size: 1.7rem; font-weight: 800; margin-bottom: 6px; }
+.hero-sub   { font-size: 0.88rem; color: rgba(255,255,255,0.6); }
+.hero-icon  { width:64px; height:64px; border-radius:18px; background:linear-gradient(135deg,var(--gold),var(--gold3)); display:flex; align-items:center; justify-content:center; font-size:1.7rem; color:var(--navy); flex-shrink:0; box-shadow:0 6px 22px rgba(232,184,75,0.4); }
+
+/* ══ SECTIONS ══ */
+.section-container { display: none; }
+.section-container.active { display: block; animation: fadeUp 0.45s ease both; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+
+/* ══ KPI ══ */
+.kpi-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 18px; margin-bottom: 28px; }
+.kpi {
+  background: #fff; border-radius: 16px; padding: 22px 20px;
+  box-shadow: 0 3px 16px rgba(0,0,0,0.07); border: 1px solid rgba(0,0,0,0.04);
+  position: relative; overflow: hidden; transition: all 0.3s;
+}
+.kpi:hover { transform: translateY(-5px); box-shadow: 0 10px 28px rgba(0,0,0,0.12); }
+.kpi::after { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+.kpi.blue::after  { background: linear-gradient(90deg, var(--navy2), var(--accent)); }
+.kpi.gold::after  { background: linear-gradient(90deg, var(--gold3), var(--gold2)); }
+.kpi.green::after { background: linear-gradient(90deg, #27ae60, #2ecc71); }
+.kpi.red::after   { background: linear-gradient(90deg, #c0392b, #e74c3c); }
+.kpi-ico-w { width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; margin-bottom:14px; }
+.kpi.blue  .kpi-ico-w { background:rgba(26,58,92,0.1);   color:var(--navy2); }
+.kpi.gold  .kpi-ico-w { background:rgba(232,184,75,0.15); color:var(--gold3); }
+.kpi.green .kpi-ico-w { background:rgba(46,204,113,0.12); color:#27ae60; }
+.kpi.red   .kpi-ico-w { background:rgba(231,76,60,0.1);   color:#c0392b; }
+.kpi-val { font-size:2rem; font-weight:700; color:#1e293b; line-height:1; margin-bottom:5px; }
+.kpi-lbl { font-size:0.8rem; color:#94a3b8; font-weight:500; }
+
+/* ══ CARD ══ */
+.card { background:#fff; border-radius:16px; box-shadow:0 3px 16px rgba(0,0,0,0.07); border:1px solid rgba(0,0,0,0.04); overflow:hidden; margin-bottom:22px; }
+.card-hd { padding:18px 22px; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between; }
+.card-hd h5 { font-size:0.95rem; font-weight:700; color:#1e293b; margin:0; display:flex; align-items:center; gap:9px; }
+.card-hd h5 i { color:var(--gold3); }
+.card-bd { padding:22px; }
+
+/* ══ TABLE ══ */
+.table { margin-bottom:0; background:#fff; }
+.table thead { background:linear-gradient(90deg, var(--navy), var(--navy2)); color:#fff; }
+.table thead th { border:none; padding:14px; font-weight:600; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.6px; }
+.table tbody tr:hover { background:rgba(26,58,92,0.03); }
+.table td { padding:13px 14px; vertical-align:middle; border-color:#f1f5f9; font-size:0.88rem; }
+
+/* ══ BADGES ══ */
+.badge { font-size:0.75rem; padding:5px 11px; border-radius:50px; font-weight:600; }
+.bdg-rh  { background:linear-gradient(135deg,var(--navy),var(--navy3)); color:#fff; }
+.bdg-emp { background:linear-gradient(135deg,#339af0,#74c0fc); color:#fff; }
+.bdg-dir { background:linear-gradient(135deg,var(--gold3),var(--gold2)); color:var(--navy); }
+
+/* ══ BUTTONS ══ */
+.btn { border-radius:10px; font-weight:600; padding:9px 18px; transition:all 0.28s; display:inline-flex; align-items:center; gap:7px; border:none; font-size:0.86rem; cursor:pointer; }
+.btn:hover { transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,0.15); }
+.btn-navy  { background:linear-gradient(135deg,var(--navy),var(--navy2)); color:#fff; }
+.btn-gold  { background:linear-gradient(135deg,var(--gold3),var(--gold)); color:var(--navy); font-weight:700; }
+.btn-succ  { background:linear-gradient(135deg,#27ae60,#2ecc71); color:#fff; }
+.btn-dang  { background:linear-gradient(135deg,#c0392b,#e74c3c); color:#fff; }
+.btn-ghost { background:transparent; border:2px solid var(--navy2); color:var(--navy2); }
+.btn-ghost:hover { background:var(--navy2); color:#fff; }
+.btn-sm { padding:6px 12px; font-size:0.8rem; border-radius:8px; margin:0 2px; }
+
+/* ══ FILTER BAR ══ */
+.filter-bar {
+  background:#fff; padding:16px 20px; border-radius:14px;
+  box-shadow:0 3px 12px rgba(0,0,0,0.05); margin-bottom:20px;
+  display:flex; flex-wrap:wrap; gap:14px; align-items:flex-end;
+}
+.filter-bar label { font-size:0.75rem; font-weight:700; color:#64748b; margin-bottom:5px; display:block; text-transform:uppercase; letter-spacing:0.5px; }
+.filter-bar .form-control, .filter-bar .form-select { border-radius:9px; border:1.5px solid #e2e8f0; font-size:0.86rem; padding:8px 13px; min-width:180px; }
+
+/* ══ RH CARDS ══ */
+.rh-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(265px, 1fr)); gap:18px; }
+.rh-card {
+  background:#fff; border-radius:16px; padding:22px;
+  box-shadow:0 3px 16px rgba(0,0,0,0.07); border:1px solid rgba(0,0,0,0.04);
+  transition:all 0.3s; position:relative; overflow:hidden;
+}
+.rh-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--gold),var(--navy2)); }
+.rh-card:hover { transform:translateY(-5px); box-shadow:0 12px 28px rgba(0,0,0,0.11); }
+.rh-top { display:flex; align-items:center; gap:13px; margin-bottom:13px; }
+.rh-av  { width:50px; height:50px; border-radius:50%; background:linear-gradient(135deg,var(--navy),var(--navy3)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:1.1rem; border:3px solid rgba(232,184,75,0.25); flex-shrink:0; }
+.rh-name  { font-size:0.95rem; font-weight:700; color:#1e293b; }
+.rh-email { font-size:0.77rem; color:#94a3b8; margin-top:2px; }
+.rh-meta  { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+.rh-tag   { display:inline-flex; align-items:center; gap:5px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:4px 9px; font-size:0.74rem; color:#475569; font-weight:500; }
+.rh-tag i { color:var(--gold3); font-size:0.7rem; }
+.rh-btns  { display:flex; gap:8px; }
+.btn-rev  { flex:1; padding:8px; border-radius:9px; border:none; cursor:pointer; background:rgba(231,76,60,0.08); color:#c0392b; font-size:0.79rem; font-weight:600; transition:all 0.25s; display:flex; align-items:center; justify-content:center; gap:5px; }
+.btn-rev:hover { background:#e74c3c; color:#fff; transform:translateY(-2px); }
+.btn-see  { padding:8px 14px; border-radius:9px; border:none; cursor:pointer; background:rgba(26,58,92,0.08); color:var(--navy2); font-size:0.79rem; font-weight:600; transition:all 0.25s; display:flex; align-items:center; gap:5px; }
+.btn-see:hover { background:var(--navy2); color:#fff; transform:translateY(-2px); }
+
+/* ══ SEARCH DROPDOWN ══ */
+.srch-wrap { position:relative; }
+.srch-res  {
+  position:absolute; top:100%; left:0; right:0;
+  background:#fff; border-radius:12px; border:1px solid #e2e8f0;
+  box-shadow:0 10px 30px rgba(0,0,0,0.12); z-index:200;
+  max-height:280px; overflow-y:auto; display:none; margin-top:4px;
+}
+.srch-item { padding:11px 16px; cursor:pointer; display:flex; align-items:center; gap:12px; border-bottom:1px solid #f8fafc; transition:background 0.15s; }
+.srch-item:last-child { border-bottom:none; }
+.srch-item:hover { background:rgba(26,58,92,0.04); }
+.srch-av   { width:36px; height:36px; border-radius:50%; flex-shrink:0; background:linear-gradient(135deg,var(--navy),var(--accent)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:0.8rem; }
+.srch-name { font-size:0.88rem; font-weight:600; color:#1e293b; }
+.srch-det  { font-size:0.75rem; color:#94a3b8; }
+
+/* ══ EMPTY STATE ══ */
+.empty { text-align:center; padding:50px 20px; }
+.empty i { font-size:3rem; color:#cbd5e1; display:block; margin-bottom:12px; }
+.empty h6 { color:#94a3b8; font-weight:600; }
+
+/* ══ MODAL ══ */
+.modal-content { border-radius:20px; border:none; box-shadow:0 20px 60px rgba(0,0,0,0.22); overflow:hidden; }
+.modal-header  { border:none; padding:22px 26px; }
+.modal-header.navy { background:linear-gradient(135deg,var(--navy),var(--navy2)); color:#fff; }
+.modal-header.gold { background:linear-gradient(135deg,var(--gold3),var(--gold)); color:var(--navy); }
+.modal-title   { font-weight:700; font-size:1rem; }
+.modal-body    { padding:24px 26px; }
+.modal-footer  { padding:16px 26px; border-top:1px solid #f1f5f9; }
+.form-label    { font-size:0.8rem; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:0.4px; margin-bottom:6px; }
+.form-control, .form-select { border-radius:10px; border:1.5px solid #e2e8f0; padding:10px 14px; font-size:0.88rem; }
+
+/* ══ AVATAR UPLOAD ══ */
+.upload-area {
+  border: 2px dashed var(--navy2);
+  border-radius: 15px;
+  padding: 30px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(26,58,92,0.05);
+}
+.upload-area:hover { background: rgba(26,58,92,0.1); border-color: var(--gold); }
+.upload-area i { font-size: 3rem; color: var(--navy2); margin-bottom: 10px; }
+.avatar-preview {
+  width: 120px; height: 120px; border-radius: 50%; object-fit: cover;
+  border: 4px solid var(--gold); margin: 0 auto 20px; display: block;
+}
+
+/* ══ HISTORY ITEMS ══ */
+.hist-item { display:flex; align-items:flex-start; gap:14px; padding:14px 0; border-bottom:1px solid #f1f5f9; }
+.hist-item:last-child { border-bottom:none; }
+.hist-dot  { width:36px; height:36px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:0.85rem; margin-top:2px; }
+.hist-dot.nom { background:rgba(232,184,75,0.15); color:var(--gold3); }
+.hist-dot.rev { background:rgba(231,76,60,0.1);  color:#c0392b; }
+.hist-name { font-size:0.88rem; font-weight:600; color:#1e293b; margin-bottom:2px; }
+.hist-desc { font-size:0.78rem; color:#94a3b8; }
+.hist-date { font-size:0.73rem; color:#cbd5e1; margin-left:auto; padding-top:3px; }
+
+/* ══ TOAST ══ */
+.t-wrap {
+  position:fixed; bottom:24px; right:24px; z-index:9999;
+  background:var(--navy); color:#fff; border-radius:14px; padding:16px 18px;
+  min-width:290px; max-width:360px;
+  box-shadow:0 10px 35px rgba(0,0,0,0.28); border:1px solid rgba(232,184,75,0.18);
+  display:flex; align-items:flex-start; gap:13px;
+  transform:translateX(130%); transition:transform 0.4s cubic-bezier(.4,0,.2,1);
+}
+.t-wrap.show { transform:translateX(0); }
+.t-ico  { width:38px; height:38px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+.t-ico.gold   { background:rgba(232,184,75,0.2);  color:var(--gold); }
+.t-ico.succ   { background:rgba(46,204,113,0.2);  color:#2ecc71; }
+.t-ico.dang   { background:rgba(231,76,60,0.2);   color:#e74c3c; }
+.t-ttl { font-weight:700; font-size:0.88rem; margin-bottom:2px; }
+.t-msg { font-size:0.8rem; color:rgba(255,255,255,0.65); }
+.t-x   { background:none; border:none; color:rgba(255,255,255,0.35); cursor:pointer; margin-left:auto; align-self:flex-start; font-size:0.95rem; }
+.t-x:hover { color:#fff; }
+.t-bar { position:absolute; bottom:0; left:0; height:3px; width:100%; background:linear-gradient(90deg,var(--gold),var(--accent)); animation:shrink 4s linear forwards; }
+
+/* ══ CHART ══ */
+.chart-box { position:relative; height:230px; }
+
+/* ══ ALERTS ══ */
+.alert { border-radius:12px; border:none; padding:13px 18px; font-size:0.88rem; }
+
+/* ══ ANIMATIONS ══ */
+@keyframes shrink { from{width:100%} to{width:0} }
+@keyframes pulseGreen { 0%{box-shadow:0 0 0 0 rgba(46,204,113,0.5)} 70%{box-shadow:0 0 0 7px rgba(46,204,113,0)} 100%{box-shadow:0 0 0 0 rgba(46,204,113,0)} }
+
+@media(max-width:1100px){ .kpi-row{grid-template-columns:repeat(2,1fr);} }
+@media(max-width:992px) { body{margin-left:0;} #sidebar{width:100%;height:auto;position:relative;} .main{padding:18px;} }
+@media(max-width:576px) { .kpi-row{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="t-wrap" id="toast">
+  <div class="t-ico gold" id="tIco"><i class="fas fa-crown"></i></div>
+  <div style="flex:1;min-width:0">
+    <div class="t-ttl" id="tTtl">Notification</div>
+    <div class="t-msg" id="tMsg">—</div>
+  </div>
+  <button class="t-x" onclick="closeToast()"><i class="fas fa-times"></i></button>
+  <div class="t-bar" id="tBar"></div>
+</div>
+
+<!-- ══ SIDEBAR ══ -->
+<div id="sidebar">
+  <div class="sb-header">
+    <div class="sb-logo">
+      <div class="sb-logo-icon"><i class="fas fa-crown"></i></div>
+      <div>
+        <div class="sb-logo-name">Direction</div>
+        <div class="sb-logo-sub">Espace directeur</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sb-user">
+    <div class="sb-avatar-wrap" onclick="openAvatarModal()">
+      <img id="sbAv" src="https://ui-avatars.com/api/?name=DIR&size=100&background=1a3a5c&color=e8b84b&bold=true" class="sb-avatar" alt="Directeur" />
+      <span class="sb-online"></span>
+    </div>
+    <div class="sb-role-pill"><i class="fas fa-crown"></i> Directeur</div>
+    <div class="sb-username" id="sbName">Directeur</div>
+    <div class="sb-email" id="sbEmail"></div>
+  </div>
+
+  <nav class="sb-nav">
+    <div class="sb-section-lbl">Navigation</div>
+    <a class="sb-link active" onclick="showSection('dashboard',this)"><i class="fas fa-tachometer-alt"></i><span>Vue d'ensemble</span></a>
+    <a class="sb-link" onclick="showSection('gestionRH',this)"><i class="fas fa-user-tie"></i><span>Responsables RH</span><span class="sb-badge" id="rhBadge">0</span></a>
+    <a class="sb-link" onclick="showSection('employes',this)"><i class="fas fa-users"></i><span>Tous les employés</span></a>
+    <div class="sb-section-lbl mt-2">Analyse</div>
+    <a class="sb-link" onclick="showSection('statistiques',this)"><i class="fas fa-chart-bar"></i><span>Statistiques globales</span></a>
+    <a class="sb-link" onclick="showSection('historique',this)"><i class="fas fa-history"></i><span>Historique nominations</span></a>
+  </nav>
+
+  <div class="sb-mini">
+    <div class="sb-mini-lbl">Aperçu rapide</div>
+    <div class="sb-mini-grid">
+      <div class="sb-mini-item"><div class="sb-mini-val" id="mEmp">0</div><div class="sb-mini-txt">Employés</div></div>
+      <div class="sb-mini-item"><div class="sb-mini-val" id="mRH">0</div><div class="sb-mini-txt">RH actifs</div></div>
+      <div class="sb-mini-item"><div class="sb-mini-val" id="mCng">0</div><div class="sb-mini-txt">Congés att.</div></div>
+      <div class="sb-mini-item"><div class="sb-mini-val" id="mRet">0</div><div class="sb-mini-txt">Retards</div></div>
+    </div>
+  </div>
+
+  <div class="sb-footer mt-auto">
+    <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
+  </div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+  <div id="alertErr" class="alert alert-danger d-none mb-3"></div>
+  <div id="alertOk" class="alert alert-success d-none mb-3"></div>
+
+  <!-- ══ DASHBOARD ══ -->
+  <div id="dashboard" class="section-container active">
+    <div class="page-hero">
+      <div>
+        <div class="hero-title">Vue d'ensemble</div>
+        <div class="hero-sub" id="heroDate">Pilotage global de l'organisation</div>
+      </div>
+      <div class="hero-icon"><i class="fas fa-crown"></i></div>
+    </div>
+
+    <div class="kpi-row">
+      <div class="kpi blue"><div class="kpi-ico-w"><i class="fas fa-users"></i></div><div class="kpi-val" id="kE">0</div><div class="kpi-lbl">Total employés</div></div>
+      <div class="kpi gold"><div class="kpi-ico-w"><i class="fas fa-user-tie"></i></div><div class="kpi-val" id="kRH">0</div><div class="kpi-lbl">Responsables RH</div></div>
+      <div class="kpi green"><div class="kpi-ico-w"><i class="fas fa-calendar-check"></i></div><div class="kpi-val" id="kCng">0</div><div class="kpi-lbl">Congés en attente</div></div>
+      <div class="kpi red"><div class="kpi-ico-w"><i class="fas fa-clock"></i></div><div class="kpi-val" id="kRet">0</div><div class="kpi-lbl">Retards ce mois</div></div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-7">
+        <div class="card">
+          <div class="card-hd">
+            <h5><i class="fas fa-user-tie"></i> Responsables RH actifs</h5>
+            <button class="btn btn-gold btn-sm" onclick="showSection('gestionRH', document.querySelectorAll('.sb-link')[1])"><i class="fas fa-arrow-right"></i> Gérer</button>
+          </div>
+          <div class="table-responsive">
+            <table class="table mb-0">
+              <thead><tr><th>Nom</th><th>Email</th><th>Poste</th><th>Depuis</th><th></th></tr></thead>
+              <tbody id="dashRHTbl"><tr><td colspan="5" class="text-center py-4 text-muted">Chargement...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="card">
+          <div class="card-hd"><h5><i class="fas fa-history"></i> Dernières actions</h5></div>
+          <div class="card-bd" id="dashHist"><div class="empty"><i class="fas fa-history"></i><h6>Aucune action récente</h6></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ GESTION RH ══ -->
+  <div id="gestionRH" class="section-container">
+    <div class="page-hero">
+      <div><div class="hero-title">Responsables RH</div><div class="hero-sub">Nommer et gérer les responsables RH</div></div>
+      <div class="hero-icon"><i class="fas fa-user-tie"></i></div>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+      <span style="font-size:0.9rem;color:#64748b;font-weight:500;"><span id="rhCount">0</span> responsable(s) RH actif(s)</span>
+      <div class="d-flex gap-2">
+        <button class="btn btn-gold" data-bs-toggle="modal" data-bs-target="#nomModal"><i class="fas fa-plus-circle"></i> Nommer un RH</button>
+        <button class="btn btn-succ" data-bs-toggle="modal" data-bs-target="#createRHModal"><i class="fas fa-user-plus"></i> Créer + RH</button>
+      </div>
+    </div>
+    <div class="rh-grid" id="rhGrid">
+      <div class="empty" style="grid-column:1/-1"><i class="fas fa-user-tie"></i><h6>Aucun responsable RH</h6><p>Cliquez sur "Nommer" pour commencer.</p></div>
+    </div>
+  </div>
+
+  <!-- ══ EMPLOYÉS ══ -->
+  <div id="employes" class="section-container">
+    <div class="page-hero">
+      <div><div class="hero-title">Tous les employés</div><div class="hero-sub">Consultation et gestion de l'effectif</div></div>
+      <div class="hero-icon"><i class="fas fa-users"></i></div>
+    </div>
+    <div class="filter-bar">
+      <div><label>Rechercher</label><input type="text" id="sEmp" class="form-control" placeholder="Nom ou email..." oninput="filterEmps()" style="min-width:220px;" /></div>
+      <div><label>Rôle</label><select id="fRole" class="form-select" onchange="filterEmps()"><option value="">Tous</option><option value="employe">Employé</option><option value="responsable_rh">Responsable RH</option><option value="directeur">Directeur</option></select></div>
+      <div><label>Poste</label><select id="fPoste" class="form-select" onchange="filterEmps()"><option value="">Tous les postes</option></select></div>
+      <div class="ms-auto">
+        <button class="btn btn-ghost btn-sm" onclick="resetFilters()"><i class="fas fa-undo-alt"></i> Réinitialiser</button>
+        <button class="btn btn-navy btn-sm" onclick="exportEmployesCSV()"><i class="fas fa-file-csv"></i> Exporter CSV</button>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="table">
+        <thead><tr><th>ID</th><th>Nom</th><th>Email</th><th>Poste</th><th>Rôle</th><th>Actions</th></tr></thead>
+        <tbody id="empTbl"><tr><td colspan="6" class="text-center py-4 text-muted">Chargement...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ STATISTIQUES ══ -->
+  <div id="statistiques" class="section-container">
+    <div class="page-hero">
+      <div><div class="hero-title">Statistiques globales</div><div class="hero-sub">Vue analytique de l'organisation</div></div>
+      <div class="hero-icon"><i class="fas fa-chart-bar"></i></div>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-6"><div class="card"><div class="card-hd"><h5><i class="fas fa-briefcase"></i> Répartition par poste</h5></div><div class="card-bd"><div class="chart-box"><canvas id="cPoste"></canvas></div></div></div></div>
+      <div class="col-md-6"><div class="card"><div class="card-hd"><h5><i class="fas fa-user-shield"></i> Répartition des rôles</h5></div><div class="card-bd"><div class="chart-box"><canvas id="cRole"></canvas></div></div></div></div>
+      <div class="col-md-6"><div class="card"><div class="card-hd"><h5><i class="fas fa-calendar-alt"></i> Statut des congés</h5></div><div class="card-bd"><div class="chart-box"><canvas id="cConge"></canvas></div></div></div></div>
+      <div class="col-md-6"><div class="card"><div class="card-hd"><h5><i class="fas fa-user-tie"></i> RH vs Employés</h5></div><div class="card-bd"><div class="chart-box"><canvas id="cRHEmp"></canvas></div></div></div></div>
+    </div>
+  </div>
+
+  <!-- ══ HISTORIQUE ══ -->
+  <div id="historique" class="section-container">
+    <div class="page-hero">
+      <div><div class="hero-title">Historique des nominations</div><div class="hero-sub">Journal de toutes les nominations et révocations</div></div>
+      <div class="hero-icon"><i class="fas fa-history"></i></div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><h5><i class="fas fa-list"></i> Journal des actions</h5><button class="btn btn-ghost btn-sm" onclick="renderHistorique()"><i class="fas fa-sync-alt"></i> Actualiser</button></div>
+      <div class="card-bd" id="histList"><div class="empty"><i class="fas fa-history"></i><h6>Aucune action</h6></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL NOMMER RH ══ -->
+<div class="modal fade" id="nomModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header gold">
+        <h5 class="modal-title"><i class="fas fa-crown me-2"></i>Nommer un Responsable RH</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-warning mb-3"><i class="fas fa-info-circle me-2"></i>Seuls les employés sans rôle RH peuvent être nommés.</div>
+        <div class="mb-3 srch-wrap">
+          <label class="form-label">Rechercher un employé</label>
+          <input type="text" id="nomSrch" class="form-control" placeholder="Tapez un nom ou email..." oninput="searchForNom()" autocomplete="off" />
+          <div class="srch-res" id="nomRes"></div>
+        </div>
+        <div id="nomPreview" style="display:none;">
+          <div style="background:#f8fafc;border-radius:12px;padding:16px;border:1.5px solid #e2e8f0;display:flex;align-items:center;gap:14px;">
+            <div class="srch-av" id="nomPrevAv">?</div>
+            <div>
+              <div style="font-weight:700;color:#1e293b;font-size:0.92rem;" id="nomPrevNom">—</div>
+              <div style="font-size:0.78rem;color:#94a3b8;" id="nomPrevEmail">—</div>
+              <div style="font-size:0.75rem;color:#64748b;margin-top:3px;" id="nomPrevPoste">—</div>
+            </div>
+            <button type="button" onclick="clearNomSel()" style="margin-left:auto;background:none;border:none;color:#94a3b8;cursor:pointer;"><i class="fas fa-times"></i></button>
+          </div>
+        </div>
+        <input type="hidden" id="nomEmpId" />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-gold" onclick="nommerRH()"><i class="fas fa-crown me-1"></i> Confirmer la nomination</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL CRÉER EMPLOYÉ + RH ══ -->
+<div class="modal fade" id="createRHModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header gold">
+        <h5 class="modal-title"><i class="fas fa-user-plus me-2"></i>Créer un employé et le nommer RH</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="createRHForm">
+          <div class="row">
+            <div class="col-md-6 mb-3"><label class="form-label">Nom *</label><input type="text" id="newRhNom" class="form-control" required></div>
+            <div class="col-md-6 mb-3"><label class="form-label">Prénom *</label><input type="text" id="newRhPrenom" class="form-control" required></div>
+          </div>
+          <div class="mb-3"><label class="form-label">Email *</label><input type="email" id="newRhEmail" class="form-control" required></div>
+          <div class="mb-3"><label class="form-label">Téléphone</label><input type="tel" id="newRhTel" class="form-control"></div>
+          <div class="mb-3"><label class="form-label">Poste *</label><select id="newRhPoste" class="form-control" required><option value="">Sélectionner un poste</option></select></div>
+          <div class="mb-3"><label class="form-label">Mot de passe *</label><input type="password" id="newRhMdp" class="form-control" minlength="8" required></div>
+          <div class="alert alert-info"><i class="fas fa-info-circle me-2"></i>Cet employé sera automatiquement nommé Responsable RH après sa création.</div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-gold" onclick="createAndNominateRH()"><i class="fas fa-check-circle me-1"></i> Créer et nommer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL RÉVOQUER RH ══ -->
+<div class="modal fade" id="revModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header navy">
+        <h5 class="modal-title"><i class="fas fa-user-minus me-2"></i>Révoquer le Responsable RH</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-danger mb-3"><i class="fas fa-exclamation-triangle me-2"></i>Cet employé repassera au rôle "Employé" standard.</div>
+        <div style="background:#f8fafc;border-radius:12px;padding:16px;border:1.5px solid #e2e8f0;display:flex;align-items:center;gap:14px;">
+          <div class="srch-av" id="revAv" style="background:linear-gradient(135deg,#c0392b,#e74c3c);">?</div>
+          <div><div style="font-weight:700;color:#1e293b;" id="revNom">—</div><div style="font-size:0.78rem;color:#94a3b8;" id="revEmail">—</div></div>
+        </div>
+        <input type="hidden" id="revId" />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-dang" onclick="revoquerRH()"><i class="fas fa-user-minus me-1"></i> Révoquer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL PHOTO DE PROFIL ══ -->
+<div class="modal fade" id="avatarModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header gold">
+        <h5 class="modal-title"><i class="fas fa-camera me-2"></i>Photo de profil</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center mb-4"><img src="https://ui-avatars.com/api/?name=DIR&size=150&background=1a3a5c&color=e8b84b&bold=true" class="avatar-preview" id="avatarPreview" alt="Aperçu"></div>
+        <form id="avatarForm" enctype="multipart/form-data">
+          <div class="upload-area" onclick="document.getElementById('avatarInput').click()">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <h6 class="mt-3">Cliquez pour choisir une photo</h6>
+            <p class="text-muted small">PNG, JPG, JPEG (max 2 Mo)</p>
+            <input type="file" id="avatarInput" name="photo" accept="image/png,image/jpeg,image/jpg" style="display:none;" onchange="previewAvatar(this)">
+          </div>
+          <div class="mt-4 d-flex gap-2">
+            <button type="button" class="btn btn-dang flex-grow-1" onclick="deleteAvatar()"><i class="fas fa-trash-alt me-2"></i>Supprimer</button>
+            <button type="submit" class="btn btn-gold flex-grow-1"><i class="fas fa-save me-2"></i>Enregistrer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL DÉTAIL EMPLOYÉ ══ -->
+<div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header navy">
+        <h5 class="modal-title"><i class="fas fa-user me-2"></i>Profil employé</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center mb-4">
+          <div id="dAv" style="width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--accent));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.4rem;margin:0 auto 12px;">?</div>
+          <div style="font-size:1.05rem;font-weight:700;color:#1e293b;" id="dNom">—</div>
+          <div style="font-size:0.82rem;color:#94a3b8;" id="dEmail">—</div>
+        </div>
+        <div class="row g-3">
+          <div class="col-6"><div style="background:#f8fafc;border-radius:10px;padding:13px;"><div style="font-size:0.69rem;text-transform:uppercase;color:#94a3b8;font-weight:700;">Poste</div><div style="font-weight:600;color:#1e293b;" id="dPoste">—</div></div></div>
+          <div class="col-6"><div style="background:#f8fafc;border-radius:10px;padding:13px;"><div style="font-size:0.69rem;text-transform:uppercase;color:#94a3b8;font-weight:700;">Rôle</div><div id="dRole">—</div></div></div>
+          <div class="col-6"><div style="background:#f8fafc;border-radius:10px;padding:13px;"><div style="font-size:0.69rem;text-transform:uppercase;color:#94a3b8;font-weight:700;">Téléphone</div><div style="font-weight:600;color:#1e293b;" id="dTel">—</div></div></div>
+          <div class="col-6"><div style="background:#f8fafc;border-radius:10px;padding:13px;"><div style="font-size:0.69rem;text-transform:uppercase;color:#94a3b8;font-weight:700;">ID</div><div style="font-weight:600;color:#1e293b;" id="dId">—</div></div></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" data-bs-dismiss="modal">Fermer</button>
+        <button type="button" class="btn btn-gold" id="btnNomDet" onclick="nommerDepuisDetail()"><i class="fas fa-crown me-1"></i> Nommer RH</button>
+        <button type="button" class="btn btn-dang" id="btnRevDet" onclick="revoquerDepuisDetail()" style="display:none;"><i class="fas fa-user-minus me-1"></i> Révoquer RH</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+
+</script>
+</body>
+</html>

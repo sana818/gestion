@@ -1,0 +1,47 @@
+@startuml
+left to right direction
+actor "Employé" as User
+actor "Directeur" as Admin
+rectangle "Système Gestion Congés" {
+  (S'inscrire) as UC_Signup
+  (Se connecter) as UC_Login
+  (Consulter profil) as UC_Profile
+  (Modifier profil) as UC_EditProfile
+  (Demander un congé) as UC_RequestLeave
+  (Consulter état de congé) as UC_CheckLeave
+  
+  (Consulter employé) as UC_ViewUsers
+  (Ajouter employé) as UC_AddUser
+  (Modifier employé) as UC_EditUser
+  (Supprimer employé) as UC_DeleteUser
+  (Filtrer employé par poste) as UC_FilterUsers
+  
+  (Consulter demandes de congé) as UC_ViewLeaves
+  (Traiter demande) as UC_ProcessLeave
+}
+
+' Relations Utilisateur
+User --> UC_Login
+User --> UC_Profile
+User --> UC_EditProfile
+User --> UC_RequestLeave
+User --> UC_CheckLeave
+
+' Relations Admin
+Admin --> UC_Login
+Admin --> UC_ViewUsers
+Admin --> UC_AddUser
+Admin --> UC_EditUser
+Admin --> UC_DeleteUser
+Admin --> UC_FilterUsers
+Admin --> UC_ViewLeaves
+Admin --> UC_ProcessLeave
+
+' Relations include/extend
+UC_RequestLeave .> UC_ProcessLeave : <<extend>>
+UC_EditUser .> UC_ViewUsers : <<include>>
+UC_DeleteUser .> UC_ViewUsers : <<include>>
+UC_FilterUsers .> UC_ViewUsers : <<include>>
+UC_EditProfile .> UC_Profile : <<include>>
+
+@enduml

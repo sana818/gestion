@@ -1,0 +1,87 @@
+[04-Apr-2026 13:04:49 Europe/Berlin] PHP Fatal error:  Uncaught Error: Class 'Database' not found in C:\xampp\htdocs\gestion\justificatif.php:115
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\gestion\justificatif.php on line 115
+[04-Apr-2026 13:06:34 Europe/Berlin] PHP Fatal error:  Uncaught Error: Class 'Database' not found in C:\xampp\htdocs\gestion\justificatif.php:115
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\gestion\justificatif.php on line 115
+[04-Apr-2026 13:08:36 Europe/Berlin] PHP Fatal error:  Uncaught Error: Class 'Database' not found in C:\xampp\htdocs\gestion\justificatif.php:72
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\gestion\justificatif.php on line 72
+[04-Apr-2026 13:11:00 Europe/Berlin] PHP Fatal error:  Uncaught Error: Class 'Database' not found in C:\xampp\htdocs\gestion\justificatif.php:115
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\gestion\justificatif.php on line 115
+[04-Apr-2026 13:24:43 Europe/Berlin] PHP Fatal error:  Uncaught Error: Class 'Database' not found in C:\xampp\htdocs\gestion\justificatif.php:69
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\gestion\justificatif.php on line 69
+[04-Apr-2026 13:26:08 Europe/Berlin] PHP Fatal error:  Uncaught Error: Class 'Database' not found in C:\xampp\htdocs\gestion\justificatif.php:82
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\gestion\justificatif.php on line 82
+[04-Apr-2026 13:28:47 Europe/Berlin] [justificatif.php] Démarrage du script
+[04-Apr-2026 13:28:47 Europe/Berlin] [justificatif.php] Imports OK
+[04-Apr-2026 13:28:47 Europe/Berlin] [justificatif.php] JWT trouvé: OUI
+[04-Apr-2026 13:28:47 Europe/Berlin] [justificatif.php] JWT décodé, ID=11
+[04-Apr-2026 13:28:47 Europe/Berlin] [justificatif.php] Méthode GET
+[04-Apr-2026 13:28:47 Europe/Berlin] PHP Fatal error:  Uncaught Error: Class 'Database' not found in C:\xampp\htdocs\gestion\justificatif.php:85
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\gestion\justificatif.php on line 85
+[04-Apr-2026 13:30:39 Europe/Berlin] [justificatif.php] Démarrage du script
+[04-Apr-2026 13:30:39 Europe/Berlin] [justificatif.php] Imports OK
+[04-Apr-2026 13:30:39 Europe/Berlin] [justificatif.php] JWT trouvé: NON
+[04-Apr-2026 13:33:11 Europe/Berlin] [justificatif.php] Démarrage du script
+[04-Apr-2026 13:33:11 Europe/Berlin] [justificatif.php] Imports OK
+[04-Apr-2026 13:33:11 Europe/Berlin] [justificatif.php] JWT trouvé: NON
+[04-Apr-2026 13:33:12 Europe/Berlin] [justificatif.php] Démarrage du script
+[04-Apr-2026 13:33:12 Europe/Berlin] [justificatif.php] Imports OK
+[04-Apr-2026 13:33:12 Europe/Berlin] [justificatif.php] JWT trouvé: NON
+[04-Apr-2026 13:34:07 Europe/Berlin] [justificatif.php] Démarrage du script
+[04-Apr-2026 13:34:07 Europe/Berlin] [justificatif.php] Imports OK
+[04-Apr-2026 13:34:07 Europe/Berlin] [justificatif.php] JWT trouvé: NON
+[04-Apr-2026 13:34:31 Europe/Berlin] [justificatif.php] Démarrage du script
+[04-Apr-2026 13:34:31 Europe/Berlin] [justificatif.php] Imports OK
+[04-Apr-2026 13:34:31 Europe/Berlin] [justificatif.php] JWT trouvé: OUI
+[04-Apr-2026 13:34:31 Europe/Berlin] [justificatif.php] JWT décodé, ID=11
+[04-Apr-2026 13:34:31 Europe/Berlin] [justificatif.php] Méthode GET
+[04-Apr-2026 13:34:31 Europe/Berlin] PHP Fatal error:  Uncaught Error: Class 'Database' not found in C:\xampp\htdocs\gestion\justificatif.php:85
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\gestion\justificatif.php on line 85
+[04-Apr-2026 13:35:28 Europe/Berlin] [justificatif.php] Démarrage du script
+[04-Apr-2026 13:35:28 Europe/Berlin] [justificatif.php] Imports OK
+[04-Apr-2026 13:35:28 Europe/Berlin] [justificatif.php] JWT trouvé: NON
+[04-Apr-2026 13:36:09 Europe/Berlin] [justificatif.php] Démarrage du script
+[04-Apr-2026 13:36:09 Europe/Berlin] [justificatif.php] Imports OK
+[04-Apr-2026 13:36:09 Europe/Berlin] [justificatif.php] JWT trouvé: NON
+[04-Apr-2026 13:37:54 Europe/Berlin] [justificatif.php] Démarrage du script
+[04-Apr-2026 13:37:54 Europe/Berlin] [justificatif.php] Imports OK
+[04-Apr-2026 13:37:54 Europe/Berlin] [justificatif.php] JWT trouvé: NON
+[04-Apr-2026 13:37:55 Europe/Berlin] [justificatif.php] Démarrage du script
+[04-Apr-2026 13:37:55 Europe/Berlin] [justificatif.php] Imports OK
+[04-Apr-2026 13:37:55 Europe/Berlin] [justificatif.php] JWT trouvé: NON
+[04-Apr-2026 13:37:57 Europe/Berlin] [justificatif.php] Démarrage du script
+[04-Apr-2026 13:37:57 Europe/Berlin] [justificatif.php] Imports OK
+[04-Apr-2026 13:37:57 Europe/Berlin] [justificatif.php] JWT trouvé: OUI
+[04-Apr-2026 13:37:57 Europe/Berlin] [justificatif.php] JWT décodé, ID=11
+[04-Apr-2026 13:37:57 Europe/Berlin] [justificatif.php] Méthode GET
+[04-Apr-2026 13:37:57 Europe/Berlin] PHP Fatal error:  Uncaught Error: Class 'Database' not found in C:\xampp\htdocs\gestion\justificatif.php:85
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\gestion\justificatif.php on line 85
+[04-Apr-2026 13:55:07 Europe/Berlin] [justificatif.php] Démarrage du script
+[04-Apr-2026 13:55:07 Europe/Berlin] [justificatif.php] Imports OK
+[04-Apr-2026 13:55:07 Europe/Berlin] [justificatif.php] JWT trouvé: NON
+[04-Apr-2026 13:55:08 Europe/Berlin] [justificatif.php] Démarrage du script
+[04-Apr-2026 13:55:08 Europe/Berlin] [justificatif.php] Imports OK
+[04-Apr-2026 13:55:08 Europe/Berlin] [justificatif.php] JWT trouvé: NON
+[04-Apr-2026 13:59:38 Europe/Berlin] [justificatif.php] Démarrage du script
+[04-Apr-2026 13:59:38 Europe/Berlin] [justificatif.php] Imports OK
+[04-Apr-2026 13:59:38 Europe/Berlin] [justificatif.php] JWT trouvé: NON
+[04-Apr-2026 13:59:39 Europe/Berlin] [justificatif.php] Démarrage du script
+[04-Apr-2026 13:59:39 Europe/Berlin] [justificatif.php] Imports OK
+[04-Apr-2026 13:59:39 Europe/Berlin] [justificatif.php] JWT trouvé: NON

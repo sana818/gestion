@@ -1,0 +1,87 @@
+@startuml
+left to right direction
+
+' --- Style clair et lisible ---
+skinparam monochrome false
+skinparam shadowing false
+skinparam classBackgroundColor white
+skinparam classBorderColor black
+skinparam classFontColor black
+skinparam classFontSize 14
+skinparam classAttributeFontSize 12
+skinparam arrowColor black
+
+' Désactive les icônes devant + et -
+skinparam classAttributeIconSize 0
+
+hide circle
+hide empty members
+
+' --- Classes principales ---
+class Utilisateur {
+  - id: Integer
+  - nom: String
+  - email: String
+  + seConnecter()
+  + seDeconnecter()
+}
+
+class Employe {
+  - dateNaissance: Date
+  - telephone: String
+  - poste: String
+  - dateEmbauche: Date
+  - soldeConge: Integer
+  + faireDemandeConge()
+  + consulterSolde()
+  + consulterNotifications()
+}
+
+class ResponsableRH {
+  + gererEmployes()
+  + consulterDemandes()
+  + traiterDemande()
+  + consulterNotifications()
+}
+
+class DemandeConge {
+  - id: Integer
+  - dateDebut: Date
+  - dateFin: Date
+  - type: String
+  - statut: String
+  - commentaire: String
+  + creerDemande()
+  + modifierStatut()
+}
+
+class Notification {
+  - id: Integer
+  - message: String
+  - dateEnvoi: DateTime
+  - lu: Boolean
+  + envoyer()
+  + marquerCommeLue()
+}
+
+class SoldeConge {
+  - id: Integer
+  - joursTotal: Integer
+  - joursUtilises: Integer
+  - joursRestants: Integer
+  + calculerSolde()
+  + mettreAJour()
+}
+
+' --- Héritage ---
+Utilisateur <|-- Employe
+Utilisateur <|-- ResponsableRH
+
+' --- Relations ---
+Employe "1" --> "0..*" DemandeConge : fait
+ResponsableRH "1" --> "0..*" DemandeConge : traite
+DemandeConge "1" --> "0..*" Notification : génère
+Utilisateur "1" --> "0..*" Notification : reçoit
+Employe "1" --> "1" SoldeConge : possède
+
+@enduml
